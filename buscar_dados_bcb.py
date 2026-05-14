@@ -652,4 +652,3 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         print("\n" + "=" * 60)
-        input("Pressione Enter para fechar...")
