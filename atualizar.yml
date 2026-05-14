@@ -1,4 +1,4 @@
-name: Atualizar Painel USD/BRL
+name: .github/workflows/atualizar.yml
 
 on:
   schedule:
