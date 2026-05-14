@@ -1,10 +1,9 @@
-name: .github/workflows/atualizar.yml
+name: Atualizar Painel USD/BRL
 
 on:
   schedule:
-    # Roda de segunda a sexta às 18h (horário de Brasília = 21h UTC)
-    - cron: '0 21 * * 1-5'
-  workflow_dispatch: # permite rodar manualmente pelo GitHub
+    - cron: '1 16 * * *'
+  workflow_dispatch:
 
 jobs:
   gerar-painel:
