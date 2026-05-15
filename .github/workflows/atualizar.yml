@@ -2,7 +2,7 @@ name: Atualizar Painel USD/BRL
 
 on:
   schedule:
-    - cron: '1 16 * * *'
+    - cron: '0 17 * * 1-5'
   workflow_dispatch:
 
 jobs:
