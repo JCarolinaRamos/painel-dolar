@@ -96,23 +96,23 @@ def buscar_focus():
 
     try:
         indicadores = {
-            "Cambio":      ("cambio_2026",  "cambio_2027",  "cambio_2028"),
-            "IPCA":        ("ipca_2026",    None,           None),
-            "Selic":       ("selic_2026",   None,           None),
+            "C%C3%A2mbio": ("cambio_2026",  "cambio_2027",  "cambio_2028"),
+            "IPCA":         ("ipca_2026",    None,           None),
+            "Selic":        ("selic_2026",   None,           None),
         }
 
         ano_atual = datetime.today().year
         data_corte = (datetime.today().replace(day=1)).strftime("%Y-%m-%d")
 
         for indicador, campos in indicadores.items():
-            params = {
-                "$filter": f"Indicador eq '{indicador}' and Data ge '{data_corte}'",
-                "$orderby": "Data desc",
-                "$top": 10,
-                "$format": "json",
-                "$select": "Indicador,Data,Mediana,DataReferencia"
-            }
-            r = requests.get(url, params=params, headers=headers, timeout=30)
+            # Monta URL manualmente para evitar dupla codificacao do acento
+            url_req = (
+                f"{url}?$filter=Indicador%20eq%20%27{indicador}%27"
+                f"%20and%20Data%20ge%20%27{data_corte}%27"
+                f"&$orderby=Data%20desc&$top=10&$format=json"
+                f"&$select=Indicador,Data,Mediana,DataReferencia"
+            )
+            r = requests.get(url_req, headers=headers, timeout=30)
             r.raise_for_status()
             dados = r.json().get("value", [])
 
@@ -700,15 +700,11 @@ if __name__ == "__main__":
     print("=" * 60)
     print("  Painel USD/BRL - Banco Central do Brasil")
     print("=" * 60)
-    try:
-        try:
-            import requests
-        except ImportError:
-            print("\n[ERRO] Biblioteca requests nao encontrada.")
-            print("   Execute: pip install requests")
-            input("\nPressione Enter para fechar...")
-            sys.exit(1)
 
+    # Detecta se esta rodando em ambiente CI (GitHub Actions)
+    is_ci = os.environ.get("CI", "false").lower() == "true"
+
+    try:
         diarios = buscar_ptax()
         mensal, ultimo = agrupar_por_mes(diarios)
         focus = buscar_focus()
@@ -721,8 +717,6 @@ if __name__ == "__main__":
 
         html = gerar_html(mensal, ultimo, len(diarios), focus)
 
-        # Quando empacotado pelo PyInstaller, usa a pasta do .exe
-        # Quando rodado como .py, usa a pasta do script
         if getattr(sys, 'frozen', False):
             pasta = os.path.dirname(sys.executable)
         else:
@@ -735,19 +729,17 @@ if __name__ == "__main__":
         print(f"\n[OK] Painel gerado: {caminho}")
         print(f"     {len(diarios):,} cotacoes -> {len(mensal)} medias mensais")
         print(f"     Ultima cotacao: {ultimo['dataHoraCotacao'][:10]} - R$ {ultimo['cotacaoVenda']:.4f}")
-        print(f"\n     Abrindo no navegador...")
 
-        webbrowser.open(f"file:///{caminho.replace(os.sep, '/')}")
+        if not is_ci:
+            print(f"\n     Abrindo no navegador...")
+            import webbrowser
+            webbrowser.open(f"file:///{caminho.replace(os.sep, '/')}")
 
-    except requests.exceptions.ConnectionError:
-        print("\n[ERRO] Sem conexao com a internet ou API do BCB indisponivel.")
-    except requests.exceptions.Timeout:
-        print("\n[ERRO] Timeout: a API do BCB demorou demais para responder.")
-    except requests.exceptions.HTTPError as e:
-        print(f"\n[ERRO] HTTP: {e}")
     except Exception as e:
         print(f"\n[ERRO] Inesperado: {e}")
         traceback.print_exc()
+        sys.exit(1)
     finally:
         print("\n" + "=" * 60)
-        input("Pressione Enter para fechar...")
+        if not is_ci:
+            input("Pressione Enter para fechar...")
