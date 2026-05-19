@@ -77,14 +77,104 @@ def agrupar_por_mes(dados):
     print(f"[BCB] Ultimo dado: {ultimo['dataHoraCotacao'][:10]} - R$ {ultimo['cotacaoVenda']:.4f}")
     return mensal, ultimo
 
-def gerar_html(mensal, ultimo, total_diarios):
-    data_geracao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    ultimo_dt    = datetime.strptime(ultimo["dataHoraCotacao"][:10], "%Y-%m-%d").strftime("%d/%m/%Y")
-    ultimo_val   = f"{ultimo['cotacaoVenda']:.4f}"
-    media_mes    = f"{mensal[-1]['v']:.4f}"
-    dados_js     = json.dumps(mensal, ensure_ascii=False)
-    proj_js      = json.dumps(SERIES_PROJ, ensure_ascii=False)
-    cores_js     = json.dumps(CORES, ensure_ascii=False)
+def buscar_focus():
+    """Busca os dados mais recentes do Boletim Focus via API do BCB."""
+    url = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativaMercadoAnuais"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; PainelBCB/1.0)",
+        "Accept": "application/json"
+    }
+
+    # Valores fallback caso a API falhe
+    focus = {
+        "cambio_2026": 5.20, "cambio_2027": 5.30, "cambio_2028": 5.35,
+        "ipca_2026": 4.92, "selic_2026": 13.00,
+        "data_focus": "18/mai/2026"
+    }
+
+    MESES_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+
+    try:
+        indicadores = {
+            "Cambio":      ("cambio_2026",  "cambio_2027",  "cambio_2028"),
+            "IPCA":        ("ipca_2026",    None,           None),
+            "Selic":       ("selic_2026",   None,           None),
+        }
+
+        ano_atual = datetime.today().year
+        data_corte = (datetime.today().replace(day=1)).strftime("%Y-%m-%d")
+
+        for indicador, campos in indicadores.items():
+            params = {
+                "$filter": f"Indicador eq '{indicador}' and Data ge '{data_corte}'",
+                "$orderby": "Data desc",
+                "$top": 10,
+                "$format": "json",
+                "$select": "Indicador,Data,Mediana,DataReferencia"
+            }
+            r = requests.get(url, params=params, headers=headers, timeout=30)
+            r.raise_for_status()
+            dados = r.json().get("value", [])
+
+            # Pega última data disponível
+            if not dados:
+                continue
+
+            ultima_data = dados[0]["Data"]
+
+            # Filtra apenas registros da última data
+            recentes = [d for d in dados if d["Data"] == ultima_data]
+
+            # Formata data do Focus
+            dt = datetime.strptime(ultima_data, "%Y-%m-%d")
+            focus["data_focus"] = f"{dt.day:02d}/{MESES_PT[dt.month-1]}/{dt.year}"
+
+            for row in recentes:
+                ano_ref = str(row.get("DataReferencia", ""))[:4]
+                mediana = row.get("Mediana")
+                if mediana is None:
+                    continue
+                mediana = round(float(mediana), 2)
+
+                if ano_ref == str(ano_atual) and campos[0]:
+                    focus[campos[0]] = mediana
+                elif ano_ref == str(ano_atual + 1) and campos[1]:
+                    focus[campos[1]] = mediana
+                elif ano_ref == str(ano_atual + 2) and campos[2]:
+                    focus[campos[2]] = mediana
+
+        print(f"[Focus] Dados obtidos com sucesso ({focus['data_focus']}):")
+        print(f"        Cambio {ano_atual}: R$ {focus['cambio_2026']:.2f} | "
+              f"{ano_atual+1}: R$ {focus['cambio_2027']:.2f} | "
+              f"{ano_atual+2}: R$ {focus['cambio_2028']:.2f}")
+        print(f"        IPCA {ano_atual}: {focus['ipca_2026']:.2f}% | "
+              f"Selic {ano_atual}: {focus['selic_2026']:.2f}%")
+
+    except Exception as e:
+        print(f"[Focus] Aviso: nao foi possivel buscar dados ({e}). Usando valores fallback.")
+
+    return focus
+
+
+def gerar_html(mensal, ultimo, total_diarios, focus):
+    data_geracao   = datetime.now().strftime("%d/%m/%Y %H:%M")
+    ultimo_dt      = datetime.strptime(ultimo["dataHoraCotacao"][:10], "%Y-%m-%d").strftime("%d/%m/%Y")
+    ultimo_val     = f"{ultimo['cotacaoVenda']:.4f}"
+    media_mes      = f"{mensal[-1]['v']:.4f}"
+    dados_js       = json.dumps(mensal, ensure_ascii=False)
+    proj_js        = json.dumps(SERIES_PROJ, ensure_ascii=False)
+    cores_js       = json.dumps(CORES, ensure_ascii=False)
+
+    # Dados do Focus
+    f_cambio_26    = f"{focus['cambio_2026']:.2f}".replace(".", ",")
+    f_cambio_27    = f"{focus['cambio_2027']:.2f}".replace(".", ",")
+    f_cambio_28    = f"{focus['cambio_2028']:.2f}".replace(".", ",")
+    f_ipca_26      = f"{focus['ipca_2026']:.2f}".replace(".", ",")
+    f_selic_26     = f"{focus['selic_2026']:.2f}".replace(".", ",")
+    f_data_focus   = focus["data_focus"]
+    f_cambio_26_f  = focus['cambio_2026']   # float para JS
+    f_cambio_27_f  = focus['cambio_2027']
+    f_cambio_28_f  = focus['cambio_2028']
 
     html = f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -206,8 +296,8 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
   </div>
   <div class="card">
     <div class="cl">Focus dez/26</div>
-    <div class="cv">R$ 5,20</div>
-    <div class="cs">Boletim Focus · 11/mai/2026</div>
+    <div class="cv">R$ {f_cambio_26}</div>
+    <div class="cs">Boletim Focus · {f_data_focus}</div>
   </div>
 </div>
 
@@ -250,10 +340,10 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
   <div class="igrid">
     <div class="ic">
       <div class="in"><div class="idot" style="background:#888780"></div>Focus - BCB</div>
-      <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,20</span></div>
-      <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,30</span></div>
-      <div class="ir"><span class="irl">2028</span><span class="irv">R$ 5,35</span></div>
-      <div class="inote">Mediana de mercado · Boletim Focus 11/mai/2026</div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ {f_cambio_26}</span></div>
+      <div class="ir"><span class="irl">2027</span><span class="irv">R$ {f_cambio_27}</span></div>
+      <div class="ir"><span class="irl">2028</span><span class="irv">R$ {f_cambio_28}</span></div>
+      <div class="inote">Mediana de mercado · Boletim Focus {f_data_focus}</div>
     </div>
     <div class="ic">
       <div class="in"><div class="idot" style="background:#e67e22"></div>XP Investimentos</div>
@@ -286,9 +376,9 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
     <div class="ic hl">
       <div class="in"><div class="idot" style="background:#1a5fa8"></div>Focus dez/2026</div>
       <div class="ir"><span class="irl">Minimo</span><span class="irv dn">R$ 5,00</span></div>
-      <div class="ir"><span class="irl">Mediana</span><span class="irv">R$ 5,15</span></div>
+      <div class="ir"><span class="irl">Mediana</span><span class="irv">R$ {f_cambio_26}</span></div>
       <div class="ir"><span class="irl">Maximo</span><span class="irv up">R$ 5,60</span></div>
-      <div class="inote">5 instituicoes · relatorios mai/2026</div>
+      <div class="inote">5 instituicoes · relatorios {f_data_focus}</div>
     </div>
   </div>
   <div class="leg">
@@ -400,7 +490,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#888780"></div>
-            <span class="inst-nome">Focus BCB &mdash; R$ 5,20</span>
+            <span class="inst-nome">Focus BCB &mdash; R$ {f_cambio_26}</span>
             <span class="inst-proj">Mediana de mercado</span>
           </div>
           <div class="inst-reason-texto">
@@ -442,14 +532,14 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
           </div>
           <div class="monitor-item">
             <div class="monitor-label">IPCA 2026</div>
-            <div class="monitor-val">4,91%</div>
+            <div class="monitor-val">{f_ipca_26}%</div>
             <div class="monitor-sub">9a alta consecutiva</div>
           </div>
         </div>
         <div style="margin-top:14px;">
           <strong>Nivel critico a observar:</strong><br>
           <span class="tag tag-baixo">R$ 4,80 &mdash; suporte forte</span>
-          <span class="tag tag-medio">R$ 5,20 &mdash; resistencia Focus</span>
+          <span class="tag tag-medio">R$ {f_cambio_26} &mdash; resistencia Focus</span>
           <span class="tag tag-alto">R$ 5,60 &mdash; pico eleitoral (MS)</span>
         </div>
       </div>
@@ -490,7 +580,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
 
 <div class="foot">
   Fonte: API PTAX Banco Central do Brasil (olinda.bcb.gov.br) · {total_diarios:,} cotacoes diarias · 
-  Ultimo dado: {ultimo_dt} · Analise narrativa baseada em relatorios publicos de mai/2026 (XP, Bradesco, Itau, Morgan Stanley, BTG, Focus BCB, Rico, Suno) · 
+  Ultimo dado: {ultimo_dt} · Analise narrativa baseada em relatorios publicos (XP, Bradesco, Itau, Morgan Stanley, BTG, Focus BCB, Rico, Suno) · 
   Gerado em {data_geracao} · Nao constitui recomendacao de investimento.
 </div>
 
@@ -621,7 +711,15 @@ if __name__ == "__main__":
 
         diarios = buscar_ptax()
         mensal, ultimo = agrupar_por_mes(diarios)
-        html = gerar_html(mensal, ultimo, len(diarios))
+        focus = buscar_focus()
+
+        # Atualiza projecao Focus BCB com dados reais
+        lv = mensal[-1]['v']
+        SERIES_PROJ["Focus BCB"] = [
+            round(lv + (focus['cambio_2026'] - lv) * i / 7, 2) for i in range(1, 8)
+        ] + [focus['cambio_2027']]
+
+        html = gerar_html(mensal, ultimo, len(diarios), focus)
 
         # Quando empacotado pelo PyInstaller, usa a pasta do .exe
         # Quando rodado como .py, usa a pasta do script
@@ -652,3 +750,4 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         print("\n" + "=" * 60)
+        input("Pressione Enter para fechar...")
