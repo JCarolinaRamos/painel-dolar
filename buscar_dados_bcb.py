@@ -42,6 +42,29 @@ MESES_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','d
 
 
 # ─── PTAX USD/BRL ─────────────────────────────────────────────────────────────
+def requisicao_com_retry(url, params, headers, tentativas=4, timeout=60):
+    """Faz requisicao HTTP com retry exponencial para lidar com 503/timeout do BCB."""
+    import time
+    ultimo_erro = None
+    for i in range(tentativas):
+        try:
+            if i > 0:
+                espera = 2 ** i  # 2, 4, 8 segundos
+                print(f"[BCB] Tentativa {i+1}/{tentativas} — aguardando {espera}s...")
+                time.sleep(espera)
+            r = requests.get(url, params=params, headers=headers, timeout=timeout)
+            if r.status_code == 503:
+                raise requests.exceptions.HTTPError(f"503 Service Unavailable (tentativa {i+1})")
+            r.raise_for_status()
+            return r
+        except (requests.exceptions.HTTPError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout) as e:
+            ultimo_erro = e
+            print(f"[BCB] Erro na tentativa {i+1}: {e}")
+    raise ultimo_erro
+
+
 def buscar_ptax():
     hoje = datetime.today().strftime('%m-%d-%Y')
     url  = (
@@ -57,13 +80,11 @@ def buscar_ptax():
     }
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     print(f"[BCB] Buscando cotacoes USD/BRL de {DATA_INICIAL} ate {hoje}...")
-    r = requests.get(url, params=params, headers=headers, timeout=60)
-    r.raise_for_status()
+    r = requisicao_com_retry(url, params, headers)
     dados = r.json()["value"]
     print(f"[BCB] {len(dados)} cotacoes diarias recebidas.")
     if len(dados) < 100:
-        print(f"[BCB] AVISO: poucos dados recebidos. Verifique a conexao e o formato da data.")
-        print(f"[BCB] Primeiro registro: {dados[0] if dados else 'VAZIO'}")
+        print(f"[BCB] AVISO: poucos dados recebidos. Primeiro registro: {dados[0] if dados else 'VAZIO'}")
     return dados
 
 
@@ -155,8 +176,7 @@ def buscar_moeda(codigo):
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     print(f"[BCB] Buscando cotacoes {codigo}/BRL...")
     try:
-        r = requests.get(url, params=params, headers=headers, timeout=30)
-        r.raise_for_status()
+        r = requisicao_com_retry(url, params, headers, tentativas=3, timeout=30)
         dados = r.json().get("value", [])
         if not dados:
             raise ValueError(f"Sem dados {codigo}")
@@ -1443,27 +1463,64 @@ if __name__ == "__main__":
 
     is_ci = os.environ.get("CI", "false").lower() == "true"
 
+    # ── Busca PTAX (critica — sem ela nao ha painel) ──
     try:
         diarios        = buscar_ptax()
         mensal, ultimo = agrupar_por_mes(diarios)
-        focus          = buscar_focus()
-        var_brl        = calcular_variacoes(mensal)
-        mensal_eur     = buscar_moeda("EUR")
-        var_eur        = calcular_variacoes_moeda(mensal_eur, mensal, "EUR")
-        mensal_cny     = buscar_moeda("CNY")
-        var_cny        = calcular_variacoes_moeda(mensal_cny, mensal, "CNY")
-        mensal_gbp     = buscar_moeda("GBP")
-        var_gbp        = calcular_variacoes_moeda(mensal_gbp, mensal, "GBP")
-        fluxo_raw      = buscar_fluxo_cambial()
-        fluxo          = calcular_fluxo(fluxo_raw)
+    except Exception as e:
+        print(f"\n[ERRO CRITICO] Nao foi possivel buscar a PTAX apos retries: {e}")
+        print("     Verifique sua conexao ou tente novamente em alguns minutos.")
+        traceback.print_exc()
+        sys.exit(1)
 
+    # ── Busca dados secundarios (falhas sao toleradas) ──
+    try:
+        focus = buscar_focus()
+    except Exception as e:
+        print(f"[AVISO] Focus indisponivel: {e}. Usando fallback.")
+        focus = {"cambio_2026":5.20,"cambio_2027":5.30,"cambio_2028":5.35,
+                 "ipca_2026":4.92,"selic_2026":13.00,"data_focus":"(indisponivel)"}
+
+    var_brl = calcular_variacoes(mensal)
+
+    try:
+        mensal_eur = buscar_moeda("EUR")
+        var_eur    = calcular_variacoes_moeda(mensal_eur, mensal, "EUR")
+    except Exception as e:
+        print(f"[AVISO] EUR indisponivel: {e}. Usando fallback.")
+        var_eur = None
+
+    try:
+        mensal_cny = buscar_moeda("CNY")
+        var_cny    = calcular_variacoes_moeda(mensal_cny, mensal, "CNY")
+    except Exception as e:
+        print(f"[AVISO] CNY indisponivel: {e}. Usando fallback.")
+        var_cny = None
+
+    try:
+        mensal_gbp = buscar_moeda("GBP")
+        var_gbp    = calcular_variacoes_moeda(mensal_gbp, mensal, "GBP")
+    except Exception as e:
+        print(f"[AVISO] GBP indisponivel: {e}. Usando fallback.")
+        var_gbp = None
+
+    try:
+        fluxo_raw = buscar_fluxo_cambial()
+        fluxo     = calcular_fluxo(fluxo_raw)
+    except Exception as e:
+        print(f"[AVISO] Fluxo cambial indisponivel: {e}. Usando fallback.")
+        fluxo = calcular_fluxo({})
+
+    # ── Gera HTML ──
+    try:
         # Atualiza projecao Focus BCB com dados reais
         lv = mensal[-1]['v']
         SERIES_PROJ["Focus BCB"] = [
             round(lv + (focus['cambio_2026'] - lv) * i / 7, 2) for i in range(1, 8)
         ] + [focus['cambio_2027']]
 
-        html = gerar_html(mensal, ultimo, len(diarios), focus, var_brl, var_eur, fluxo, diarios=diarios, var_cny=var_cny, var_gbp=var_gbp)
+        html = gerar_html(mensal, ultimo, len(diarios), focus, var_brl, var_eur, fluxo,
+                          diarios=diarios, var_cny=var_cny, var_gbp=var_gbp)
 
         if getattr(sys, 'frozen', False):
             pasta = os.path.dirname(sys.executable)
@@ -1476,7 +1533,7 @@ if __name__ == "__main__":
 
         print(f"\n[OK] Painel gerado: {caminho}")
         print(f"     {len(diarios):,} cotacoes -> {len(mensal)} medias mensais")
-        print(f"     EUR/USD atual: {var_eur['atual']:.4f}")
+        if var_eur: print(f"     EUR/USD atual: {var_eur['atual']:.4f}")
         print(f"     Fluxo cambial ({fluxo['ultimo_mes']}): saldo US$ {fluxo['saldo_mes']/1000:.1f} bi")
         print(f"     Variacao USD/BRL: mes {var_brl['pct_mes']:+.2f}% | ano {var_brl['pct_ano']:+.2f}% | 12m {var_brl['pct_12m']:+.2f}%")
 
@@ -1486,9 +1543,9 @@ if __name__ == "__main__":
             webbrowser.open(f"file:///{caminho.replace(os.sep, '/')}")
 
     except Exception as e:
-        print(f"\n[ERRO] Inesperado: {e}")
+        print(f"\n[ERRO] Falha ao gerar HTML: {e}")
         traceback.print_exc()
-        import sys; sys.exit(1)
+        sys.exit(1)
     finally:
         print("\n" + "=" * 65)
         if not is_ci:
