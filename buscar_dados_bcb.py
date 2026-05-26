@@ -1133,7 +1133,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
     </div>
   </div>
 
-  {{_gerar_card_tendencia_focus(focus)}}
+  {_gerar_card_tendencia_focus(focus)}
 
   <div class="an-card" style="background:#f0f7ff;border-color:#93c5fd;margin-top:4px;">
     <div class="an-titulo"><span class="an-ico">&#128188;</span> Implicacao para o setor de tecnologia financeira e automacao comercial</div>
