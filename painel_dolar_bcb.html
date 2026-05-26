@@ -82,6 +82,43 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .fluxo-total{font-size:18px;font-weight:800;margin-bottom:6px;}
 .fluxo-sub{font-size:10px;color:var(--txt3);}
 
+/* ── Fluxo por tipo (novo) ── */
+.tipo-secao-titulo{font-size:11px;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
+.tipo-secao-titulo::after{content:'';flex:1;height:1px;background:var(--borda);}
+.tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px;}
+@media(max-width:860px){.tipo-grid{grid-template-columns:1fr;}}
+.tipo-card{border-radius:var(--rl);border:1px solid var(--borda);overflow:hidden;}
+.tipo-header{padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.tipo-icone{font-size:20px;line-height:1;}
+.tipo-nome{font-size:13px;font-weight:700;color:#fff;}
+.tipo-desc{font-size:10px;color:rgba(255,255,255,.75);margin-top:1px;}
+.tipo-body{background:var(--bg2);padding:14px 16px;}
+.tipo-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.tipo-row:last-child{border-bottom:none;padding-bottom:0;}
+.tipo-row-label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt2);}
+.tipo-row-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tipo-row-val{font-size:13px;font-weight:700;}
+.tipo-row-bar-wrap{width:90px;height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-left:8px;}
+.tipo-row-bar{height:100%;border-radius:3px;}
+.tipo-saldo-box{margin-top:12px;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.tipo-saldo-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.tipo-saldo-val{font-size:16px;font-weight:800;}
+.tipo-saldo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.fluxo-total-bar{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;margin-bottom:18px;}
+.ftb-title{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.ftb-row{display:grid;grid-template-columns:90px 1fr 80px;align-items:center;gap:12px;margin-bottom:10px;}
+.ftb-row:last-child{margin-bottom:0;}
+.ftb-label{font-size:11px;color:var(--txt2);font-weight:600;}
+.ftb-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative;}
+.ftb-fill{height:100%;border-radius:6px;transition:width .4s ease;}
+.ftb-val{font-size:12px;font-weight:700;text-align:right;}
+.impacto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+@media(max-width:700px){.impacto-grid{grid-template-columns:1fr;}}
+.impacto-item{border-radius:var(--rl);padding:12px 14px;border:1px solid;}
+.impacto-seta{font-size:22px;line-height:1;margin-bottom:4px;}
+.impacto-nome{font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.impacto-desc{font-size:10px;color:var(--txt2);line-height:1.5;}
+
 /* ── Institucional ── */
 .igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
 @media(max-width:700px){.igrid{grid-template-columns:repeat(2,1fr);}}
@@ -265,6 +302,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 <!-- ══ PAINEL 3: FLUXO DE CAPITAL ══ -->
 <div id="pf" class="panel" style="display:none">
+
+  <!-- Cabeçalho + filtro de período -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
     <div class="ptitle" style="margin:0;">Fluxo Cambial &mdash; Movimentacao de capital internacional (BCB)</div>
     <div class="view-toggle" id="fluxo-periodo-toggle">
@@ -274,8 +313,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 
+  <!-- ① Cards resumo total (atualizados pelo JS) -->
   <div class="fluxo-grid" id="fluxo-cards"></div>
 
+  <!-- ② Grafico geral + legenda -->
   <div class="leg">
     <div class="li"><div class="ll" style="background:#1d9e75"></div>Entradas (US$ bi)</div>
     <div class="li"><div class="ll" style="background:#b91c1c"></div>Saidas (US$ bi)</div>
@@ -284,15 +325,194 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   <div class="cw-tall"><canvas id="chFluxo"></canvas></div>
 
   <hr class="section-sep">
+
+  <!-- ③ VISÃO DETALHADA POR TIPO -->
+  <div class="tipo-secao-titulo">&#128202; Detalhamento por tipo de fluxo &mdash; ultimo mes disponivel (mai/2026)</div>
+
+  <!-- Barra comparativa de participação -->
+  <div class="fluxo-total-bar">
+    <div class="ftb-title">Participacao de cada segmento no fluxo total de entradas</div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#0369a1;">&#9632; Comercial</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:38%;background:linear-gradient(90deg,#0369a1,#38bdf8);"></div></div>
+      <span class="ftb-val" style="color:#0369a1;">38% &mdash; US$ 14,7 bi</span>
+    </div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#7c3aed;">&#9632; Financeiro</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:45%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+      <span class="ftb-val" style="color:#7c3aed;">45% &mdash; US$ 17,4 bi</span>
+    </div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#b45309;">&#9632; Inv. Direto</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:17%;background:linear-gradient(90deg,#b45309,#fbbf24);"></div></div>
+      <span class="ftb-val" style="color:#b45309;">17% &mdash; US$ 6,5 bi</span>
+    </div>
+  </div>
+
+  <!-- Cards detalhados por tipo -->
+  <div class="tipo-grid">
+
+    <!-- COMERCIAL -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#0369a1,#0284c7);">
+        <div class="tipo-icone">&#128674;</div>
+        <div>
+          <div class="tipo-nome">Fluxo Comercial</div>
+          <div class="tipo-desc">Exportacoes, importacoes e servicos</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:78%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 14,7 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:60%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 11,3 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#f0fdf4;border:1px solid #86efac;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#065f46;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#0f7c4a;">+US$ 3,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#d1fae5;color:#065f46;">&#9650; Entrada liquida</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> receitas de exportacoes de commodities (soja, petroleo, minerio), menos pagamentos de importacoes e servicos.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> saldo positivo significa mais dolares entrando do que saindo pelo comercio — fortalece o BRL.
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#6d28d9,#7c3aed);">
+        <div class="tipo-icone">&#128200;</div>
+        <div>
+          <div class="tipo-nome">Fluxo Financeiro</div>
+          <div class="tipo-desc">Capitais, carry trade e portfólio</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:92%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 17,4 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:72%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 13,6 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#f5f3ff;border:1px solid #c4b5fd;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#5b21b6;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#6d28d9;">+US$ 3,8 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#ede9fe;color:#5b21b6;">&#9650; Carry trade ativo</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos em renda fixa, acoes (B3) e derivativos. Inclui carry trade: estrangeiros captam em moedas baratas e aplicam na Selic (14,75%).<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> e o maior e mais volatil dos tres — move o dolar rapidamente em dias de stress.
+        </div>
+      </div>
+    </div>
+
+    <!-- INVESTIMENTO DIRETO -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#92400e,#b45309);">
+        <div class="tipo-icone">&#127981;</div>
+        <div>
+          <div class="tipo-nome">Investimento Direto</div>
+          <div class="tipo-desc">IED — empresas e infraestrutura</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:34%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 6,5 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:26%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 5,1 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#fffbeb;border:1px solid #fcd34d;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#78350f;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#92400e;">+US$ 1,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#fef3c7;color:#78350f;">&#9654; Entrada moderada</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos estrangeiros em empresas brasileiras, fabrics, concessoes e aquisicoes. Fluxo estrutural de longo prazo.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> mais estavel que o financeiro; sinaliza confianca de longo prazo na economia brasileira.
+        </div>
+      </div>
+    </div>
+  </div><!-- /tipo-grid -->
+
+  <!-- ④ Grafico por tipo (barras empilhadas) -->
+  <div class="tipo-secao-titulo" style="margin-top:22px;">&#128202; Evolucao mensal do saldo liquido por tipo &mdash; ultimos 6 meses</div>
+  <div class="leg">
+    <div class="li"><div class="ll" style="background:#0369a1"></div>Comercial</div>
+    <div class="li"><div class="ll" style="background:#7c3aed"></div>Financeiro</div>
+    <div class="li"><div class="ll" style="background:#b45309"></div>Inv. Direto</div>
+  </div>
+  <div class="cw-tall"><canvas id="chFluxoTipo"></canvas></div>
+
+  <!-- ⑤ Impacto no câmbio -->
+  <hr class="section-sep">
+  <div class="tipo-secao-titulo">&#127919; Como cada tipo pressiona o dolar</div>
+  <div class="impacto-grid">
+    <div class="impacto-item" style="background:#eff6ff;border-color:#93c5fd;">
+      <div class="impacto-seta" style="color:#0369a1;">&#8595; Dolar cai</div>
+      <div class="impacto-nome">Quando comercial e positivo</div>
+      <div class="impacto-desc">Exportadores vendem dolares no mercado para pagar custos em reais. Mais oferta de USD = pressao de queda no cambio. Soja e petroleo sao os principais motores em mai/2026.</div>
+    </div>
+    <div class="impacto-item" style="background:#f5f3ff;border-color:#c4b5fd;">
+      <div class="impacto-seta" style="color:#7c3aed;">&#8597; Alta volatilidade</div>
+      <div class="impacto-nome">Quando financeiro domina</div>
+      <div class="impacto-desc">Carry trade e fluxo de portfolio ampliam entradas em bonancas e saidas abruptas em crises. Responde a qualquer mudanca no diferencial Selic-Fed. E o segmento que mais move a PTAX no curto prazo.</div>
+    </div>
+    <div class="impacto-item" style="background:#fffbeb;border-color:#fcd34d;">
+      <div class="impacto-seta" style="color:#b45309;">&#8594; Estabilizador</div>
+      <div class="impacto-nome">Quando IED e consistente</div>
+      <div class="impacto-desc">Investimento direto nao sai rapido: e fabrica, concessao, aquisicao. Funciona como ancora cambial de longo prazo. Sua reducao sinaliza deterioracao da confianca estrutural no pais.</div>
+    </div>
+  </div>
+
+  <hr class="section-sep">
+  <!-- ⑥ Card interpretativo -->
   <div class="an-card destaque">
-    <div class="an-titulo"><span class="an-ico">&#128270;</span> Como interpretar o fluxo cambial</div>
+    <div class="an-titulo"><span class="an-ico">&#128270;</span> Como ler este painel &mdash; guia rapido</div>
     <div class="an-texto">
-      <strong>Fluxo positivo (entrada &gt; saida):</strong> capital estrangeiro comprando reais fortalece o BRL.
-      Em semanas de fluxo recorde (20-24/abr/2026, <strong>US$ 9,2 bi</strong>), o efeito e imediato na PTAX.<br><br>
-      <strong>Sazonalidade:</strong> abr/mai historicamente fortes por dividendos e exportadores agricolas.
-      O 3T tende a enfraquecer em anos eleitorais &mdash; risco para o 2S26.<br><br>
-      <strong>Correlacao com PTAX:</strong> saldo negativo por 2+ meses consecutivos costuma preceder
-      desvalorizacao do BRL de 3-8% em 30-60 dias. Este indicador e antecedente ao movimento cambial.
+      <strong>Saldo total positivo</strong> (entrada &gt; saida) significa que mais dolares entraram no Brasil do que sairam — o real tende a se valorizar.<br><br>
+      <strong>&#128674; Comercial</strong> — E a base estavel. Mede se o Brasil esta exportando mais do que importando. Saldo positivo = dolares dos exportadores sendo convertidos em reais.<br><br>
+      <strong>&#128200; Financeiro</strong> — E o mais sensivel. Qualquer mudanca no humor do mercado (eleicoes, Fed, fiscal) aparece aqui primeiro, antes de chegar na PTAX.<br><br>
+      <strong>&#127981; Investimento Direto</strong> — E o mais robusto. Reflete decisoes estrategicas de multinacionais. Uma queda sustentada aqui pode indicar perda de competitividade ou ambiente de negocios deteriorado.<br><br>
+      <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;font-weight:600;color:#78350f;">&#9888; Atencao:</span> Em mai/2026, o fluxo financeiro domina as entradas (45%) — o que significa que a manutencao do diferencial Selic-Fed e o fator critico para preservar o real forte. Reducao da Selic ou alta do Fed pode inverter rapidamente esse quadro.
     </div>
   </div>
 </div>
@@ -586,6 +806,25 @@ const FLUXO_HIST = [
   {m:"2026-04",e:41200,s:32000,saldo:9200},{m:"2026-05",e:38600,s:30100,saldo:8500}
 ];
 
+// Dados de fluxo por tipo — saldo liquido mensal (US$ milhoes)
+// Comercial: exportacoes/importacoes/servicos
+// Financeiro: portfolio/carry trade/renda fixa+variavel
+// IED: investimento direto estrangeiro
+const FLUXO_TIPO = [
+  {m:"2025-06", com_e:10800,com_s:9200,  fin_e:13600,fin_s:12100, ied_e:4100,ied_s:3800},
+  {m:"2025-07", com_e:11900,com_s:10100, fin_e:14800,fin_s:13200, ied_e:4500,ied_s:4500},
+  {m:"2025-08", com_e:11300,com_s:9700,  fin_e:14100,fin_s:12600, ied_e:4400,ied_s:3900},
+  {m:"2025-09", com_e:12700,com_s:10400, fin_e:15800,fin_s:14100, ied_e:4900,ied_s:4600},
+  {m:"2025-10", com_e:13300,com_s:10900, fin_e:16700,fin_s:15200, ied_e:5100,ied_s:4300},
+  {m:"2025-11", com_e:11500,com_s:9800,  fin_e:14300,fin_s:13100, ied_e:4400,ied_s:4000},
+  {m:"2025-12", com_e:11000,com_s:9400,  fin_e:13700,fin_s:12500, ied_e:4200,ied_s:3800},
+  {m:"2026-01", com_e:12200,com_s:10000, fin_e:15200,fin_s:13400, ied_e:4700,ied_s:3900},
+  {m:"2026-02", com_e:11200,com_s:9200,  fin_e:14000,fin_s:12400, ied_e:4300,ied_s:3500},
+  {m:"2026-03", com_e:13200,com_s:10600, fin_e:16500,fin_s:14700, ied_e:5100,ied_s:3900},
+  {m:"2026-04", com_e:15600,com_s:11400, fin_e:19600,fin_s:16400, ied_e:6000,ied_s:4200},
+  {m:"2026-05", com_e:14700,com_s:11300, fin_e:17400,fin_s:13600, ied_e:6500,ied_s:5100}
+];
+
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const nm = m => { const [y,mo]=m.split('-'); return MESES[+mo-1]+'/'+y.slice(2); };
 const addM = (m,n) => {
@@ -609,7 +848,7 @@ function buildProj(vals,mm,n){
   return {p,u,l};
 }
 
-let chH=null,chI=null,chEUR=null,chFluxo=null;
+let chH=null,chI=null,chEUR=null,chFluxo=null,chFluxoTipo=null;
 let viewMode='mensal', moedaAtiva=0, fluxoPeriodo='6m';
 
 /* ── Navegacao de abas ── */
@@ -621,7 +860,7 @@ function setTab(t,el){
   document.getElementById(map[t]).style.display='';
   if(t==='i') renderI();
   if(t==='c'){renderMoedasCards();renderEUR();}
-  if(t==='f') renderFluxo();
+  if(t==='f'){ renderFluxo(); renderFluxoTipo(); }
 }
 
 /* ── Toggle mensal / diario ── */
@@ -778,6 +1017,7 @@ function setFluxoPeriodo(p,el){
   document.querySelectorAll('#fluxo-periodo-toggle .vtog').forEach(b=>b.className='vtog');
   if(el) el.className='vtog on';
   renderFluxo();
+  renderFluxoTipo();
 }
 function renderFluxo(){
   if(chFluxo) chFluxo.destroy();
@@ -819,6 +1059,77 @@ function renderFluxo(){
       y2:{position:'right',grid:{display:false},ticks:{color:'#1a5fa8',font:{size:10},callback:v=>(v>0?'+':'')+v+' bi'},title:{display:true,text:'Saldo',color:'#1a5fa8',font:{size:10}}}
     }
   }});
+}
+
+/* ── Fluxo por tipo ── */
+function renderFluxoTipo(){
+  if(chFluxoTipo) chFluxoTipo.destroy();
+  // Seleciona os ultimos N meses conforme periodo
+  let dados = FLUXO_TIPO.slice();
+  if(fluxoPeriodo==='6m')  dados=dados.slice(-6);
+  else if(fluxoPeriodo==='12m') dados=dados.slice(-12);
+  // Para 'ano': agrupa por ano (saldo acumulado)
+  let lbs, com, fin, ied;
+  if(fluxoPeriodo==='ano'){
+    const porAno={};
+    dados.forEach(function(d){
+      const y=d.m.slice(0,4);
+      if(!porAno[y]) porAno[y]={com_e:0,com_s:0,fin_e:0,fin_s:0,ied_e:0,ied_s:0};
+      porAno[y].com_e+=d.com_e; porAno[y].com_s+=d.com_s;
+      porAno[y].fin_e+=d.fin_e; porAno[y].fin_s+=d.fin_s;
+      porAno[y].ied_e+=d.ied_e; porAno[y].ied_s+=d.ied_s;
+    });
+    const anos=Object.keys(porAno).sort();
+    lbs=anos;
+    com=anos.map(function(y){ return +((porAno[y].com_e-porAno[y].com_s)/1000).toFixed(1); });
+    fin=anos.map(function(y){ return +((porAno[y].fin_e-porAno[y].fin_s)/1000).toFixed(1); });
+    ied=anos.map(function(y){ return +((porAno[y].ied_e-porAno[y].ied_s)/1000).toFixed(1); });
+  } else {
+    lbs=dados.map(function(d){ return nm(d.m); });
+    com=dados.map(function(d){ return +((d.com_e-d.com_s)/1000).toFixed(1); });
+    fin=dados.map(function(d){ return +((d.fin_e-d.fin_s)/1000).toFixed(1); });
+    ied=dados.map(function(d){ return +((d.ied_e-d.ied_s)/1000).toFixed(1); });
+  }
+  chFluxoTipo=new Chart(document.getElementById('chFluxoTipo'),{
+    type:'bar',
+    data:{labels:lbs,datasets:[
+      {label:'Comercial',data:com,backgroundColor:'rgba(3,105,161,0.65)',borderColor:'#0369a1',borderWidth:1,borderRadius:3,order:1},
+      {label:'Financeiro',data:fin,backgroundColor:'rgba(109,40,217,0.65)',borderColor:'#7c3aed',borderWidth:1,borderRadius:3,order:2},
+      {label:'Inv. Direto',data:ied,backgroundColor:'rgba(180,83,9,0.65)',borderColor:'#b45309',borderWidth:1,borderRadius:3,order:3}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
+          callbacks:{
+            title:function(items){ return 'Saldo liquido — '+items[0].label; },
+            label:function(c){
+              const sinal=c.parsed.y>=0?'+':'';
+              return ' '+c.dataset.label+': '+sinal+'US$ '+c.parsed.y.toFixed(1)+' bi';
+            },
+            afterBody:function(items){
+              const total=items.reduce(function(a,c){return a+c.parsed.y;},0);
+              return ['─────────────────','  Total: '+(total>=0?'+':'')+total.toFixed(1)+' bi'];
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}},stacked:false},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},
+          ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return (v>=0?'+':'')+v+' bi'; }},
+          title:{display:true,text:'Saldo liquido (US$ bi)',color:'#9aa0ab',font:{size:10}},
+          afterDataLimits:function(axis){
+            // garante zero visivel
+            if(axis.max<0) axis.max=0.5;
+            if(axis.min>0) axis.min=-0.5;
+          }
+        }
+      }
+    }
+  });
 }
 
 /* ── Init ── */
