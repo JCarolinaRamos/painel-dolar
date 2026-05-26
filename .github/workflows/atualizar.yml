@@ -1,38 +1,28 @@
 name: Atualizar Painel USD/BRL
-
 on:
   schedule:
     - cron: '0 17 * * 1-5'   # 14h BRT - dias úteis (janela principal, após PTAX)
     - cron: '0 20 * * 1-5'   # 17h BRT - dias úteis (janela backup)
     - cron: '0 14 * * 0,6'   # 11h BRT - sábado e domingo (último dado útil disponível)
   workflow_dispatch:
-
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
 jobs:
   gerar-painel:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Instalar dependências
         run: pip install requests
-
       - name: Rodar script e gerar HTML
         run: python buscar_dados_bcb.py
-
       - name: Commit e push do HTML atualizado
         run: |
           git config user.name "github-actions[bot]"
@@ -40,13 +30,3 @@ jobs:
           git add painel_dolar_bcb.html
           git diff --cached --quiet || git commit -m "Painel atualizado: $(date -u '+%d/%m/%Y %H:%M') UTC"
           git push
-
-      - name: Forçar redeploy do GitHub Pages
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.requestPagesBuild({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            console.log('GitHub Pages build solicitado com sucesso.');
