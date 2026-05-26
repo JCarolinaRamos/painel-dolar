@@ -42,29 +42,6 @@ MESES_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','d
 
 
 # ─── PTAX USD/BRL ─────────────────────────────────────────────────────────────
-def requisicao_com_retry(url, params, headers, tentativas=4, timeout=60):
-    """Faz requisicao HTTP com retry exponencial para lidar com 503/timeout do BCB."""
-    import time
-    ultimo_erro = None
-    for i in range(tentativas):
-        try:
-            if i > 0:
-                espera = 2 ** i  # 2, 4, 8 segundos
-                print(f"[BCB] Tentativa {i+1}/{tentativas} — aguardando {espera}s...")
-                time.sleep(espera)
-            r = requests.get(url, params=params, headers=headers, timeout=timeout)
-            if r.status_code == 503:
-                raise requests.exceptions.HTTPError(f"503 Service Unavailable (tentativa {i+1})")
-            r.raise_for_status()
-            return r
-        except (requests.exceptions.HTTPError,
-                requests.exceptions.ConnectionError,
-                requests.exceptions.Timeout) as e:
-            ultimo_erro = e
-            print(f"[BCB] Erro na tentativa {i+1}: {e}")
-    raise ultimo_erro
-
-
 def buscar_ptax():
     hoje = datetime.today().strftime('%m-%d-%Y')
     url  = (
@@ -80,11 +57,13 @@ def buscar_ptax():
     }
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     print(f"[BCB] Buscando cotacoes USD/BRL de {DATA_INICIAL} ate {hoje}...")
-    r = requisicao_com_retry(url, params, headers)
+    r = requests.get(url, params=params, headers=headers, timeout=60)
+    r.raise_for_status()
     dados = r.json()["value"]
     print(f"[BCB] {len(dados)} cotacoes diarias recebidas.")
     if len(dados) < 100:
-        print(f"[BCB] AVISO: poucos dados recebidos. Primeiro registro: {dados[0] if dados else 'VAZIO'}")
+        print(f"[BCB] AVISO: poucos dados recebidos. Verifique a conexao e o formato da data.")
+        print(f"[BCB] Primeiro registro: {dados[0] if dados else 'VAZIO'}")
     return dados
 
 
@@ -176,7 +155,8 @@ def buscar_moeda(codigo):
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     print(f"[BCB] Buscando cotacoes {codigo}/BRL...")
     try:
-        r = requisicao_com_retry(url, params, headers, tentativas=3, timeout=30)
+        r = requests.get(url, params=params, headers=headers, timeout=30)
+        r.raise_for_status()
         dados = r.json().get("value", [])
         if not dados:
             raise ValueError(f"Sem dados {codigo}")
@@ -389,15 +369,30 @@ def calcular_fluxo(fluxo_raw):
 
 # ─── FOCUS ────────────────────────────────────────────────────────────────────
 def buscar_focus():
+    """
+    Busca dados do Boletim Focus via API oficial do BCB.
+    Retorna o valor mais recente + historico das ultimas 4 publicacoes
+    para o card de tendencia automatica do painel.
+    Publicado toda segunda-feira pelo BCB — workflow atualiza automaticamente.
+    """
     url = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativaMercadoAnuais"
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     focus = {
-        "cambio_2026": 5.20, "cambio_2027": 5.30, "cambio_2028": 5.35,
-        "ipca_2026": 4.92, "selic_2026": 13.00, "data_focus": "18/mai/2026"
+        "cambio_2026": 5.17, "cambio_2027": 5.26, "cambio_2028": 5.30,
+        "ipca_2026": 5.04, "selic_2026": 13.25, "data_focus": "25/mai/2026",
+        # Historico das ultimas 4 publicacoes (atualizado automaticamente pela API)
+        "historico_cambio": [
+            {"data": "abr/2026",    "valor": 5.25},
+            {"data": "11/mai/2026", "valor": 5.20},
+            {"data": "18/mai/2026", "valor": 5.20},
+            {"data": "25/mai/2026", "valor": 5.17},
+        ]
     }
     try:
         ano_atual  = datetime.today().year
-        data_corte = (datetime.today().replace(day=1)).strftime("%Y-%m-%d")
+        # Busca 45 dias para cobrir 4+ publicacoes semanais
+        data_corte = (datetime.today() - timedelta(days=45)).strftime("%Y-%m-%d")
+
         indicadores = {
             "C%C3%A2mbio": ("cambio_2026", "cambio_2027", "cambio_2028"),
             "IPCA":         ("ipca_2026",   None,          None),
@@ -407,30 +402,147 @@ def buscar_focus():
             url_req = (
                 f"{url}?$filter=Indicador%20eq%20%27{indicador}%27"
                 f"%20and%20Data%20ge%20%27{data_corte}%27"
-                f"&$orderby=Data%20desc&$top=10&$format=json"
+                f"&$orderby=Data%20desc&$top=40&$format=json"
                 f"&$select=Indicador,Data,Mediana,DataReferencia"
             )
             r = requests.get(url_req, headers=headers, timeout=30)
             r.raise_for_status()
             dados = r.json().get("value", [])
-            if not dados: continue
+            if not dados:
+                continue
+
+            # Publicacao mais recente
             ultima_data = dados[0]["Data"]
             recentes    = [d for d in dados if d["Data"] == ultima_data]
             dt = datetime.strptime(ultima_data, "%Y-%m-%d")
             focus["data_focus"] = f"{dt.day:02d}/{MESES_PT[dt.month-1]}/{dt.year}"
+
             for row in recentes:
                 ano_ref = str(row.get("DataReferencia", ""))[:4]
                 mediana = row.get("Mediana")
-                if mediana is None: continue
+                if mediana is None:
+                    continue
                 mediana = round(float(mediana), 2)
-                if ano_ref == str(ano_atual)   and campos[0]: focus[campos[0]] = mediana
+                if   ano_ref == str(ano_atual)   and campos[0]: focus[campos[0]] = mediana
                 elif ano_ref == str(ano_atual+1) and campos[1]: focus[campos[1]] = mediana
                 elif ano_ref == str(ano_atual+2) and campos[2]: focus[campos[2]] = mediana
-        print(f"[Focus] Cambio {ano_atual}: R$ {focus['cambio_2026']:.2f} | IPCA: {focus['ipca_2026']:.2f}% | Selic: {focus['selic_2026']:.2f}%")
+
+            # Para cambio: monta historico automatico das ultimas 4 publicacoes
+            if indicador == "C%C3%A2mbio":
+                por_data = defaultdict(list)
+                for row in dados:
+                    ano_ref = str(row.get("DataReferencia", ""))[:4]
+                    if ano_ref == str(ano_atual) and row.get("Mediana") is not None:
+                        por_data[row["Data"]].append(round(float(row["Mediana"]), 2))
+
+                # 4 datas mais recentes em ordem cronologica
+                datas_ordenadas = sorted(por_data.keys(), reverse=True)[:4]
+                datas_ordenadas.reverse()
+
+                historico = []
+                for data_str in datas_ordenadas:
+                    medianas = por_data[data_str]
+                    if not medianas:
+                        continue
+                    valor = round(sum(medianas) / len(medianas), 2)
+                    dt_h  = datetime.strptime(data_str, "%Y-%m-%d")
+                    dias_atras = (datetime.today() - dt_h).days
+                    # Ha mais de 21 dias: exibe so mes/ano; senao: dia/mes/ano
+                    if dias_atras > 21:
+                        label = f"{MESES_PT[dt_h.month-1]}/{dt_h.year}"
+                    else:
+                        label = f"{dt_h.day:02d}/{MESES_PT[dt_h.month-1]}/{dt_h.year}"
+                    historico.append({"data": label, "valor": valor})
+
+                if len(historico) >= 2:
+                    focus["historico_cambio"] = historico
+                    print(f"[Focus] Tendencia ({len(historico)} semanas): "
+                          + " -> ".join(f"R$ {h['valor']:.2f} ({h['data']})" for h in historico))
+
+        print(f"[Focus] Cambio {ano_atual}: R$ {focus['cambio_2026']:.2f} | "
+              f"IPCA: {focus['ipca_2026']:.2f}% | Selic: {focus['selic_2026']:.2f}% | "
+              f"Data: {focus['data_focus']}")
+
     except Exception as e:
-        print(f"[Focus] Aviso: {e}. Usando fallback.")
+        print(f"[Focus] Aviso: {e}. Usando fallback com dados de 25/mai/2026.")
+
     return focus
 
+
+
+def _gerar_card_tendencia_focus(focus):
+    """
+    Gera o card HTML de Tendencia Focus BCB dinamicamente
+    a partir do historico de 4 semanas buscado automaticamente da API.
+    """
+    historico = focus.get("historico_cambio", [])
+    if len(historico) < 2:
+        return ""  # sem dados suficientes para mostrar tendencia
+
+    # Ultima publicacao (mais recente) vs primeira do historico
+    primeiro  = historico[0]
+    ultimo_h  = historico[-1]
+    variacao  = round(ultimo_h["valor"] - primeiro["valor"], 2)
+    direcao   = "queda" if variacao < 0 else "alta"
+    seta      = "&#8595;" if variacao < 0 else "&#8593;"
+
+    # Monta os boxes de cada semana
+    boxes = ""
+    for i, h in enumerate(historico):
+        is_ultimo = (i == len(historico) - 1)
+        if is_ultimo:
+            box_style = (
+                'flex:1;min-width:110px;background:linear-gradient(135deg,#eff6ff,#dbeafe);'
+                'border:2px solid #3b82f6;border-radius:8px;padding:10px 14px;text-align:center;'
+            )
+            label_style = 'font-size:10px;color:#1d4ed8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:700;'
+            val_style   = 'font-size:20px;font-weight:700;color:#1d4ed8;'
+            sub_style   = 'font-size:10px;color:#3b82f6;font-weight:600;'
+            label_txt   = 'Mais recente'
+        else:
+            box_style = (
+                'flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;'
+                'border-radius:8px;padding:10px 14px;text-align:center;'
+            )
+            label_style = 'font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;'
+            val_style   = 'font-size:18px;font-weight:700;color:#374151;'
+            sub_style   = 'font-size:10px;color:#9ca3af;'
+            label_txt   = f'Ha {len(historico) - 1 - i} sem.' if (len(historico) - 1 - i) > 1 else 'Ha 1 sem.'
+
+        boxes += (
+            f'<div style="{box_style}">'
+            f'  <div style="{label_style}">{label_txt}</div>'
+            f'  <div style="{val_style}">R$ {h["valor"]:.2f}</div>'
+            f'  <div style="{sub_style}">{h["data"]}</div>'
+            f'</div>'
+        )
+        if not is_ultimo:
+            boxes += '<div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>'
+
+    sinal_txt = f'{variacao:+.2f}'
+    cor_var   = '#0f7c4a' if variacao < 0 else '#b91c1c'
+
+    card = f"""
+  <!-- Tendencia Focus BCB — gerado automaticamente a partir da API do BCB -->
+  <div class="an-card" style="background:#eff6ff;border-color:#bfdbfe;margin-bottom:16px;">
+    <div class="an-titulo"><span class="an-ico">&#128202;</span> Tendencia Focus BCB &mdash; Projecao Dez/{focus.get('data_focus','').split('/')[-1] or '2026'}</div>
+    <div class="an-texto">
+      O mercado financeiro tem revisado <strong>consistentemente em {direcao}</strong> a projecao do dolar
+      para o fechamento de {focus.get('data_focus','').split('/')[-1] or '2026'}.
+      Nas ultimas semanas, a mediana do Boletim Focus registrou:
+      <span style="font-weight:600;color:{cor_var};">{seta} {sinal_txt} ({primeiro['data']} &rarr; {ultimo_h['data']})</span><br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;align-items:center;">
+        {boxes}
+      </div>
+      O movimento reflete o <strong>real mais forte que o esperado</strong> no acumulado do ano,
+      impulsionado pelo fluxo externo recorde e pelo diferencial de juros elevado.
+      A reducao consecutiva da mediana sugere que o mercado esta revisando o piso do dolar
+      para o horizonte de curto prazo, ainda que o risco eleitoral do 3T mantenha
+      um teto de incerteza em torno de <strong>R$ 5,60</strong> (Morgan Stanley).
+    </div>
+  </div>
+"""
+    return card
 
 # ─── HTML GENERATOR ───────────────────────────────────────────────────────────
 def gerar_html(mensal, ultimo, total_diarios, focus, var_brl, var_eur, fluxo, diarios=None, var_cny=None, var_gbp=None):
@@ -1021,6 +1133,8 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var
     </div>
   </div>
 
+  {{_gerar_card_tendencia_focus(focus)}}
+
   <div class="an-card" style="background:#f0f7ff;border-color:#93c5fd;margin-top:4px;">
     <div class="an-titulo"><span class="an-ico">&#128188;</span> Implicacao para o setor de tecnologia financeira e automacao comercial</div>
     <div class="an-texto">
@@ -1463,64 +1577,27 @@ if __name__ == "__main__":
 
     is_ci = os.environ.get("CI", "false").lower() == "true"
 
-    # ── Busca PTAX (critica — sem ela nao ha painel) ──
     try:
         diarios        = buscar_ptax()
         mensal, ultimo = agrupar_por_mes(diarios)
-    except Exception as e:
-        print(f"\n[ERRO CRITICO] Nao foi possivel buscar a PTAX apos retries: {e}")
-        print("     Verifique sua conexao ou tente novamente em alguns minutos.")
-        traceback.print_exc()
-        sys.exit(1)
+        focus          = buscar_focus()
+        var_brl        = calcular_variacoes(mensal)
+        mensal_eur     = buscar_moeda("EUR")
+        var_eur        = calcular_variacoes_moeda(mensal_eur, mensal, "EUR")
+        mensal_cny     = buscar_moeda("CNY")
+        var_cny        = calcular_variacoes_moeda(mensal_cny, mensal, "CNY")
+        mensal_gbp     = buscar_moeda("GBP")
+        var_gbp        = calcular_variacoes_moeda(mensal_gbp, mensal, "GBP")
+        fluxo_raw      = buscar_fluxo_cambial()
+        fluxo          = calcular_fluxo(fluxo_raw)
 
-    # ── Busca dados secundarios (falhas sao toleradas) ──
-    try:
-        focus = buscar_focus()
-    except Exception as e:
-        print(f"[AVISO] Focus indisponivel: {e}. Usando fallback.")
-        focus = {"cambio_2026":5.20,"cambio_2027":5.30,"cambio_2028":5.35,
-                 "ipca_2026":4.92,"selic_2026":13.00,"data_focus":"(indisponivel)"}
-
-    var_brl = calcular_variacoes(mensal)
-
-    try:
-        mensal_eur = buscar_moeda("EUR")
-        var_eur    = calcular_variacoes_moeda(mensal_eur, mensal, "EUR")
-    except Exception as e:
-        print(f"[AVISO] EUR indisponivel: {e}. Usando fallback.")
-        var_eur = None
-
-    try:
-        mensal_cny = buscar_moeda("CNY")
-        var_cny    = calcular_variacoes_moeda(mensal_cny, mensal, "CNY")
-    except Exception as e:
-        print(f"[AVISO] CNY indisponivel: {e}. Usando fallback.")
-        var_cny = None
-
-    try:
-        mensal_gbp = buscar_moeda("GBP")
-        var_gbp    = calcular_variacoes_moeda(mensal_gbp, mensal, "GBP")
-    except Exception as e:
-        print(f"[AVISO] GBP indisponivel: {e}. Usando fallback.")
-        var_gbp = None
-
-    try:
-        fluxo_raw = buscar_fluxo_cambial()
-        fluxo     = calcular_fluxo(fluxo_raw)
-    except Exception as e:
-        print(f"[AVISO] Fluxo cambial indisponivel: {e}. Usando fallback.")
-        fluxo = calcular_fluxo({})
-
-    # ── Gera HTML ──
-    try:
         # Atualiza projecao Focus BCB com dados reais
         lv = mensal[-1]['v']
         SERIES_PROJ["Focus BCB"] = [
             round(lv + (focus['cambio_2026'] - lv) * i / 7, 2) for i in range(1, 8)
         ] + [focus['cambio_2027']]
 
-        html = gerar_html(mensal, ultimo, len(diarios), focus, var_brl, var_eur, fluxo,
-                          diarios=diarios, var_cny=var_cny, var_gbp=var_gbp)
+        html = gerar_html(mensal, ultimo, len(diarios), focus, var_brl, var_eur, fluxo, diarios=diarios, var_cny=var_cny, var_gbp=var_gbp)
 
         if getattr(sys, 'frozen', False):
             pasta = os.path.dirname(sys.executable)
@@ -1533,7 +1610,7 @@ if __name__ == "__main__":
 
         print(f"\n[OK] Painel gerado: {caminho}")
         print(f"     {len(diarios):,} cotacoes -> {len(mensal)} medias mensais")
-        if var_eur: print(f"     EUR/USD atual: {var_eur['atual']:.4f}")
+        print(f"     EUR/USD atual: {var_eur['atual']:.4f}")
         print(f"     Fluxo cambial ({fluxo['ultimo_mes']}): saldo US$ {fluxo['saldo_mes']/1000:.1f} bi")
         print(f"     Variacao USD/BRL: mes {var_brl['pct_mes']:+.2f}% | ano {var_brl['pct_ano']:+.2f}% | 12m {var_brl['pct_12m']:+.2f}%")
 
@@ -1543,9 +1620,9 @@ if __name__ == "__main__":
             webbrowser.open(f"file:///{caminho.replace(os.sep, '/')}")
 
     except Exception as e:
-        print(f"\n[ERRO] Falha ao gerar HTML: {e}")
+        print(f"\n[ERRO] Inesperado: {e}")
         traceback.print_exc()
-        sys.exit(1)
+        import sys; sys.exit(1)
     finally:
         print("\n" + "=" * 65)
         if not is_ci:
