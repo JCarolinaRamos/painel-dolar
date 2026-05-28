@@ -1251,6 +1251,13 @@ def gerar_html(mensal, ultimo, n_diarios):
     gerado_em   = agora.strftime("%d/%m/%Y %H:%M")
 
     data_json  = json.dumps(mensal, ensure_ascii=False, separators=(",", ":"))
+
+    # Formatacao BR (virgula como separador decimal)
+    def fmt_br(v, casas=4):
+        return f"{v:.{casas}f}".replace('.', ',')
+
+    ultima_ptax_br = fmt_br(ultima_ptax, 4)
+    media_mes_br   = fmt_br(media_mes, 4)
     sproj_json = json.dumps(SERIES_PROJ, ensure_ascii=False)
 
     html = HTML_TEMPLATE
@@ -1262,7 +1269,7 @@ def gerar_html(mensal, ultimo, n_diarios):
     # 2. Ultima PTAX card — valor
     html = re.sub(
         r'(<div class="cl">Ultima PTAX \(venda\)</div>\s*<div class="cv">)R\$\s*[\d.]+(<)',
-        rf'\g<1>R$ {ultima_ptax:.4f}\2', html)
+        rf'\g<1>R$ {ultima_ptax_br}\2', html)
 
     # 3. Ultima PTAX card — data
     html = re.sub(
@@ -1272,7 +1279,7 @@ def gerar_html(mensal, ultimo, n_diarios):
     # 4. Media mes card — valor
     html = re.sub(
         r'(<div class="cl">Media do mes atual</div>\s*<div class="cv">)R\$\s*[\d.]+(<)',
-        rf'\g<1>R$ {media_mes:.4f}\2', html)
+        rf'\g<1>R$ {media_mes_br}\2', html)
 
     # 5. Media mes card — label do mes
     html = re.sub(
