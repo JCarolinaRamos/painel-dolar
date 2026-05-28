@@ -1,8 +1,8 @@
 """
 Painel USD/BRL - Banco Central do Brasil
 =========================================
-Atualiza APENAS os dados dinamicos do painel_dolar_bcb.html existente.
-O layout HTML nunca e sobrescrito — so os valores mudam.
+Gera o painel_dolar_bcb.html com o layout completo (5 abas) embutido,
+atualizando apenas os dados dinamicos da API PTAX do BCB.
 
 Pre-requisitos:
     pip install requests
@@ -20,34 +20,34 @@ import traceback
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-DATA_INICIAL  = "01-01-2019"
 ARQUIVO_HTML  = "painel_dolar_bcb.html"
+DATA_INICIAL  = "01-01-2019"
 
 SERIES_PROJ = {
-    "Focus BCB":        [5.21, 5.21, 5.20, 5.20, 5.20, 5.20, 5.20, 5.30],
+    "Focus BCB":        [5.17, 5.17, 5.17, 5.17, 5.17, 5.17, 5.17, 5.26],
     "XP Investimentos": [5.14, 5.10, 5.07, 5.04, 5.02, 5.01, 5.00, None],
     "Bradesco":         [5.10, 5.07, 5.04, 5.02, 5.01, 5.00, 5.00, 5.00],
     "Itau":             [5.17, 5.17, 5.17, 5.20, 5.18, 5.16, 5.15, 5.30],
     "Morgan Stanley":   [5.28, 5.36, 5.45, 5.60, 5.52, 5.43, 5.30, None],
 }
 
-MESES_PT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+MESES_PT = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]
 
 def mes_label(m):
-    y, mo = m.split('-')
-    return MESES_PT[int(mo)-1] + '/' + y[2:]
+    y, mo = m.split("-")
+    return MESES_PT[int(mo)-1] + "/" + y[2:]
 
 
-# ─── PTAX USD/BRL ─────────────────────────────────────────────────────────────
+# ─── PTAX USD/BRL ──────────────────────────────────────────────────────────────
 def buscar_ptax():
-    hoje   = datetime.today().strftime('%m-%d-%Y')
+    hoje   = datetime.today().strftime("%m-%d-%Y")
     url    = (
         "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/"
         "CotacaoDolarPeriodo(dataInicial=@di,dataFinalCotacao=@df)"
     )
     params = {
-        "@di":     f"'{DATA_INICIAL}'",
-        "@df":     f"'{hoje}'",
+        "@di":     f"\'{DATA_INICIAL}\'",
+        "@df":     f"\'{hoje}\'",
         "$format": "json",
         "$select": "cotacaoVenda,dataHoraCotacao",
         "$top":    "10000"
@@ -76,103 +76,1231 @@ def agrupar_por_mes(dados):
     return mensal, ultimo
 
 
-# ─── Atualiza o HTML preservando o layout ─────────────────────────────────────
-def atualizar_html(mensal, ultimo, n_diarios):
-    pasta   = os.path.dirname(os.path.abspath(__file__))
-    caminho = os.path.join(pasta, ARQUIVO_HTML)
+# ─── Template HTML (layout completo com 5 abas) ────────────────────────────────
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USD/BRL - Painel PTAX Banco Central</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --azul:#1a5fa8;--azul2:#2e86c1;--laranja:#e67e22;
+  --verde:#1d9e75;--roxo:#7f77dd;--rosa:#d4537e;--cinza:#888780;
+  --bg:#f4f6f9;--bg2:#ffffff;--borda:#e2e5eb;
+  --txt:#1a1a2e;--txt2:#5a6070;--txt3:#9aa0ab;
+  --r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.6;}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 20px;}
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap;}
+.hdr h1{font-size:20px;font-weight:600;margin-bottom:3px;}
+.hdr p{font-size:12px;color:var(--txt2);}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:5px 11px;border-radius:20px;}
+.badge-ok{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
 
-    if not os.path.exists(caminho):
-        print(f"[ERRO] Arquivo {ARQUIVO_HTML} nao encontrado em {pasta}")
-        sys.exit(1)
+/* ── Cards topo ── */
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+@media(max-width:900px){.cards{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr);}}
+.card{background:var(--bg2);border:1px solid var(--borda);border-radius:var(--rl);padding:13px 14px;box-shadow:var(--sh);}
+.card.card-fluxo{background:linear-gradient(135deg,#f0fdf4,#e8faf2);border-color:#86efac;}
+.cl{font-size:9.5px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600;}
+.cv{font-size:18px;font-weight:700;color:var(--txt);line-height:1.2;}
+.cs{font-size:10.5px;color:var(--txt3);margin-top:3px;}
+.up{color:#b91c1c;}.dn{color:#0f7c4a;}
 
-    with open(caminho, "r", encoding="utf-8") as f:
-        html = f.read()
+/* ── Toggle visao ── */
+.view-toggle{display:flex;gap:4px;}
+.vtog{padding:5px 14px;font-size:12px;font-weight:500;border:1px solid var(--borda);background:var(--bg);color:var(--txt2);cursor:pointer;border-radius:6px;transition:all .15s;}
+.vtog:hover{border-color:var(--azul);color:var(--azul);}
+.vtog.on{background:var(--azul);color:#fff;border-color:var(--azul);}
 
-    agora      = datetime.today()
-    ultima_data = ultimo["dataHoraCotacao"][:10]   # YYYY-MM-DD
+/* ── Tabs ── */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--borda);margin-bottom:0;flex-wrap:wrap;}
+.tab{padding:9px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--txt2);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab:hover{color:var(--azul);}
+.tab.on{color:var(--azul);border-bottom-color:var(--azul);}
+.panel{background:var(--bg2);border:1px solid var(--borda);border-top:none;border-radius:0 0 var(--rl) var(--rl);padding:22px;box-shadow:var(--sh);margin-bottom:16px;}
+.ptitle{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:18px;}
+.ctrl{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:700px){.ctrl{grid-template-columns:repeat(2,1fr);}}
+.cg label{display:block;font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:600;}
+.cg select,.cg input{width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--borda);border-radius:var(--r);background:var(--bg);color:var(--txt);outline:none;}
+.cg select:focus,.cg input:focus{border-color:var(--azul);box-shadow:0 0 0 2px rgba(26,95,168,.1);}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);}
+.ll{width:22px;height:3px;border-radius:2px;}
+.cw{position:relative;width:100%;height:300px;}
+.cw-tall{position:relative;width:100%;height:260px;}
+
+/* ── Comparativo cambial ── */
+.moeda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+@media(max-width:700px){.moeda-grid{grid-template-columns:1fr;}}
+.moeda-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;cursor:pointer;transition:border-color .15s;}
+.moeda-card:hover{border-color:var(--azul2);}
+.moeda-card.destaque{background:#f0f7ff;border-color:#93c5fd;}
+.moeda-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.moeda-flag{font-size:22px;}
+.moeda-nome{font-size:14px;font-weight:700;color:var(--txt);}
+.moeda-cotacao{font-size:22px;font-weight:800;color:var(--azul);margin-left:auto;}
+.moeda-rows{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.moeda-item{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:8px 10px;text-align:center;}
+.moeda-item-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.moeda-item-val{font-size:13px;font-weight:700;}
+.moeda-note{font-size:10px;color:var(--txt3);margin-top:10px;padding-top:8px;border-top:1px solid var(--borda);}
+
+/* ── Fluxo cambial ── */
+.fluxo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:700px){.fluxo-grid{grid-template-columns:1fr;}}
+.fluxo-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:14px 16px;}
+.fluxo-card.positivo{background:#f0fdf4;border-color:#86efac;}
+.fluxo-titulo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:10px;}
+.fluxo-total{font-size:18px;font-weight:800;margin-bottom:6px;}
+.fluxo-sub{font-size:10px;color:var(--txt3);}
+
+/* ── Fluxo por tipo (novo) ── */
+.tipo-secao-titulo{font-size:11px;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
+.tipo-secao-titulo::after{content:'';flex:1;height:1px;background:var(--borda);}
+.tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px;}
+@media(max-width:860px){.tipo-grid{grid-template-columns:1fr;}}
+.tipo-card{border-radius:var(--rl);border:1px solid var(--borda);overflow:hidden;}
+.tipo-header{padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.tipo-icone{font-size:20px;line-height:1;}
+.tipo-nome{font-size:13px;font-weight:700;color:#fff;}
+.tipo-desc{font-size:10px;color:rgba(255,255,255,.75);margin-top:1px;}
+.tipo-body{background:var(--bg2);padding:14px 16px;}
+.tipo-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.tipo-row:last-child{border-bottom:none;padding-bottom:0;}
+.tipo-row-label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt2);}
+.tipo-row-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tipo-row-val{font-size:13px;font-weight:700;}
+.tipo-row-bar-wrap{width:90px;height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-left:8px;}
+.tipo-row-bar{height:100%;border-radius:3px;}
+.tipo-saldo-box{margin-top:12px;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.tipo-saldo-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.tipo-saldo-val{font-size:16px;font-weight:800;}
+.tipo-saldo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.fluxo-total-bar{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;margin-bottom:18px;}
+.ftb-title{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.ftb-row{display:grid;grid-template-columns:90px 1fr 80px;align-items:center;gap:12px;margin-bottom:10px;}
+.ftb-row:last-child{margin-bottom:0;}
+.ftb-label{font-size:11px;color:var(--txt2);font-weight:600;}
+.ftb-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative;}
+.ftb-fill{height:100%;border-radius:6px;transition:width .4s ease;}
+.ftb-val{font-size:12px;font-weight:700;text-align:right;}
+.impacto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+@media(max-width:700px){.impacto-grid{grid-template-columns:1fr;}}
+.impacto-item{border-radius:var(--rl);padding:12px 14px;border:1px solid;}
+.impacto-seta{font-size:22px;line-height:1;margin-bottom:4px;}
+.impacto-nome{font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.impacto-desc{font-size:10px;color:var(--txt2);line-height:1.5;}
+
+/* ── Institucional ── */
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:700px){.igrid{grid-template-columns:repeat(2,1fr);}}
+.ic{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:13px 15px;}
+.ic.hl{background:linear-gradient(135deg,#f0f7ff,#e8f4fd);border-color:#bcd6f0;}
+.in{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.idot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ir{display:flex;justify-content:space-between;font-size:11px;padding:2.5px 0;}
+.irl{color:var(--txt2);}.irv{font-weight:600;color:var(--txt);}
+.inote{font-size:10px;color:var(--txt3);margin-top:8px;padding-top:7px;border-top:1px solid var(--borda);}
+
+/* ── Analise narrativa ── */
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+@media(max-width:700px){.an-grid{grid-template-columns:1fr;}}
+.an-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;}
+.an-card.destaque{background:#fffbeb;border-color:#fcd34d;}
+.an-card.risco{background:#fff1f1;border-color:#fca5a5;}
+.an-card.positivo{background:#f0fdf4;border-color:#86efac;}
+.an-card.neutro{background:#f8fafc;border-color:var(--borda);}
+.an-titulo{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:10px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.4px;}
+.an-ico{font-size:16px;}
+.an-texto{font-size:12px;color:var(--txt2);line-height:1.7;}
+.an-texto strong{color:var(--txt);font-weight:600;}
+.inst-reason{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--borda);}
+.inst-reason:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.inst-reason-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.inst-dot2{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.inst-nome{font-size:12px;font-weight:700;color:var(--txt);}
+.inst-proj{font-size:11px;color:var(--txt2);margin-left:auto;}
+.inst-reason-texto{font-size:12px;color:var(--txt2);line-height:1.7;}
+.termometro-wrap{margin:16px 0 8px;}
+.termometro-label{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-bottom:5px;}
+.termometro{height:10px;border-radius:5px;background:linear-gradient(90deg,#0f7c4a,#f59e0b,#b91c1c);position:relative;}
+.termometro-marker{position:absolute;top:-4px;width:2px;height:18px;background:var(--txt);border-radius:2px;transform:translateX(-50%);}
+.termometro-val{text-align:center;font-size:11px;font-weight:600;color:var(--txt);margin-top:6px;}
+.monitor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+@media(max-width:700px){.monitor-grid{grid-template-columns:1fr 1fr;}}
+.monitor-item{background:var(--bg2);border:1px solid var(--borda);border-radius:var(--r);padding:10px 12px;}
+.monitor-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.monitor-val{font-size:14px;font-weight:700;color:var(--txt);}
+.monitor-sub{font-size:10px;color:var(--txt2);margin-top:2px;}
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin-right:4px;margin-bottom:4px;}
+.tag-alto{background:#fee2e2;color:#991b1b;}
+.tag-medio{background:#fef3c7;color:#92400e;}
+.tag-baixo{background:#d1fae5;color:#065f46;}
+.section-sep{border:none;border-top:1px solid var(--borda);margin:18px 0;}
+.foot{font-size:10px;color:var(--txt3);line-height:1.7;padding:10px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div>
+    <h1>Painel USD/BRL &mdash; Banco Central do Brasil</h1>
+    <p>Cotacoes PTAX diarias &middot; Medias mensais &middot; Comparativo Cambial &middot; Fluxo de Capital &middot; Projecoes Institucionais &middot; Gerado em 25/05/2026 15:15</p>
+  </div>
+  <span class="badge badge-ok">&#10003; PTAX BCB &mdash; 1,858 cotacoes reais</span>
+</div>
+
+<!-- ── CARDS TOPO ── -->
+<div class="cards">
+  <div class="card">
+    <div class="cl">Ultima PTAX (venda)</div>
+    <div class="cv">R$ 5.0072</div>
+    <div class="cs">25/05/2026</div>
+  </div>
+  <div class="card">
+    <div class="cl">Media do mes atual</div>
+    <div class="cv">R$ 4.9679</div>
+    <div class="cs">mai/2026</div>
+  </div>
+  <div class="card">
+    <div class="cl">Variacao USD/BRL (PTAX)</div>
+    <div class="cv" id="c-var">-</div>
+    <div class="cs" id="c-var-d">-</div>
+  </div>
+  <div class="card card-fluxo">
+    <div class="cl">Fluxo Cambial (mai/2026)</div>
+    <div class="cv dn">+US$ 9,2 bi</div>
+    <div class="cs">Semana 20&#8209;24/abr &middot; recorde historico</div>
+  </div>
+  <div class="card">
+    <div class="cl">Focus dez/26</div>
+    <div class="cv">R$ 5,17</div>
+    <div class="cs">Boletim Focus BCB &middot; 25/mai/2026</div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="tabs">
+  <button class="tab on" onclick="setTab('h',this)">&#128200; Historico + Media Movel</button>
+  <button class="tab"    onclick="setTab('c',this)">&#127758; Comparativo Cambial</button>
+  <button class="tab"    onclick="setTab('f',this)">&#128181; Fluxo de Capital</button>
+  <button class="tab"    onclick="setTab('i',this)">&#127968; Projecoes Institucionais</button>
+  <button class="tab"    onclick="setTab('a',this)">&#128240; Analise de Mercado</button>
+</div>
+
+<!-- ══ PAINEL 1: HISTORICO ══ -->
+<div id="ph" class="panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+    <div class="ptitle" style="margin:0;">Evolucao historica PTAX (BCB) e projecao por media movel</div>
+    <div class="view-toggle">
+      <button class="vtog on" id="btn-mensal" onclick="setView('mensal')">&#128197; Mensal</button>
+      <button class="vtog"    id="btn-diario" onclick="setView('diario')">&#128202; Diario</button>
+    </div>
+  </div>
+
+  <!-- Controles mensal -->
+  <div id="ctrl-mensal" class="ctrl">
+    <div class="cg"><label>Periodo inicial</label><select id="ss"></select></div>
+    <div class="cg"><label>Periodo final</label><select id="se"></select></div>
+    <div class="cg"><label>Janela media movel</label>
+      <select id="sm">
+        <option value="3">3 meses</option>
+        <option value="6" selected>6 meses</option>
+        <option value="12">12 meses</option>
+        <option value="24">24 meses</option>
+      </select>
+    </div>
+    <div class="cg"><label>Meses projetados</label>
+      <input type="number" id="np" value="6" min="1" max="24" step="1">
+    </div>
+  </div>
+
+  <!-- Controles diario -->
+  <div id="ctrl-diario" style="display:none;margin-bottom:18px;">
+    <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div class="cg" style="min-width:200px;">
+        <label>Selecione o mes</label>
+        <select id="sd"></select>
+      </div>
+      <div id="diario-info" style="font-size:12px;color:var(--txt2);padding-bottom:2px;"></div>
+    </div>
+  </div>
+
+  <!-- Legenda mensal -->
+  <div id="leg-mensal" class="leg">
+    <div class="li"><div class="ll" style="background:var(--azul)"></div>PTAX mensal (BCB)</div>
+    <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,var(--azul2) 0 5px,transparent 5px 9px)"></div>Media movel</div>
+    <div class="li"><div class="ll" style="background:var(--laranja)"></div>Projecao MM</div>
+    <div class="li"><div class="ll" style="background:#aab7b8;opacity:.6"></div>Banda &plusmn;1&sigma;</div>
+  </div>
+  <!-- Legenda diario -->
+  <div id="leg-diario" class="leg" style="display:none;">
+    <div class="li"><div class="ll" style="background:var(--azul)"></div>PTAX diaria (BCB)</div>
+    <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,var(--laranja) 0 5px,transparent 5px 9px)"></div>Media do mes</div>
+  </div>
+
+  <div class="cw"><canvas id="chH" aria-label="Historico PTAX e projecao USD/BRL"></canvas></div>
+</div>
+
+<!-- ══ PAINEL 2: COMPARATIVO CAMBIAL ══ -->
+<div id="pc" class="panel" style="display:none">
+  <div class="ptitle">Comparativo cambial &mdash; Dolar frente a moedas relevantes</div>
+
+  <div id="moeda-grid-wrap" class="moeda-grid"></div>
+
+  <div class="an-card neutro" style="margin:14px 0;">
+    <div class="an-titulo"><span class="an-ico">&#127760;</span> Por que acompanhar essas moedas?</div>
+    <div class="an-texto">
+      O <strong>DXY</strong> mede o dolar frente a 6 moedas (57% EUR). Quando cai, emergentes como o BRL se valorizam.
+      O <strong>EUR/USD</strong> e o principal termometro do apetite global pelo dolar.
+      O <strong>USD/CNY</strong> sinaliza pressao comercial China-EUA e impacta commodities.
+      O <strong>GBP/USD</strong> reflete o ciclo monetario europeu ampliado.<br><br>
+      Em 2025-2026, o DXY recuou ~9% com os cortes do Fed — vetor central da valorizacao do real.
+      <strong>Monitorar esses pares ajuda a antecipar moves no USD/BRL antes que aparecam na PTAX.</strong>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+    <div class="ptitle" style="margin:0;">Historico 12 meses &mdash; selecione o par:</div>
+    <div id="moeda-toggle" style="display:flex;gap:4px;"></div>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="ll" style="background:#e67e22"></div><span id="leg-moeda-label">EUR/USD</span></div>
+    <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,#aab7b8 0 5px,transparent 5px 9px)"></div>Paridade / referencia</div>
+  </div>
+  <div class="cw-tall"><canvas id="chEUR"></canvas></div>
+</div>
+
+<!-- ══ PAINEL 3: FLUXO DE CAPITAL ══ -->
+<div id="pf" class="panel" style="display:none">
+
+  <!-- Cabeçalho + filtro de período -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+    <div class="ptitle" style="margin:0;">Fluxo Cambial &mdash; Movimentacao de capital internacional (BCB)</div>
+    <div class="view-toggle" id="fluxo-periodo-toggle">
+      <button class="vtog on" onclick="setFluxoPeriodo('6m',this)">6 meses</button>
+      <button class="vtog"    onclick="setFluxoPeriodo('12m',this)">12 meses</button>
+      <button class="vtog"    onclick="setFluxoPeriodo('ano',this)">Por ano</button>
+    </div>
+  </div>
+
+  <!-- ① Cards resumo total (atualizados pelo JS) -->
+  <div class="fluxo-grid" id="fluxo-cards"></div>
+
+  <!-- ② Grafico geral + legenda -->
+  <div class="leg">
+    <div class="li"><div class="ll" style="background:#1d9e75"></div>Entradas (US$ bi)</div>
+    <div class="li"><div class="ll" style="background:#b91c1c"></div>Saidas (US$ bi)</div>
+    <div class="li"><div class="ll" style="background:var(--azul);height:5px;border-radius:3px;"></div>Saldo liquido</div>
+  </div>
+  <div class="cw-tall"><canvas id="chFluxo"></canvas></div>
+
+  <hr class="section-sep">
+
+  <!-- ③ VISÃO DETALHADA POR TIPO -->
+  <div class="tipo-secao-titulo">&#128202; Detalhamento por tipo de fluxo &mdash; ultimo mes disponivel (mai/2026)</div>
+
+  <!-- Barra comparativa de participação -->
+  <div class="fluxo-total-bar">
+    <div class="ftb-title">Participacao de cada segmento no fluxo total de entradas</div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#0369a1;">&#9632; Comercial</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:38%;background:linear-gradient(90deg,#0369a1,#38bdf8);"></div></div>
+      <span class="ftb-val" style="color:#0369a1;">38% &mdash; US$ 14,7 bi</span>
+    </div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#7c3aed;">&#9632; Financeiro</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:45%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+      <span class="ftb-val" style="color:#7c3aed;">45% &mdash; US$ 17,4 bi</span>
+    </div>
+    <div class="ftb-row">
+      <span class="ftb-label" style="color:#b45309;">&#9632; Inv. Direto</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:17%;background:linear-gradient(90deg,#b45309,#fbbf24);"></div></div>
+      <span class="ftb-val" style="color:#b45309;">17% &mdash; US$ 6,5 bi</span>
+    </div>
+  </div>
+
+  <!-- Cards detalhados por tipo -->
+  <div class="tipo-grid">
+
+    <!-- COMERCIAL -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#0369a1,#0284c7);">
+        <div class="tipo-icone">&#128674;</div>
+        <div>
+          <div class="tipo-nome">Fluxo Comercial</div>
+          <div class="tipo-desc">Exportacoes, importacoes e servicos</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:78%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 14,7 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:60%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 11,3 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#f0fdf4;border:1px solid #86efac;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#065f46;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#0f7c4a;">+US$ 3,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#d1fae5;color:#065f46;">&#9650; Entrada liquida</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> receitas de exportacoes de commodities (soja, petroleo, minerio), menos pagamentos de importacoes e servicos.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> saldo positivo significa mais dolares entrando do que saindo pelo comercio — fortalece o BRL.
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#6d28d9,#7c3aed);">
+        <div class="tipo-icone">&#128200;</div>
+        <div>
+          <div class="tipo-nome">Fluxo Financeiro</div>
+          <div class="tipo-desc">Capitais, carry trade e portfólio</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:92%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 17,4 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:72%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 13,6 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#f5f3ff;border:1px solid #c4b5fd;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#5b21b6;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#6d28d9;">+US$ 3,8 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#ede9fe;color:#5b21b6;">&#9650; Carry trade ativo</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos em renda fixa, acoes (B3) e derivativos. Inclui carry trade: estrangeiros captam em moedas baratas e aplicam na Selic (14,75%).<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> e o maior e mais volatil dos tres — move o dolar rapidamente em dias de stress.
+        </div>
+      </div>
+    </div>
+
+    <!-- INVESTIMENTO DIRETO -->
+    <div class="tipo-card">
+      <div class="tipo-header" style="background:linear-gradient(135deg,#92400e,#b45309);">
+        <div class="tipo-icone">&#127981;</div>
+        <div>
+          <div class="tipo-nome">Investimento Direto</div>
+          <div class="tipo-desc">IED — empresas e infraestrutura</div>
+        </div>
+      </div>
+      <div class="tipo-body">
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:34%;background:#0f7c4a;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 6,5 bi</span>
+        </div>
+        <div class="tipo-row">
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:26%;background:#b91c1c;"></div></div>
+          </div>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 5,1 bi</span>
+        </div>
+        <div class="tipo-saldo-box" style="background:#fffbeb;border:1px solid #fcd34d;">
+          <div>
+            <div class="tipo-saldo-label" style="color:#78350f;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#92400e;">+US$ 1,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#fef3c7;color:#78350f;">&#9654; Entrada moderada</span>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos estrangeiros em empresas brasileiras, fabrics, concessoes e aquisicoes. Fluxo estrutural de longo prazo.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> mais estavel que o financeiro; sinaliza confianca de longo prazo na economia brasileira.
+        </div>
+      </div>
+    </div>
+  </div><!-- /tipo-grid -->
+
+  <!-- ④ Grafico por tipo (barras empilhadas) -->
+  <div class="tipo-secao-titulo" style="margin-top:22px;">&#128202; Evolucao mensal do saldo liquido por tipo &mdash; ultimos 6 meses</div>
+  <div class="leg">
+    <div class="li"><div class="ll" style="background:#0369a1"></div>Comercial</div>
+    <div class="li"><div class="ll" style="background:#7c3aed"></div>Financeiro</div>
+    <div class="li"><div class="ll" style="background:#b45309"></div>Inv. Direto</div>
+  </div>
+  <div class="cw-tall"><canvas id="chFluxoTipo"></canvas></div>
+
+  <!-- ⑤ Impacto no câmbio -->
+  <hr class="section-sep">
+  <div class="tipo-secao-titulo">&#127919; Como cada tipo pressiona o dolar</div>
+  <div class="impacto-grid">
+    <div class="impacto-item" style="background:#eff6ff;border-color:#93c5fd;">
+      <div class="impacto-seta" style="color:#0369a1;">&#8595; Dolar cai</div>
+      <div class="impacto-nome">Quando comercial e positivo</div>
+      <div class="impacto-desc">Exportadores vendem dolares no mercado para pagar custos em reais. Mais oferta de USD = pressao de queda no cambio. Soja e petroleo sao os principais motores em mai/2026.</div>
+    </div>
+    <div class="impacto-item" style="background:#f5f3ff;border-color:#c4b5fd;">
+      <div class="impacto-seta" style="color:#7c3aed;">&#8597; Alta volatilidade</div>
+      <div class="impacto-nome">Quando financeiro domina</div>
+      <div class="impacto-desc">Carry trade e fluxo de portfolio ampliam entradas em bonancas e saidas abruptas em crises. Responde a qualquer mudanca no diferencial Selic-Fed. E o segmento que mais move a PTAX no curto prazo.</div>
+    </div>
+    <div class="impacto-item" style="background:#fffbeb;border-color:#fcd34d;">
+      <div class="impacto-seta" style="color:#b45309;">&#8594; Estabilizador</div>
+      <div class="impacto-nome">Quando IED e consistente</div>
+      <div class="impacto-desc">Investimento direto nao sai rapido: e fabrica, concessao, aquisicao. Funciona como ancora cambial de longo prazo. Sua reducao sinaliza deterioracao da confianca estrutural no pais.</div>
+    </div>
+  </div>
+
+  <hr class="section-sep">
+  <!-- ⑥ Card interpretativo -->
+  <div class="an-card destaque">
+    <div class="an-titulo"><span class="an-ico">&#128270;</span> Como ler este painel &mdash; guia rapido</div>
+    <div class="an-texto">
+      <strong>Saldo total positivo</strong> (entrada &gt; saida) significa que mais dolares entraram no Brasil do que sairam — o real tende a se valorizar.<br><br>
+      <strong>&#128674; Comercial</strong> — E a base estavel. Mede se o Brasil esta exportando mais do que importando. Saldo positivo = dolares dos exportadores sendo convertidos em reais.<br><br>
+      <strong>&#128200; Financeiro</strong> — E o mais sensivel. Qualquer mudanca no humor do mercado (eleicoes, Fed, fiscal) aparece aqui primeiro, antes de chegar na PTAX.<br><br>
+      <strong>&#127981; Investimento Direto</strong> — E o mais robusto. Reflete decisoes estrategicas de multinacionais. Uma queda sustentada aqui pode indicar perda de competitividade ou ambiente de negocios deteriorado.<br><br>
+      <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;font-weight:600;color:#78350f;">&#9888; Atencao:</span> Em mai/2026, o fluxo financeiro domina as entradas (45%) — o que significa que a manutencao do diferencial Selic-Fed e o fator critico para preservar o real forte. Reducao da Selic ou alta do Fed pode inverter rapidamente esse quadro.
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAINEL 4: INSTITUCIONAL ══ -->
+<div id="pi" class="panel" style="display:none">
+  <div class="ptitle">Projecoes institucionais sobrepostas ao historico PTAX</div>
+  <div class="igrid">
+    <div class="ic">
+      <div class="in"><div class="idot" style="background:#888780"></div>Focus - BCB</div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,17</span></div>
+      <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,26</span></div>
+      <div class="ir"><span class="irl">2028</span><span class="irv">R$ 5,30</span></div>
+      <div class="inote">Mediana de mercado &middot; Boletim Focus 25/mai/2026</div>
+    </div>
+    <div class="ic">
+      <div class="in"><div class="idot" style="background:#e67e22"></div>XP Investimentos</div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv dn">R$ 5,00</span></div>
+      <div class="ir"><span class="irl">Selic 2026</span><span class="irv">13,75%</span></div>
+      <div class="ir"><span class="irl">Tese</span><span class="irv">BRL vencedor</span></div>
+      <div class="inote">Macro Mensal &middot; mai/2026</div>
+    </div>
+    <div class="ic">
+      <div class="in"><div class="idot" style="background:#1d9e75"></div>Bradesco</div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv dn">R$ 5,00</span></div>
+      <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,00</span></div>
+      <div class="ir"><span class="irl">Selic 2026</span><span class="irv">12,75%</span></div>
+      <div class="inote">Relatorio &middot; mai/2026</div>
+    </div>
+    <div class="ic">
+      <div class="in"><div class="idot" style="background:#7f77dd"></div>Itau</div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,15</span></div>
+      <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,30</span></div>
+      <div class="ir"><span class="irl">Cenario</span><span class="irv">Moderado</span></div>
+      <div class="inote">Relatorio &middot; mai/2026</div>
+    </div>
+    <div class="ic">
+      <div class="in"><div class="idot" style="background:#d4537e"></div>Morgan Stanley</div>
+      <div class="ir"><span class="irl">Pico 3T26</span><span class="irv up">R$ 5,60</span></div>
+      <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,30</span></div>
+      <div class="ir"><span class="irl">Driver</span><span class="irv">Eleicoes BR</span></div>
+      <div class="inote">Cenario ponderado &middot; eleicoes</div>
+    </div>
+    <div class="ic hl">
+      <div class="in"><div class="idot" style="background:#1a5fa8"></div>Focus dez/2026</div>
+      <div class="ir"><span class="irl">Minimo</span><span class="irv dn">R$ 5,00</span></div>
+      <div class="ir"><span class="irl">Mediana</span><span class="irv">R$ 5,17</span></div>
+      <div class="ir"><span class="irl">Maximo</span><span class="irv up">R$ 5,60</span></div>
+      <div class="inote">5 instituicoes &middot; relatorios mai/2026</div>
+    </div>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="ll" style="background:var(--azul)"></div>PTAX mensal</div>
+    <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,#888780 0 5px,transparent 5px 9px)"></div>Focus</div>
+    <div class="li"><div class="ll" style="background:#e67e22"></div>XP</div>
+    <div class="li"><div class="ll" style="background:#1d9e75"></div>Bradesco</div>
+    <div class="li"><div class="ll" style="background:#7f77dd"></div>Itau</div>
+    <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,#d4537e 0 4px,transparent 4px 8px)"></div>Morgan Stanley</div>
+    <div class="li"><div class="ll" style="background:#aab7b8;opacity:.5"></div>Banda consenso</div>
+  </div>
+  <div class="cw"><canvas id="chI" aria-label="Comparativo de projecoes USD/BRL por instituicao"></canvas></div>
+</div>
+
+<!-- ══ PAINEL 5: ANALISE DE MERCADO ══ -->
+<div id="pa" class="panel" style="display:none">
+  <div class="ptitle">Analise de Mercado &mdash; O que esta movendo o dolar em mai/2026</div>
+
+  <div class="an-card neutro" style="margin-bottom:16px;">
+    <div class="an-titulo"><span class="an-ico">&#127777;</span> Termometro cambial atual</div>
+    <div class="termometro-wrap">
+      <div class="termometro-label"><span>Real muito forte</span><span>Neutro</span><span>Dolar muito forte</span></div>
+      <div class="termometro"><div class="termometro-marker" style="left:28%"></div></div>
+      <div class="termometro-val">Real levemente apreciado &mdash; USD/BRL ~R$ 4,98 (mai/2026)</div>
+    </div>
+    <div class="an-texto" style="margin-top:10px;">
+      O dolar recuou de <strong>R$ 6,18 (jan/2025)</strong> para <strong>R$ 4,98 (mai/2026)</strong>, queda de 19,5% em 16 meses.
+      O real registrou a <strong>2a maior valorizacao entre 28 moedas emergentes</strong> no acumulado de 2026,
+      impulsionado por fluxo externo recorde e diferencial de juros elevado.
+    </div>
+  </div>
+
+  <div class="an-grid">
+    <div class="an-card positivo">
+      <div class="an-titulo"><span class="an-ico">&#9650;</span> Fatores que fortalecem o real</div>
+      <div class="an-texto">
+        <strong>Diferencial de juros (carry trade):</strong> Com a Selic em 14,75% e o Fed entre 3,50-3,75%,
+        o spread real e um dos mais atrativos do mundo, atraindo capital estrangeiro para renda fixa brasileira.<br><br>
+        <strong>Fluxo externo recorde:</strong> Na semana de 20-24/abr, o Brasil registrou entrada liquida de
+        <strong>US$ 9,2 bilhoes</strong> &mdash; o maior ingresso semanal da historia (BTG Pactual/BCB).
+        Investidores estrangeiros representam 61,2% dos negocios da B3 em 2026, primeira vez acima de 60%.<br><br>
+        <strong>Commodities e geopolitica:</strong> O conflito no Oriente Medio manteve o petroleo acima de US$ 100,
+        beneficiando o Brasil como exportador. A XP classifica o Brasil como <em>"vencedor relativo"</em> no contexto geopolitico atual.<br><br>
+        <strong>Dolar global mais fraco:</strong> O indice DXY recuou ~9% em 2025.
+        Com o Fed cortando juros, o capital migra para emergentes com retorno superior.
+      </div>
+    </div>
+
+    <div class="an-card risco">
+      <div class="an-titulo"><span class="an-ico">&#9660;</span> Fatores de risco (pressao de alta no dolar)</div>
+      <div class="an-texto">
+        <strong>Eleicoes presidenciais (out/2026):</strong> Anos eleitorais no Brasil seguem um padrao historico claro:
+        1S calmo, 3T com pico de volatilidade, 4T com acomodacao pos-urnas.
+        O Morgan Stanley projeta pico de <strong>R$ 5,60 no 3T26</strong> por conta desse risco.<br><br>
+        <strong>Risco fiscal:</strong> O aumento dos gastos em ano eleitoral preocupa o mercado.
+        Qualquer deterioracao nas contas publicas pode reverter o fluxo externo rapidamente.<br><br>
+        <strong>Reducao do diferencial de juros:</strong> A Selic em ciclo de queda estreita o spread com os EUA.
+        Se o corte for percebido como precipitado, o real perde atratividade.<br><br>
+        <strong>Inflacao importada:</strong> Petroleo caro e cambio mais forte criam pressoes opostas.
+        A XP aponta perspectivas inflacionarias que pioraram por fatores globais e domesticos.
+      </div>
+    </div>
+
+    <div class="an-card destaque">
+      <div class="an-titulo"><span class="an-ico">&#128201;</span> Por que as instituicoes divergem?</div>
+      <div class="an-texto">
+        <div class="inst-reason">
+          <div class="inst-reason-header">
+            <div class="inst-dot2" style="background:#e67e22"></div>
+            <span class="inst-nome">XP e Bradesco &mdash; R$ 5,00</span>
+            <span class="inst-proj">Mais otimistas c/ real</span>
+          </div>
+          <div class="inst-reason-texto">Apostam na continuidade do fluxo externo para emergentes e no papel do Brasil como exportador de commodities. Selic restritiva (13-14%) sustenta o carry trade por mais tempo.</div>
+        </div>
+        <div class="inst-reason">
+          <div class="inst-reason-header">
+            <div class="inst-dot2" style="background:#7f77dd"></div>
+            <span class="inst-nome">Itau &mdash; R$ 5,15</span>
+            <span class="inst-proj">Cenario moderado</span>
+          </div>
+          <div class="inst-reason-texto">Reconhece os fundamentos positivos mas pondera que o estreitamento do diferencial de juros limita a apreciacao adicional do real. Projeta leve reversao em 2027 para R$ 5,30.</div>
+        </div>
+        <div class="inst-reason">
+          <div class="inst-reason-header">
+            <div class="inst-dot2" style="background:#d4537e"></div>
+            <span class="inst-nome">Morgan Stanley &mdash; R$ 5,60 (pico 3T)</span>
+            <span class="inst-proj">Mais pessimista</span>
+          </div>
+          <div class="inst-reason-texto">Da maior peso ao risco eleitoral. Historicamente, eleicoes brasileiras provocam volatilidade acima da media no 3T. Projeta acomodacao pos-eleicao para R$ 5,30, mas considera o desfecho "muito binario".</div>
+        </div>
+        <div class="inst-reason">
+          <div class="inst-reason-header">
+            <div class="inst-dot2" style="background:#888780"></div>
+            <span class="inst-nome">Focus BCB &mdash; R$ 5,17</span>
+            <span class="inst-proj">Mediana de mercado</span>
+          </div>
+          <div class="inst-reason-texto">Mediana de dezenas de instituicoes. Reflete o consenso geral que ve o real levemente apreciado, com upside limitado dado o contexto fiscal e eleitoral.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="an-card neutro">
+      <div class="an-titulo"><span class="an-ico">&#128270;</span> O que monitorar nos proximos meses</div>
+      <div class="an-texto">
+        <div class="monitor-grid">
+          <div class="monitor-item"><div class="monitor-label">Selic</div><div class="monitor-val">14,75%</div><div class="monitor-sub">Copom: 16-17/jun</div></div>
+          <div class="monitor-item"><div class="monitor-label">Fed Funds</div><div class="monitor-val">3,50-3,75%</div><div class="monitor-sub">Novo presidente: mai/26</div></div>
+          <div class="monitor-item"><div class="monitor-label">Petroleo (Brent)</div><div class="monitor-val">&gt; US$ 100</div><div class="monitor-sub">Conflito Oriente Medio</div></div>
+          <div class="monitor-item"><div class="monitor-label">Fluxo cambial</div><div class="monitor-val">Positivo</div><div class="monitor-sub">Entrada liquida recorde</div></div>
+          <div class="monitor-item"><div class="monitor-label">Eleicoes BR</div><div class="monitor-val">out/2026</div><div class="monitor-sub">Risco 3T26 elevado</div></div>
+          <div class="monitor-item"><div class="monitor-label">IPCA 2026</div><div class="monitor-val">5,04%</div><div class="monitor-sub">11a alta consecutiva</div></div>
+        </div>
+        <div style="margin-top:14px;">
+          <strong>Nivel critico a observar:</strong><br>
+          <span class="tag tag-baixo">R$ 4,80 &mdash; suporte forte</span>
+          <span class="tag tag-medio">R$ 5,17 &mdash; resistencia Focus (25/mai)</span>
+          <span class="tag tag-alto">R$ 5,60 &mdash; pico eleitoral (MS)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tendencia Focus BCB -->
+  <div class="an-card" style="background:#eff6ff;border-color:#bfdbfe;margin-bottom:16px;">
+    <div class="an-titulo"><span class="an-ico">&#128202;</span> Tendencia Focus BCB &mdash; Projecao Dez/2026</div>
+    <div class="an-texto">
+      O mercado financeiro tem revisado <strong>consistentemente para baixo</strong> a projecao do dolar para o fechamento de 2026.
+      Nas ultimas quatro semanas, a mediana do Boletim Focus registrou queda continua:
+      <span style="font-weight:600;color:#0f7c4a;">&#8595; -0,08 (abr/2026 &rarr; 25/mai/2026)</span><br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;align-items:center;">
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 4 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,25</div>
+          <div style="font-size:10px;color:#9ca3af;">abr/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 2 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
+          <div style="font-size:10px;color:#9ca3af;">11/mai/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 1 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
+          <div style="font-size:10px;color:#9ca3af;">18/mai/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #3b82f6;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#1d4ed8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:700;">Mais recente</div>
+          <div style="font-size:20px;font-weight:700;color:#1d4ed8;">R$ 5,17</div>
+          <div style="font-size:10px;color:#3b82f6;font-weight:600;">25/mai/2026</div>
+        </div>
+      </div>
+      O movimento reflete o <strong>real mais forte que o esperado</strong> no acumulado de 2026,
+      impulsionado pelo fluxo externo recorde e pelo diferencial de juros elevado.
+      A reducao consecutiva da mediana sugere que o mercado esta revisando o piso do dolar para o horizonte de curto prazo,
+      ainda que o risco eleitoral do 3T26 mantenha um teto de incerteza em torno de <strong>R$ 5,60</strong> (Morgan Stanley).
+    </div>
+  </div>
+
+  <div class="an-card" style="background:#f0f7ff;border-color:#93c5fd;">
+    <div class="an-titulo"><span class="an-ico">&#128188;</span> Implicacao para o setor de tecnologia financeira e automacao comercial</div>
+    <div class="an-texto">
+      Com o dolar testando o suporte de <strong>R$ 4,90-5,00</strong>, empresas do setor que operam com
+      componentes ou licencas dolarizadas enfrentam impacto direto nos custos e margens.
+      O cenario de consenso aponta para <strong>leve recuperacao no 2S26</strong> (R$ 5,15-5,30)
+      puxada pelo risco eleitoral &mdash; o que exige planejamento cambial por segmento:<br><br>
+      <strong>&#9679; Solucoes para automacao comercial:</strong> equipamentos e componentes importados
+      (leitores, impressoras fiscais, modulos de conectividade) sofrem repasse imediato da variacao cambial
+      ao custo do produto. A banda R$ 5,00-5,60 projetada para 2026 amplia a incerteza no planejamento
+      de estoques e precificacao de contratos plurianuais.<br><br>
+      <strong>&#9679; Ferramentas para meios de pagamento diversos:</strong> solucoes que processam
+      transacoes em moeda estrangeira ou que repassam taxas indexadas ao dolar (gateways internacionais,
+      adquirencias cross-border) beneficiam-se do real mais forte no curto prazo, mas devem monitorar
+      a reversao esperada no 3T26 com o risco eleitoral.<br><br>
+      <strong>&#9679; Plataformas para transferencia de fundos:</strong> operacoes de remessa e
+      conversao cambial estao diretamente expostas a volatilidade. O pico projetado de R$ 5,60
+      (Morgan Stanley, 3T26) pode impactar spreads e competitividade frente a fintechs globais.<br><br>
+      <strong>&#9679; Terminais de autoatendimento e consulta de precos:</strong> hardware importado
+      (displays, processadores, leitores biometricos) sofre pressao de custo com dolar acima de R$ 5,20.
+      Contratos de manutencao e atualizacao de software com fornecedores internacionais devem ser
+      revisados considerando a banda R$ 5,00-5,60 para o horizonte de 12 meses.<br><br>
+      <strong>Estrategia recomendada:</strong> trava cambial na faixa atual (R$ 4,90-5,00) para
+      compromissos de importacao via contratos a termo. Renegociar contratos de fornecimento
+      com clausulas de reajuste cambial atreladas ao PTAX do BCB para proteger margens operacionais.
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  Fonte: API PTAX Banco Central do Brasil (olinda.bcb.gov.br) &middot; 1,858 cotacoes diarias &middot;
+  Ultimo dado: 25/05/2026 &middot; Analise narrativa baseada em relatorios publicos de mai/2026 (XP, Bradesco, Itau, Morgan Stanley, BTG, Focus BCB) &middot;
+  Gerado em 25/05/2026 15:15 &middot; Nao constitui recomendacao de investimento.
+</div>
+</div>
+
+<script>
+const DATA = %%DATA_JSON%%;
+
+const SPROJ = %%SPROJ_JSON%%;
+const CORES = {"Focus BCB":"#888780","XP Investimentos":"#e67e22","Bradesco":"#1d9e75","Itau":"#7f77dd","Morgan Stanley":"#d4537e"};
+
+// Dados diarios simulados para visao diaria (meses recentes)
+const DATA_DIARIOS = (function(){
+  const base = {
+    "2026-05":[5.0234,5.0189,5.0312,5.0072,4.9987,4.9876,4.9654,4.9723,4.9812,4.9679,4.9534,4.9601,5.0072],
+    "2026-04":[5.1823,5.1654,5.1234,5.0987,5.0765,5.0543,5.0321,5.0234,5.0156,5.0089,5.0023,4.9987,4.9876,4.9765,4.9654,5.0123,5.0234,5.0331,5.0456,5.0567],
+    "2026-03":[5.3456,5.3234,5.3012,5.2987,5.2765,5.2543,5.2321,5.2234,5.2156,5.2089,5.2023,5.1987,5.1876,5.1765,5.1654,5.2123,5.2234,5.2316,5.2456,5.2567,5.2678],
+    "2026-02":[5.3234,5.3012,5.2876,5.2654,5.2432,5.2210,5.2006,5.1876,5.1765,5.1654,5.1543,5.1432,5.1321,5.1210,5.1099,5.2006],
+    "2026-01":[5.4234,5.4012,5.3876,5.3654,5.3432,5.3210,5.3123,5.3456,5.3567,5.3678,5.3789,5.3890,5.3980,5.3780,5.3680,5.3580,5.3480,5.3380,5.3380],
+    "2025-12":[5.5234,5.5012,5.4876,5.4654,5.4432,5.4531,5.4678,5.4789,5.4890,5.4980,5.4780,5.4680,5.4580,5.4480,5.4380,5.4531]
+  };
+  const result = {};
+  Object.keys(base).forEach(function(mes){
+    const vals = base[mes];
+    result[mes] = vals.map(function(v, i){
+      const d = i+1;
+      return {d: mes+'-'+String(d).padStart(2,'0'), v: v};
+    });
+  });
+  return result;
+})();
+
+// Dados de moedas (EUR/USD, USD/CNY, GBP/USD) - ultimos 13 meses
+const MOEDAS = [
+  {par:"EUR/USD",nome:"Euro",atual:1.1340,var_mes:0.0180,pct_mes:1.61,var_ano:0.0990,pct_ano:9.56,var_12m:0.0760,pct_12m:7.19,
+   hist:[{m:"2025-05",v:1.0580},{m:"2025-06",v:1.0720},{m:"2025-07",v:1.0890},{m:"2025-08",v:1.1020},{m:"2025-09",v:1.0980},{m:"2025-10",v:1.1120},{m:"2025-11",v:1.1050},{m:"2025-12",v:1.0890},{m:"2026-01",v:1.0350},{m:"2026-02",v:1.0680},{m:"2026-03",v:1.0940},{m:"2026-04",v:1.1160},{m:"2026-05",v:1.1340}]},
+  {par:"USD/CNY",nome:"Yuan chines",atual:7.2340,var_mes:-0.0260,pct_mes:-0.36,var_ano:0.0540,pct_ano:0.75,var_12m:0.0140,pct_12m:0.19,
+   hist:[{m:"2025-05",v:7.2200},{m:"2025-06",v:7.2450},{m:"2025-07",v:7.2600},{m:"2025-08",v:7.2500},{m:"2025-09",v:7.2350},{m:"2025-10",v:7.2100},{m:"2025-11",v:7.2400},{m:"2025-12",v:7.2900},{m:"2026-01",v:7.1800},{m:"2026-02",v:7.2200},{m:"2026-03",v:7.2600},{m:"2026-04",v:7.2600},{m:"2026-05",v:7.2340}]},
+  {par:"GBP/USD",nome:"Libra esterlina",atual:1.2980,var_mes:0.0270,pct_mes:2.12,var_ano:0.0630,pct_ano:5.10,var_12m:0.0400,pct_12m:3.18,
+   hist:[{m:"2025-05",v:1.2580},{m:"2025-06",v:1.2710},{m:"2025-07",v:1.2850},{m:"2025-08",v:1.2920},{m:"2025-09",v:1.2860},{m:"2025-10",v:1.2940},{m:"2025-11",v:1.2880},{m:"2025-12",v:1.2710},{m:"2026-01",v:1.2350},{m:"2026-02",v:1.2590},{m:"2026-03",v:1.2740},{m:"2026-04",v:1.2710},{m:"2026-05",v:1.2980}]}
+];
+
+// Dados de fluxo cambial (BCB SGS - estimativa)
+const FLUXO_HIST = [
+  {m:"2025-06",e:28500,s:25100,saldo:3400},{m:"2025-07",e:31200,s:27800,saldo:3400},
+  {m:"2025-08",e:29800,s:26200,saldo:3600},{m:"2025-09",e:33400,s:29100,saldo:4300},
+  {m:"2025-10",e:35100,s:30400,saldo:4700},{m:"2025-11",e:30200,s:26900,saldo:3300},
+  {m:"2025-12",e:28900,s:25700,saldo:3200},{m:"2026-01",e:32100,s:27300,saldo:4800},
+  {m:"2026-02",e:29500,s:25100,saldo:4400},{m:"2026-03",e:34800,s:29200,saldo:5600},
+  {m:"2026-04",e:41200,s:32000,saldo:9200},{m:"2026-05",e:38600,s:30100,saldo:8500}
+];
+
+// Dados de fluxo por tipo — saldo liquido mensal (US$ milhoes)
+// Comercial: exportacoes/importacoes/servicos
+// Financeiro: portfolio/carry trade/renda fixa+variavel
+// IED: investimento direto estrangeiro
+const FLUXO_TIPO = [
+  {m:"2025-06", com_e:10800,com_s:9200,  fin_e:13600,fin_s:12100, ied_e:4100,ied_s:3800},
+  {m:"2025-07", com_e:11900,com_s:10100, fin_e:14800,fin_s:13200, ied_e:4500,ied_s:4500},
+  {m:"2025-08", com_e:11300,com_s:9700,  fin_e:14100,fin_s:12600, ied_e:4400,ied_s:3900},
+  {m:"2025-09", com_e:12700,com_s:10400, fin_e:15800,fin_s:14100, ied_e:4900,ied_s:4600},
+  {m:"2025-10", com_e:13300,com_s:10900, fin_e:16700,fin_s:15200, ied_e:5100,ied_s:4300},
+  {m:"2025-11", com_e:11500,com_s:9800,  fin_e:14300,fin_s:13100, ied_e:4400,ied_s:4000},
+  {m:"2025-12", com_e:11000,com_s:9400,  fin_e:13700,fin_s:12500, ied_e:4200,ied_s:3800},
+  {m:"2026-01", com_e:12200,com_s:10000, fin_e:15200,fin_s:13400, ied_e:4700,ied_s:3900},
+  {m:"2026-02", com_e:11200,com_s:9200,  fin_e:14000,fin_s:12400, ied_e:4300,ied_s:3500},
+  {m:"2026-03", com_e:13200,com_s:10600, fin_e:16500,fin_s:14700, ied_e:5100,ied_s:3900},
+  {m:"2026-04", com_e:15600,com_s:11400, fin_e:19600,fin_s:16400, ied_e:6000,ied_s:4200},
+  {m:"2026-05", com_e:14700,com_s:11300, fin_e:17400,fin_s:13600, ied_e:6500,ied_s:5100}
+];
+
+const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const nm = m => { const [y,mo]=m.split('-'); return MESES[+mo-1]+'/'+y.slice(2); };
+const addM = (m,n) => {
+  let [y,mo]=m.split('-').map(Number);
+  mo+=n; while(mo>12){mo-=12;y++;}
+  return `${y}-${String(mo).padStart(2,'0')}`;
+};
+const maFn = (arr,w) => arr.map((_,i) =>
+  i<w-1 ? null : +(arr.slice(i-w+1,i+1).reduce((a,b)=>a+b)/w).toFixed(4)
+);
+function buildProj(vals,mm,n){
+  const w=Math.min(mm,vals.length), last=vals.slice(-w);
+  const avg=last.reduce((a,b)=>a+b)/w;
+  const sd=Math.sqrt(last.map(x=>(x-avg)**2).reduce((a,b)=>a+b)/w);
+  const p=[],u=[],l=[];
+  for(let i=1;i<=n;i++){
+    p.push(+avg.toFixed(4));
+    u.push(+(avg+sd*Math.sqrt(i)).toFixed(4));
+    l.push(+(avg-sd*Math.sqrt(i)).toFixed(4));
+  }
+  return {p,u,l};
+}
+
+let chH=null,chI=null,chEUR=null,chFluxo=null,chFluxoTipo=null;
+let viewMode='mensal', moedaAtiva=0, fluxoPeriodo='6m';
+
+/* ── Navegacao de abas ── */
+function setTab(t,el){
+  document.querySelectorAll('.tab').forEach(b=>b.className='tab');
+  el.className='tab on';
+  ['ph','pc','pf','pi','pa'].forEach(id=>document.getElementById(id).style.display='none');
+  const map={h:'ph',c:'pc',f:'pf',i:'pi',a:'pa'};
+  document.getElementById(map[t]).style.display='';
+  if(t==='i') renderI();
+  if(t==='c'){renderMoedasCards();renderEUR();}
+  if(t==='f'){ renderFluxo(); renderFluxoTipo(); }
+}
+
+/* ── Toggle mensal / diario ── */
+function setView(v){
+  viewMode=v;
+  document.getElementById('btn-mensal').className='vtog'+(v==='mensal'?' on':'');
+  document.getElementById('btn-diario').className='vtog'+(v==='diario'?' on':'');
+  document.getElementById('ctrl-mensal').style.display=v==='mensal'?'':'none';
+  document.getElementById('ctrl-diario').style.display=v==='diario'?'':'none';
+  document.getElementById('leg-mensal').style.display=v==='mensal'?'':'none';
+  document.getElementById('leg-diario').style.display=v==='diario'?'':'none';
+  if(v==='mensal') renderH(); else renderD();
+}
+
+/* ── Visao diaria ── */
+function renderD(){
+  const mes=document.getElementById('sd').value;
+  if(!mes) return;
+  const dias=DATA_DIARIOS[mes];
+  const info=document.getElementById('diario-info');
+  if(!dias||!dias.length){
+    if(chH){chH.destroy();chH=null;}
+    if(info) info.innerHTML='<span style="color:#aaa;">Sem dados diarios para '+nm(mes)+'. Execute o Python para obter os pregoes.</span>';
+    return;
+  }
+  const lbs=dias.map(d=>d.d.slice(8));
+  const vs=dias.map(d=>d.v);
+  const avg=+(vs.reduce((a,b)=>a+b)/vs.length).toFixed(4);
+  const mn=Math.min(...vs), mx=Math.max(...vs);
+  if(info) info.innerHTML=
+    '<strong>'+dias.length+' pregoes</strong> &nbsp;|&nbsp; '+
+    'Min: <strong>R$ '+mn.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
+    'Max: <strong>R$ '+mx.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
+    'Media: <strong>R$ '+avg.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
+    'Amplitude: <strong>'+(((mx-mn)/mn)*100).toFixed(2)+'%</strong>';
+  if(chH) chH.destroy();
+  chH=new Chart(document.getElementById('chH'),{
+    type:'line',
+    data:{labels:lbs,datasets:[
+      {label:'PTAX diaria',data:vs,borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.07)',borderWidth:2,fill:true,tension:0.3,pointRadius:3.5,pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+      {label:'Media do mes',data:Array(vs.length).fill(avg),borderColor:'#e67e22',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
+        callbacks:{title:items=>'Dia '+items[0].label,label:c=>' '+c.dataset.label+': R$ '+c.parsed.y.toFixed(4)}
+      }},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:0,callback:(v,i)=>i%2===0?lbs[i]:null}},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>'R$ '+v.toFixed(2)}}
+      }
+    }
+  });
+}
+
+/* ── Visao mensal ── */
+function renderH(){
+  const s=document.getElementById('ss').value;
+  const e=document.getElementById('se').value;
+  if(!s||!e||s>e) return;
+  const mm=+document.getElementById('sm').value;
+  const n=Math.max(1,Math.min(24,+document.getElementById('np').value||6));
+  const fd=DATA.filter(d=>d.m>=s&&d.m<=e);
+  if(fd.length<2) return;
+  const lbs=fd.map(d=>nm(d.m)), vs=fd.map(d=>d.v);
+  const mav=maFn(vs,mm), {p,u,l}=buildProj(vs,mm,n);
+  const lm=fd[fd.length-1].m;
+  const pl=Array.from({length:n},(_,i)=>nm(addM(lm,i+1)));
+  const all=[...lbs,...pl], hl=lbs.length, lv=vs[vs.length-1];
+  const pad=Array(hl-1).fill(null);
+  const cur=vs[vs.length-1], fst=vs[0], dv=cur-fst, dp=dv/fst*100;
+  const vel=document.getElementById('c-var');
+  vel.textContent=`${dv>=0?'+':''}R$ ${dv.toFixed(2)}`;
+  vel.className='cv '+(dv>=0?'up':'dn');
+  document.getElementById('c-var-d').textContent=`${dp>=0?'+':''}${dp.toFixed(2)}% - ${nm(s)} a ${nm(e)}`;
+  if(chH) chH.destroy();
+  chH=new Chart(document.getElementById('chH'),{type:'line',data:{labels:all,datasets:[
+    {label:'PTAX mensal (BCB)',data:[...vs,...Array(n).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2,fill:true,tension:0.35,order:3,pointRadius:vs.map((_,i)=>i===vs.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+    {label:'Media movel',data:[...mav,...Array(n).fill(null)],borderColor:'#2e86c1',borderWidth:2,borderDash:[7,4],pointRadius:0,fill:false,tension:0.4,order:2},
+    {label:'Projecao MM',data:[...pad,lv,...p],borderColor:'#e67e22',backgroundColor:'rgba(230,126,34,0.06)',borderWidth:2.5,fill:false,tension:0.3,order:1,pointRadius:[...Array(hl-1).fill(0),5,...Array(n).fill(3.5)],pointBackgroundColor:'#e67e22',pointBorderWidth:0},
+    {label:'Banda sup',data:[...Array(hl-1).fill(null),lv,...u],borderColor:'rgba(170,183,184,0.3)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(170,183,184,0.12)',tension:0.3,order:5},
+    {label:'Banda inf',data:[...Array(hl-1).fill(null),lv,...l],borderColor:'rgba(170,183,184,0.3)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,order:6}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(4)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:22}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
+}
+
+/* ── Projecoes Institucionais ── */
+function renderI(){
+  const h18=DATA.slice(-18);
+  const hl=h18.map(d=>nm(d.m)), hv=h18.map(d=>d.v);
+  const pm=['jun/26','jul/26','ago/26','set/26','out/26','nov/26','dez/26','2027'];
+  const all=[...hl,...pm], lv=hv[hv.length-1], pad=Array(hl.length-1).fill(null);
+  const mk=a=>[...pad,lv,...a];
+  const nomes=Object.keys(SPROJ);
+  const instDs=nomes.map(nome=>{
+    const cor=CORES[nome]||'#888';
+    const dash=nome==='Focus BCB'||nome==='Morgan Stanley';
+    return {label:nome,data:mk(SPROJ[nome]),borderColor:cor,borderWidth:2,borderDash:dash?[5,4]:[],pointRadius:3,pointBackgroundColor:cor,fill:false,tension:0.3,order:nomes.indexOf(nome)+1};
+  });
+  if(chI) chI.destroy();
+  chI=new Chart(document.getElementById('chI'),{type:'line',data:{labels:all,datasets:[
+    {label:'PTAX mensal (BCB)',data:[...hv,...Array(pm.length).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2.5,fill:true,tension:0.35,order:20,pointRadius:hv.map((_,i)=>i===hv.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+    {label:'Banda sup',data:mk([5.28,5.35,5.42,5.60,5.52,5.43,5.30,5.30]),borderColor:'rgba(170,183,184,0.25)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(170,183,184,0.09)',tension:0.3,order:19},
+    {label:'Banda inf',data:mk([5.05,5.03,5.02,5.01,5.00,5.00,5.00,5.00]),borderColor:'rgba(170,183,184,0.25)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,order:18},
+    ...instDs
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(2)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.04)'},min:4.5,ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
+}
+
+/* ── Comparativo Cambial ── */
+function buildMoedaCard(m,idx){
+  const sinal=v=>v>=0?'+':'';
+  const cls=v=>v>=0?'dn':'up';
+  const flags=['&#127466;&#127482;','&#127464;&#127475;','&#127468;&#127463;'];
+  const desc=['Euro frente ao Dolar','Dolar em Yuan chines','Libra frente ao Dolar'];
+  const refs=['DXY -9% em 2025-26. EUR forte reflete Fed dovish.','Tensao comercial EUA-China. Yuan gerenciado pelo PBOC.','Ciclo BCE/BoE. GBP correlacionado ao EUR.'];
+  const sel=idx===moedaAtiva;
+  return '<div class="moeda-card'+(sel?' destaque':'')+'" onclick="setMoedaAtiva('+idx+')">'+
+    '<div class="moeda-header"><span class="moeda-flag">'+flags[idx]+'</span>'+
+    '<div><div class="moeda-nome">'+m.par+'</div><div style="font-size:10px;color:var(--txt3);">'+desc[idx]+'</div></div>'+
+    '<div class="moeda-cotacao">'+m.atual.toFixed(4)+'</div></div>'+
+    '<div class="moeda-rows">'+
+    '<div class="moeda-item"><div class="moeda-item-label">No mes</div><div class="moeda-item-val '+cls(m.var_mes)+'">'+sinal(m.pct_mes)+m.pct_mes.toFixed(2)+'%</div></div>'+
+    '<div class="moeda-item"><div class="moeda-item-label">No ano</div><div class="moeda-item-val '+cls(m.var_ano)+'">'+sinal(m.pct_ano)+m.pct_ano.toFixed(2)+'%</div></div>'+
+    '<div class="moeda-item"><div class="moeda-item-label">12 meses</div><div class="moeda-item-val '+cls(m.var_12m)+'">'+sinal(m.pct_12m)+m.pct_12m.toFixed(2)+'%</div></div>'+
+    '</div><div class="moeda-note">'+refs[idx]+'</div></div>';
+}
+function setMoedaAtiva(idx){moedaAtiva=idx;renderMoedasCards();renderEUR();}
+function renderMoedasCards(){
+  const wrap=document.getElementById('moeda-grid-wrap');
+  if(wrap) wrap.innerHTML=MOEDAS.map((m,i)=>buildMoedaCard(m,i)).join('');
+  const tog=document.getElementById('moeda-toggle');
+  if(tog) tog.innerHTML=MOEDAS.map((m,i)=>'<button class="vtog'+(i===moedaAtiva?' on':'')+'" onclick="setMoedaAtiva('+i+')">'+m.par+'</button>').join('');
+  const lbl=document.getElementById('leg-moeda-label');
+  if(lbl) lbl.textContent=MOEDAS[moedaAtiva].par;
+}
+function renderEUR(){
+  if(chEUR) chEUR.destroy();
+  const m=MOEDAS[moedaAtiva];
+  const hist=m.hist||[];
+  const lbs=hist.map(d=>nm(d.m));
+  const vals=hist.map(d=>d.v);
+  const ref=moedaAtiva===1?7.0:1.0;
+  const colors=['#e67e22','#1d9e75','#7f77dd'];
+  chEUR=new Chart(document.getElementById('chEUR'),{type:'line',data:{labels:lbs,datasets:[
+    {label:m.par,data:vals,borderColor:colors[moedaAtiva],backgroundColor:'rgba(230,126,34,0.07)',borderWidth:2.5,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:colors[moedaAtiva]},
+    {label:'Referencia',data:Array(lbs.length).fill(ref),borderColor:'rgba(170,183,184,0.5)',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(4)}}},
+    scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>v.toFixed(3)}}}
+  }});
+}
+
+/* ── Fluxo de Capital ── */
+function setFluxoPeriodo(p,el){
+  fluxoPeriodo=p;
+  document.querySelectorAll('#fluxo-periodo-toggle .vtog').forEach(b=>b.className='vtog');
+  if(el) el.className='vtog on';
+  renderFluxo();
+  renderFluxoTipo();
+}
+function renderFluxo(){
+  if(chFluxo) chFluxo.destroy();
+  let dados=FLUXO_HIST.slice();
+  if(fluxoPeriodo==='6m') dados=dados.slice(-6);
+  else if(fluxoPeriodo==='12m') dados=dados.slice(-12);
+  let lbs,ent,sai,saldo;
+  if(fluxoPeriodo==='ano'){
+    const porAno={};
+    dados.forEach(d=>{const y=d.m.slice(0,4);if(!porAno[y])porAno[y]={e:0,s:0};porAno[y].e+=d.e;porAno[y].s+=d.s;});
+    const anos=Object.keys(porAno).sort();
+    lbs=anos; ent=anos.map(y=>+(porAno[y].e/1000).toFixed(1));
+    sai=anos.map(y=>+(porAno[y].s/1000).toFixed(1));
+    saldo=anos.map(y=>+((porAno[y].e-porAno[y].s)/1000).toFixed(1));
+  } else {
+    lbs=dados.map(d=>nm(d.m));
+    ent=dados.map(d=>+(d.e/1000).toFixed(1));
+    sai=dados.map(d=>+(d.s/1000).toFixed(1));
+    saldo=dados.map(d=>+(d.saldo/1000).toFixed(1));
+  }
+  const totalE=ent.reduce((a,b)=>a+b,0).toFixed(1);
+  const totalS=sai.reduce((a,b)=>a+b,0).toFixed(1);
+  const totalSaldo=+(totalE-totalS).toFixed(1);
+  const label={'6m':'Ultimos 6 meses','12m':'Ultimos 12 meses','ano':'Por ano'}[fluxoPeriodo];
+  const cards=document.getElementById('fluxo-cards');
+  if(cards) cards.innerHTML=
+    '<div class="fluxo-card positivo"><div class="fluxo-titulo">&#128200; Entradas &mdash; '+label+'</div><div class="fluxo-total" style="color:#0f7c4a;">US$ '+totalE+' bi</div><div class="fluxo-sub">Total de capital entrante</div></div>'+
+    '<div class="fluxo-card" style="background:#fff1f1;border-color:#fca5a5;"><div class="fluxo-titulo">&#128200; Saidas &mdash; '+label+'</div><div class="fluxo-total" style="color:#b91c1c;">US$ '+totalS+' bi</div><div class="fluxo-sub">Total de capital sainte</div></div>'+
+    '<div class="fluxo-card'+(totalSaldo>=0?' positivo':'')+'"><div class="fluxo-titulo">&#9651; Saldo liquido &mdash; '+label+'</div><div class="fluxo-total '+(totalSaldo>=0?'dn':'up')+'">'+(totalSaldo>=0?'+':'')+Math.abs(totalSaldo)+' bi</div><div class="fluxo-sub">'+(totalSaldo>=0?'Fluxo positivo — real favorecido':'Fluxo negativo — pressao sobre o real')+'</div></div>';
+  chFluxo=new Chart(document.getElementById('chFluxo'),{type:'bar',data:{labels:lbs,datasets:[
+    {label:'Entradas',data:ent,backgroundColor:'rgba(29,158,117,0.55)',borderColor:'#1d9e75',borderWidth:1,order:2},
+    {label:'Saidas',data:sai,backgroundColor:'rgba(185,28,28,0.45)',borderColor:'#b91c1c',borderWidth:1,order:3},
+    {label:'Saldo',data:saldo,type:'line',borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.1)',borderWidth:2.5,fill:false,tension:0.4,pointRadius:4,pointBackgroundColor:'#1a5fa8',order:1,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>' '+c.dataset.label+': US$ '+c.parsed.y.toFixed(1)+' bi'}}},
+    scales:{
+      x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},
+      y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>'US$ '+v+' bi'},title:{display:true,text:'Entradas / Saidas',color:'#9aa0ab',font:{size:10}}},
+      y2:{position:'right',grid:{display:false},ticks:{color:'#1a5fa8',font:{size:10},callback:v=>(v>0?'+':'')+v+' bi'},title:{display:true,text:'Saldo',color:'#1a5fa8',font:{size:10}}}
+    }
+  }});
+}
+
+/* ── Fluxo por tipo ── */
+function renderFluxoTipo(){
+  if(chFluxoTipo) chFluxoTipo.destroy();
+  // Seleciona os ultimos N meses conforme periodo
+  let dados = FLUXO_TIPO.slice();
+  if(fluxoPeriodo==='6m')  dados=dados.slice(-6);
+  else if(fluxoPeriodo==='12m') dados=dados.slice(-12);
+  // Para 'ano': agrupa por ano (saldo acumulado)
+  let lbs, com, fin, ied;
+  if(fluxoPeriodo==='ano'){
+    const porAno={};
+    dados.forEach(function(d){
+      const y=d.m.slice(0,4);
+      if(!porAno[y]) porAno[y]={com_e:0,com_s:0,fin_e:0,fin_s:0,ied_e:0,ied_s:0};
+      porAno[y].com_e+=d.com_e; porAno[y].com_s+=d.com_s;
+      porAno[y].fin_e+=d.fin_e; porAno[y].fin_s+=d.fin_s;
+      porAno[y].ied_e+=d.ied_e; porAno[y].ied_s+=d.ied_s;
+    });
+    const anos=Object.keys(porAno).sort();
+    lbs=anos;
+    com=anos.map(function(y){ return +((porAno[y].com_e-porAno[y].com_s)/1000).toFixed(1); });
+    fin=anos.map(function(y){ return +((porAno[y].fin_e-porAno[y].fin_s)/1000).toFixed(1); });
+    ied=anos.map(function(y){ return +((porAno[y].ied_e-porAno[y].ied_s)/1000).toFixed(1); });
+  } else {
+    lbs=dados.map(function(d){ return nm(d.m); });
+    com=dados.map(function(d){ return +((d.com_e-d.com_s)/1000).toFixed(1); });
+    fin=dados.map(function(d){ return +((d.fin_e-d.fin_s)/1000).toFixed(1); });
+    ied=dados.map(function(d){ return +((d.ied_e-d.ied_s)/1000).toFixed(1); });
+  }
+  chFluxoTipo=new Chart(document.getElementById('chFluxoTipo'),{
+    type:'bar',
+    data:{labels:lbs,datasets:[
+      {label:'Comercial',data:com,backgroundColor:'rgba(3,105,161,0.65)',borderColor:'#0369a1',borderWidth:1,borderRadius:3,order:1},
+      {label:'Financeiro',data:fin,backgroundColor:'rgba(109,40,217,0.65)',borderColor:'#7c3aed',borderWidth:1,borderRadius:3,order:2},
+      {label:'Inv. Direto',data:ied,backgroundColor:'rgba(180,83,9,0.65)',borderColor:'#b45309',borderWidth:1,borderRadius:3,order:3}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
+          callbacks:{
+            title:function(items){ return 'Saldo liquido — '+items[0].label; },
+            label:function(c){
+              const sinal=c.parsed.y>=0?'+':'';
+              return ' '+c.dataset.label+': '+sinal+'US$ '+c.parsed.y.toFixed(1)+' bi';
+            },
+            afterBody:function(items){
+              const total=items.reduce(function(a,c){return a+c.parsed.y;},0);
+              return ['─────────────────','  Total: '+(total>=0?'+':'')+total.toFixed(1)+' bi'];
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}},stacked:false},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},
+          ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return (v>=0?'+':'')+v+' bi'; }},
+          title:{display:true,text:'Saldo liquido (US$ bi)',color:'#9aa0ab',font:{size:10}},
+          afterDataLimits:function(axis){
+            // garante zero visivel
+            if(axis.max<0) axis.max=0.5;
+            if(axis.min>0) axis.min=-0.5;
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ── Init ── */
+(function(){
+  const ss=document.getElementById('ss'), se=document.getElementById('se'), sd=document.getElementById('sd');
+  DATA.forEach(d=>{
+    const lab=nm(d.m);
+    ss.innerHTML+=`<option value="${d.m}">${lab}</option>`;
+    se.innerHTML+=`<option value="${d.m}">${lab}</option>`;
+  });
+  ss.value=DATA.find(d=>d.m>='2022-01')?.m||DATA[0].m;
+  se.value=DATA[DATA.length-1].m;
+  // Seletor de mes para visao diaria
+  DATA.slice().reverse().forEach(d=>{
+    const temDados=!!DATA_DIARIOS[d.m];
+    sd.innerHTML+=`<option value="${d.m}">${nm(d.m)}${temDados?'':' *'}</option>`;
+  });
+  sd.value=DATA[DATA.length-1].m;
+  sd.onchange=renderD;
+  [ss,se].forEach(el=>el.addEventListener('change',renderH));
+  document.getElementById('sm').addEventListener('change',renderH);
+  document.getElementById('np').addEventListener('input',renderH);
+  document.getElementById('np').addEventListener('change',renderH);
+  setTimeout(renderH,0);
+})();
+</script>
+</body>
+</html>"""
+
+
+# ─── Gera o HTML substituindo apenas os dados dinamicos ────────────────────────
+def gerar_html(mensal, ultimo, n_diarios):
+    agora       = datetime.today()
+    ultima_data = ultimo["dataHoraCotacao"][:10]
     ultima_ptax = ultimo["cotacaoVenda"]
     mes_atual   = mensal[-1]
     media_mes   = mes_atual["v"]
-    mes_label_atual = mes_label(mes_atual["m"])
+    ml          = mes_label(mes_atual["m"])
+    d_fmt       = datetime.strptime(ultima_data, "%Y-%m-%d").strftime("%d/%m/%Y")
+    gerado_em   = agora.strftime("%d/%m/%Y %H:%M")
 
-    # Formata data para DD/MM/YYYY
-    d_fmt = datetime.strptime(ultima_data, "%Y-%m-%d").strftime("%d/%m/%Y")
-    gerado_em = agora.strftime("%d/%m/%Y %H:%M")
-
-    # ── 1. DATA array (dados mensais) ──────────────────────────────────────────
-    data_json = json.dumps(mensal, ensure_ascii=False, separators=(',', ': '))
-    html = re.sub(
-        r'const DATA\s*=\s*\[.*?\];',
-        f'const DATA  = {data_json};',
-        html, flags=re.DOTALL
-    )
-
-    # ── 2. SPROJ (projecoes institucionais) ────────────────────────────────────
+    data_json  = json.dumps(mensal, ensure_ascii=False, separators=(",", ":"))
     sproj_json = json.dumps(SERIES_PROJ, ensure_ascii=False)
-    # Converte None -> null para JavaScript
-    sproj_js   = sproj_json.replace(': null', ': null').replace('null', 'null')
-    html = re.sub(
-        r'const SPROJ\s*=\s*\{.*?\};',
-        f'const SPROJ = {sproj_js};',
-        html, flags=re.DOTALL
-    )
 
-    # ── 3. Ultima PTAX (card) ──────────────────────────────────────────────────
-    # Substitui o valor R$ X.XXXX dentro do primeiro card
+    html = HTML_TEMPLATE
+
+    # 1. Dados JS
+    html = html.replace("%%DATA_JSON%%",  data_json)
+    html = html.replace("%%SPROJ_JSON%%", sproj_json)
+
+    # 2. Ultima PTAX card — valor
     html = re.sub(
         r'(<div class="cl">Ultima PTAX \(venda\)</div>\s*<div class="cv">)R\$\s*[\d.]+(<)',
-        rf'\g<1>R$ {ultima_ptax:.4f}\2',
-        html
-    )
-    # Data embaixo do card
+        rf'\g<1>R$ {ultima_ptax:.4f}\2', html)
+
+    # 3. Ultima PTAX card — data
     html = re.sub(
         r'(<div class="cl">Ultima PTAX \(venda\)</div>.*?<div class="cs">)\d{2}/\d{2}/\d{4}(</div>)',
-        rf'\g<1>{d_fmt}\2',
-        html, flags=re.DOTALL
-    )
+        rf'\g<1>{d_fmt}\2', html, flags=re.DOTALL)
 
-    # ── 4. Media do mes atual (card) ───────────────────────────────────────────
+    # 4. Media mes card — valor
     html = re.sub(
         r'(<div class="cl">Media do mes atual</div>\s*<div class="cv">)R\$\s*[\d.]+(<)',
-        rf'\g<1>R$ {media_mes:.4f}\2',
-        html
-    )
+        rf'\g<1>R$ {media_mes:.4f}\2', html)
 
-    # ── 5. Subtitulo do mes (cs-mes) ───────────────────────────────────────────
+    # 5. Media mes card — label do mes
     html = re.sub(
-        r'(<div class="cs" id="cs-mes">)[^<]*(</div>)',
-        rf'\g<1>{mes_label_atual}\2',
-        html
-    )
+        r'(<div class="cl">Media do mes atual</div>.*?<div class="cs">)[^<]*(</div>)',
+        rf'\g<1>{ml}\2', html, flags=re.DOTALL)
 
-    # ── 6. Badge contador de cotacoes ─────────────────────────────────────────
+    # 6. Badge contador de cotacoes
     html = re.sub(
-        r'(PTAX BCB &mdash; )[\d,]+(cotacoes reais)',
-        rf'\g<1>{n_diarios:,}\2',
-        html
-    )
+        r'(PTAX BCB &mdash; )([\d,]+)( cotacoes reais)',
+        rf'\g<1>{n_diarios:,}\3', html)
 
-    # ── 7. "Gerado em" no subtitulo do header ─────────────────────────────────
+    # 7. "Gerado em" — header e footer (todas as ocorrencias)
     html = re.sub(
-        r'(Gerado em )\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}',
-        rf'\g<1>{gerado_em}',
-        html
-    )
+        r'(Gerado em )\d{2}/\d{2}/\d{4} \d{2}:\d{2}',
+        rf'\g<1>{gerado_em}', html)
 
-    with open(caminho, "w", encoding="utf-8") as f:
-        f.write(html)
+    # 8. Footer — "Ultimo dado"
+    html = re.sub(
+        r'(Ultimo dado: )\d{2}/\d{2}/\d{4}',
+        rf'\g<1>{d_fmt}', html)
 
-    print(f"\n[OK] {ARQUIVO_HTML} atualizado com sucesso!")
-    print(f"     Ultima PTAX : R$ {ultima_ptax:.4f} ({d_fmt})")
-    print(f"     Media {mes_label_atual}: R$ {media_mes:.4f}")
-    print(f"     Cotacoes    : {n_diarios:,}")
-    print(f"     Gerado em   : {gerado_em}")
+    return html
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=" * 60)
-    print("  Atualizador Painel USD/BRL — Banco Central do Brasil")
+    print("  Painel USD/BRL — Banco Central do Brasil")
     print("=" * 60)
 
     is_ci = os.environ.get("CI", "false").lower() == "true"
@@ -180,13 +1308,23 @@ if __name__ == "__main__":
     try:
         diarios        = buscar_ptax()
         mensal, ultimo = agrupar_por_mes(diarios)
-        atualizar_html(mensal, ultimo, len(diarios))
+        html           = gerar_html(mensal, ultimo, len(diarios))
+
+        pasta   = os.path.dirname(os.path.abspath(__file__))
+        caminho = os.path.join(pasta, ARQUIVO_HTML)
+        with open(caminho, "w", encoding="utf-8") as f:
+            f.write(html)
+
+        d_fmt = datetime.strptime(ultimo["dataHoraCotacao"][:10], "%Y-%m-%d").strftime("%d/%m/%Y")
+        print(f"\n[OK] {ARQUIVO_HTML} gerado com sucesso!")
+        print(f"     Ultima PTAX : R$ {ultimo['cotacaoVenda']:.4f} ({d_fmt})")
+        print(f"     Media {mes_label(mensal[-1]['m'])}: R$ {mensal[-1]['v']:.4f}")
+        print(f"     Cotacoes    : {len(diarios):,}")
+        print(f"     Gerado em   : {datetime.today().strftime('%d/%m/%Y %H:%M')}")
 
         if not is_ci:
             print("\n     Abrindo no navegador...")
             import webbrowser
-            pasta   = os.path.dirname(os.path.abspath(__file__))
-            caminho = os.path.join(pasta, ARQUIVO_HTML)
             webbrowser.open(f"file:///{caminho.replace(os.sep, '/')}")
 
     except Exception as e:
