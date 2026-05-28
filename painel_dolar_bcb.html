@@ -23,21 +23,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .badge-ok{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
 
 /* ── Cards topo ── */
-.cards-top{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;}
-@media(max-width:900px){.cards-top{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:600px){.cards-top{grid-template-columns:repeat(2,1fr);}}
-.card{background:var(--bg2);border:1px solid var(--borda);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--sh);}
-.cl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:600;}
-.cv{font-size:21px;font-weight:700;color:var(--txt);line-height:1.2;}
-.cs{font-size:11px;color:var(--txt3);margin-top:4px;}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+@media(max-width:900px){.cards{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr);}}
+.card{background:var(--bg2);border:1px solid var(--borda);border-radius:var(--rl);padding:13px 14px;box-shadow:var(--sh);}
+.card.card-fluxo{background:linear-gradient(135deg,#f0fdf4,#e8faf2);border-color:#86efac;}
+.cl{font-size:9.5px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600;}
+.cv{font-size:18px;font-weight:700;color:var(--txt);line-height:1.2;}
+.cs{font-size:10.5px;color:var(--txt3);margin-top:3px;}
 .up{color:#b91c1c;}.dn{color:#0f7c4a;}
 
-/* ── Card variacao expandido ── */
-.card-var{background:var(--bg2);border:1px solid var(--borda);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--sh);grid-column:span 2;}
-.var-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--borda);font-size:12px;}
-.var-row:last-child{border-bottom:none;padding-bottom:0;}
-.var-label{color:var(--txt2);font-weight:500;}
-.var-val{font-weight:700;font-size:13px;}
+/* ── Toggle visao ── */
+.view-toggle{display:flex;gap:4px;}
+.vtog{padding:5px 14px;font-size:12px;font-weight:500;border:1px solid var(--borda);background:var(--bg);color:var(--txt2);cursor:pointer;border-radius:6px;transition:all .15s;}
+.vtog:hover{border-color:var(--azul);color:var(--azul);}
+.vtog.on{background:var(--azul);color:#fff;border-color:var(--azul);}
 
 /* ── Tabs ── */
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--borda);margin-bottom:0;flex-wrap:wrap;}
@@ -58,35 +58,31 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .cw-tall{position:relative;width:100%;height:260px;}
 
 /* ── Comparativo cambial ── */
-.moeda-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.moeda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
 @media(max-width:700px){.moeda-grid{grid-template-columns:1fr;}}
-.moeda-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;}
+.moeda-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;cursor:pointer;transition:border-color .15s;}
+.moeda-card:hover{border-color:var(--azul2);}
 .moeda-card.destaque{background:#f0f7ff;border-color:#93c5fd;}
 .moeda-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .moeda-flag{font-size:22px;}
 .moeda-nome{font-size:14px;font-weight:700;color:var(--txt);}
-.moeda-cotacao{font-size:24px;font-weight:800;color:var(--azul);margin-left:auto;}
+.moeda-cotacao{font-size:22px;font-weight:800;color:var(--azul);margin-left:auto;}
 .moeda-rows{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .moeda-item{background:var(--bg2);border:1px solid var(--borda);border-radius:8px;padding:8px 10px;text-align:center;}
 .moeda-item-label{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
 .moeda-item-val{font-size:13px;font-weight:700;}
 .moeda-note{font-size:10px;color:var(--txt3);margin-top:10px;padding-top:8px;border-top:1px solid var(--borda);}
-.moeda-slot{background:var(--bg);border:1px dashed var(--borda);border-radius:var(--rl);padding:20px;display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:12px;text-align:center;}
 
 /* ── Fluxo cambial ── */
 .fluxo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
 @media(max-width:700px){.fluxo-grid{grid-template-columns:1fr;}}
 .fluxo-card{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:14px 16px;}
 .fluxo-card.positivo{background:#f0fdf4;border-color:#86efac;}
-.fluxo-card.negativo{background:#fff1f1;border-color:#fca5a5;}
 .fluxo-titulo{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:10px;}
-.fluxo-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05);}
-.fluxo-row:last-of-type{border-bottom:none;}
-.fluxo-total{font-size:18px;font-weight:800;margin-bottom:8px;}
+.fluxo-total{font-size:18px;font-weight:800;margin-bottom:6px;}
 .fluxo-sub{font-size:10px;color:var(--txt3);}
-.tendencia{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:12px;background:#e0f2fe;color:#0369a1;margin-top:8px;}
 
-/* ── Fluxo por tipo ── */
+/* ── Fluxo por tipo (novo) ── */
 .tipo-secao-titulo{font-size:11px;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
 .tipo-secao-titulo::after{content:'';flex:1;height:1px;background:var(--borda);}
 .tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px;}
@@ -102,7 +98,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .tipo-row-label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt2);}
 .tipo-row-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .tipo-row-val{font-size:13px;font-weight:700;}
-.tipo-row-bar-wrap{width:80px;height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-left:6px;}
+.tipo-row-bar-wrap{width:90px;height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-left:8px;}
 .tipo-row-bar{height:100%;border-radius:3px;}
 .tipo-saldo-box{margin-top:12px;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
 .tipo-saldo-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
@@ -110,12 +106,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .tipo-saldo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
 .fluxo-total-bar{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:16px 18px;margin-bottom:18px;}
 .ftb-title{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
-.ftb-row{display:grid;grid-template-columns:90px 1fr 120px;align-items:center;gap:12px;margin-bottom:10px;}
+.ftb-row{display:grid;grid-template-columns:90px 1fr 80px;align-items:center;gap:12px;margin-bottom:10px;}
 .ftb-row:last-child{margin-bottom:0;}
-.ftb-label{font-size:11px;font-weight:600;}
-.ftb-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;}
-.ftb-fill{height:100%;border-radius:6px;}
-.ftb-val{font-size:11px;font-weight:700;text-align:right;}
+.ftb-label{font-size:11px;color:var(--txt2);font-weight:600;}
+.ftb-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative;}
+.ftb-fill{height:100%;border-radius:6px;transition:width .4s ease;}
+.ftb-val{font-size:12px;font-weight:700;text-align:right;}
 .impacto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
 @media(max-width:700px){.impacto-grid{grid-template-columns:1fr;}}
 .impacto-item{border-radius:var(--rl);padding:12px 14px;border:1px solid;}
@@ -123,7 +119,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .impacto-nome{font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px;}
 .impacto-desc{font-size:10px;color:var(--txt2);line-height:1.5;}
 
-/* ── Grid institucional ── */
+/* ── Institucional ── */
 .igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
 @media(max-width:700px){.igrid{grid-template-columns:repeat(2,1fr);}}
 .ic{background:var(--bg);border:1px solid var(--borda);border-radius:var(--rl);padding:13px 15px;}
@@ -168,8 +164,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .tag-alto{background:#fee2e2;color:#991b1b;}
 .tag-medio{background:#fef3c7;color:#92400e;}
 .tag-baixo{background:#d1fae5;color:#065f46;}
-.foot{font-size:10px;color:var(--txt3);line-height:1.7;padding:10px 0;}
 .section-sep{border:none;border-top:1px solid var(--borda);margin:18px 0;}
+.foot{font-size:10px;color:var(--txt3);line-height:1.7;padding:10px 0;}
 </style>
 </head>
 <body>
@@ -177,49 +173,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 <div class="hdr">
   <div>
-    <h1>Painel USD/BRL — Visao Estrategica Macroeconomica</h1>
-    <p>Cotacoes PTAX · Variacoes multiplos horizontes · Comparativo cambial · Fluxo de Capital · Projecoes Institucionais · Gerado em 28/05/2026 14:15</p>
+    <h1>Painel USD/BRL &mdash; Banco Central do Brasil</h1>
+    <p>Cotacoes PTAX diarias &middot; Medias mensais &middot; Comparativo Cambial &middot; Fluxo de Capital &middot; Projecoes Institucionais &middot; Gerado em 28/05/2026 14:39</p>
   </div>
   <span class="badge badge-ok">&#10003; PTAX BCB &mdash; 1,860 cotacoes reais</span>
 </div>
 
 <!-- ── CARDS TOPO ── -->
-<div class="cards-top">
+<div class="cards">
   <div class="card">
     <div class="cl">Ultima PTAX (venda)</div>
     <div class="cv">R$ 5.0579</div>
     <div class="cs">27/05/2026</div>
   </div>
   <div class="card">
-    <div class="cl">Media do mes</div>
+    <div class="cl">Media do mes atual</div>
     <div class="cv">R$ 4.9759</div>
-    <div class="cs">mai/2026</div>
+    <div class="cs">mai/26</div>
   </div>
-  <!-- Card variacao expandido -->
-  <div class="card-var">
-    <div class="cl" style="margin-bottom:10px;">Variacao USD/BRL (PTAX)</div>
-    <div class="var-row">
-      <span class="var-label">&#128197; No mes (vs. abr/26)</span>
-      <span class="var-val"><span class="dn">R$ 0.0572 (-1.14%)</span></span>
-    </div>
-    <div class="var-row">
-      <span class="var-label">&#128336; Acumulado no ano</span>
-      <span class="var-val"><span class="dn">R$ 0.3621 (-6.78%)</span></span>
-    </div>
-    <div class="var-row">
-      <span class="var-label">&#128200; Ultimos 12 meses</span>
-      <span class="var-val"><span class="dn">R$ 0.6915 (-12.20%)</span></span>
-    </div>
+  <div class="card">
+    <div class="cl">Variacao USD/BRL (PTAX)</div>
+    <div class="cv" id="c-var">-</div>
+    <div class="cs" id="c-var-d">-</div>
+  </div>
+  <div class="card card-fluxo">
+    <div class="cl">Fluxo Cambial (mai/2026)</div>
+    <div class="cv dn">+US$ 9,2 bi</div>
+    <div class="cs">Semana 20&#8209;24/abr &middot; recorde historico</div>
   </div>
   <div class="card">
     <div class="cl">Focus dez/26</div>
     <div class="cv">R$ 5,17</div>
-    <div class="cs">Boletim Focus · 25/mai/2026</div>
-  </div>
-  <div class="card">
-    <div class="cl">Fluxo cambial (abr/2026)</div>
-    <div class="cv dn">+US$ 18.6 bi</div>
-    <div class="cs">Saldo liquido · entrada - saida</div>
+    <div class="cs">Boletim Focus BCB &middot; 25/mai/2026</div>
   </div>
 </div>
 
@@ -232,19 +217,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   <button class="tab"    onclick="setTab('a',this)">&#128240; Analise de Mercado</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     PAINEL 1: HISTORICO
-     ════════════════════════════════════════════════════════════════════════ -->
+<!-- ══ PAINEL 1: HISTORICO ══ -->
 <div id="ph" class="panel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-    <div class="ptitle" style="margin-bottom:0;">Evolucao historica PTAX (BCB)</div>
+    <div class="ptitle" style="margin:0;">Evolucao historica PTAX (BCB) e projecao por media movel</div>
     <div class="view-toggle">
       <button class="vtog on" id="btn-mensal" onclick="setView('mensal')">&#128197; Mensal</button>
       <button class="vtog"    id="btn-diario" onclick="setView('diario')">&#128202; Diario</button>
     </div>
   </div>
 
-  <!-- Controles visao mensal -->
+  <!-- Controles mensal -->
   <div id="ctrl-mensal" class="ctrl">
     <div class="cg"><label>Periodo inicial</label><select id="ss"></select></div>
     <div class="cg"><label>Periodo final</label><select id="se"></select></div>
@@ -261,13 +244,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 
-  <!-- Controles visao diaria -->
+  <!-- Controles diario -->
   <div id="ctrl-diario" style="display:none;margin-bottom:18px;">
-    <div class="cg" style="max-width:220px;">
-      <label>Selecione o mes</label>
-      <select id="sd"></select>
+    <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div class="cg" style="min-width:200px;">
+        <label>Selecione o mes</label>
+        <select id="sd"></select>
+      </div>
+      <div id="diario-info" style="font-size:12px;color:var(--txt2);padding-bottom:2px;"></div>
     </div>
-    <div id="diario-info" style="margin-top:10px;font-size:12px;color:var(--txt2);"></div>
   </div>
 
   <!-- Legenda mensal -->
@@ -277,25 +262,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="li"><div class="ll" style="background:var(--laranja)"></div>Projecao MM</div>
     <div class="li"><div class="ll" style="background:#aab7b8;opacity:.6"></div>Banda &plusmn;1&sigma;</div>
   </div>
-  <!-- Legenda diaria -->
+  <!-- Legenda diario -->
   <div id="leg-diario" class="leg" style="display:none;">
     <div class="li"><div class="ll" style="background:var(--azul)"></div>PTAX diaria (BCB)</div>
     <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,var(--laranja) 0 5px,transparent 5px 9px)"></div>Media do mes</div>
   </div>
 
-  <div class="cw"><canvas id="chH"></canvas></div>
+  <div class="cw"><canvas id="chH" aria-label="Historico PTAX e projecao USD/BRL"></canvas></div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     PAINEL 2: COMPARATIVO CAMBIAL
-     ════════════════════════════════════════════════════════════════════════ -->
+<!-- ══ PAINEL 2: COMPARATIVO CAMBIAL ══ -->
 <div id="pc" class="panel" style="display:none">
-  <div class="ptitle">Comparativo cambial — Dolar frente a moedas relevantes</div>
+  <div class="ptitle">Comparativo cambial &mdash; Dolar frente a moedas relevantes</div>
 
-  <!-- Grade de moedas: gerada pelo JS com dados de MOEDAS -->
-  <div id="moeda-grid-wrap" class="moeda-grid" style="grid-template-columns:repeat(3,1fr);"></div>
+  <div id="moeda-grid-wrap" class="moeda-grid"></div>
 
-  <!-- Contexto macro -->
   <div class="an-card neutro" style="margin:14px 0;">
     <div class="an-titulo"><span class="an-ico">&#127760;</span> Por que acompanhar essas moedas?</div>
     <div class="an-texto">
@@ -308,37 +289,34 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 
-  <!-- Toggle moeda para grafico -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-    <div class="ptitle" style="margin:0;">Historico 12 meses — selecione o par:</div>
+    <div class="ptitle" style="margin:0;">Historico 12 meses &mdash; selecione o par:</div>
     <div id="moeda-toggle" style="display:flex;gap:4px;"></div>
   </div>
-  <div class="leg" id="leg-moeda">
+  <div class="leg">
     <div class="li"><div class="ll" style="background:#e67e22"></div><span id="leg-moeda-label">EUR/USD</span></div>
     <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,#aab7b8 0 5px,transparent 5px 9px)"></div>Paridade / referencia</div>
   </div>
   <div class="cw-tall"><canvas id="chEUR"></canvas></div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════════════════════════════
-     PAINEL 3: FLUXO DE CAPITAL
-     ════════════════════════════════════════════════════════════════════════ -->
+<!-- ══ PAINEL 3: FLUXO DE CAPITAL ══ -->
 <div id="pf" class="panel" style="display:none">
+
+  <!-- Cabeçalho + filtro de período -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
     <div class="ptitle" style="margin:0;">Fluxo Cambial &mdash; Movimentacao de capital internacional (BCB)</div>
     <div class="view-toggle" id="fluxo-periodo-toggle">
       <button class="vtog on" onclick="setFluxoPeriodo('6m',this)">6 meses</button>
       <button class="vtog"    onclick="setFluxoPeriodo('12m',this)">12 meses</button>
-      <button class="vtog"    onclick="setFluxoPeriodo('24m',this)">24 meses</button>
       <button class="vtog"    onclick="setFluxoPeriodo('ano',this)">Por ano</button>
     </div>
   </div>
 
-  <!-- ① Cards resumo total (JS) -->
+  <!-- ① Cards resumo total (atualizados pelo JS) -->
   <div class="fluxo-grid" id="fluxo-cards"></div>
 
-  <!-- ② Grafico total -->
+  <!-- ② Grafico geral + legenda -->
   <div class="leg">
     <div class="li"><div class="ll" style="background:#1d9e75"></div>Entradas (US$ bi)</div>
     <div class="li"><div class="ll" style="background:#b91c1c"></div>Saidas (US$ bi)</div>
@@ -348,58 +326,68 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
   <hr class="section-sep">
 
-  <!-- ③ Detalhamento por tipo — dados reais BCB SGS BPM6 -->
-  <div class="tipo-secao-titulo">&#128202; Detalhamento por tipo &mdash; abr/2026 &middot; <span style="font-weight:400;font-size:10px;color:var(--txt3);">Fonte: BCB SGS BPM6 (8/8 series reais)</span></div>
+  <!-- ③ VISÃO DETALHADA POR TIPO -->
+  <div class="tipo-secao-titulo">&#128202; Detalhamento por tipo de fluxo &mdash; ultimo mes disponivel (mai/2026)</div>
 
-  <!-- Barra de participacao -->
+  <!-- Barra comparativa de participação -->
   <div class="fluxo-total-bar">
     <div class="ftb-title">Participacao de cada segmento no fluxo total de entradas</div>
     <div class="ftb-row">
       <span class="ftb-label" style="color:#0369a1;">&#9632; Comercial</span>
-      <div class="ftb-track"><div class="ftb-fill" style="width:68%;background:linear-gradient(90deg,#0369a1,#38bdf8);"></div></div>
-      <span class="ftb-val" style="color:#0369a1;">68% &mdash; US$ 34.3 bi</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:38%;background:linear-gradient(90deg,#0369a1,#38bdf8);"></div></div>
+      <span class="ftb-val" style="color:#0369a1;">38% &mdash; US$ 14,7 bi</span>
     </div>
     <div class="ftb-row">
       <span class="ftb-label" style="color:#7c3aed;">&#9632; Financeiro</span>
-      <div class="ftb-track"><div class="ftb-fill" style="width:0%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
-      <span class="ftb-val" style="color:#7c3aed;">0% &mdash; US$ 0.0 bi</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:45%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+      <span class="ftb-val" style="color:#7c3aed;">45% &mdash; US$ 17,4 bi</span>
     </div>
     <div class="ftb-row">
       <span class="ftb-label" style="color:#b45309;">&#9632; Inv. Direto</span>
-      <div class="ftb-track"><div class="ftb-fill" style="width:32%;background:linear-gradient(90deg,#b45309,#fbbf24);"></div></div>
-      <span class="ftb-val" style="color:#b45309;">32% &mdash; US$ 16.2 bi</span>
+      <div class="ftb-track"><div class="ftb-fill" style="width:17%;background:linear-gradient(90deg,#b45309,#fbbf24);"></div></div>
+      <span class="ftb-val" style="color:#b45309;">17% &mdash; US$ 6,5 bi</span>
     </div>
   </div>
 
-  <!-- Cards por tipo -->
+  <!-- Cards detalhados por tipo -->
   <div class="tipo-grid">
+
     <!-- COMERCIAL -->
     <div class="tipo-card">
       <div class="tipo-header" style="background:linear-gradient(135deg,#0369a1,#0284c7);">
         <div class="tipo-icone">&#128674;</div>
-        <div><div class="tipo-nome">Fluxo Comercial</div><div class="tipo-desc">Exportacoes e importacoes de bens (BCB BPM6)</div></div>
+        <div>
+          <div class="tipo-nome">Fluxo Comercial</div>
+          <div class="tipo-desc">Exportacoes, importacoes e servicos</div>
+        </div>
       </div>
       <div class="tipo-body">
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#0f7c4a;"></div>Entradas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:68%;background:#0f7c4a;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:78%;background:#0f7c4a;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 34.3 bi</span>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 14,7 bi</span>
         </div>
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#b91c1c;"></div>Saidas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:72%;background:#b91c1c;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:60%;background:#b91c1c;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 24.6 bi</span>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 11,3 bi</span>
         </div>
         <div class="tipo-saldo-box" style="background:#f0fdf4;border:1px solid #86efac;">
-          <div><div class="tipo-saldo-label" style="color:#065f46;">Saldo Liquido</div>
-          <div class="tipo-saldo-val dn">+US$ 9.7 bi</div></div>
-          <span class="tipo-saldo-badge" style="background:#d1fae5;color:#065f46;">&#9650; Exportacoes</span>
+          <div>
+            <div class="tipo-saldo-label" style="color:#065f46;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#0f7c4a;">+US$ 3,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#d1fae5;color:#065f46;">&#9650; Entrada liquida</span>
         </div>
         <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
-          Serie BCB SGS 22708 (exportacoes) e 22709 (importacoes) &middot; Balanca comercial de bens BPM6 &middot; Transacoes Correntes.
-          Saldo positivo = exportacoes maiores que importacoes — oferta de dolares no mercado domestico.
+          <strong style="color:var(--txt2);">O que e:</strong> receitas de exportacoes de commodities (soja, petroleo, minerio), menos pagamentos de importacoes e servicos.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> saldo positivo significa mais dolares entrando do que saindo pelo comercio — fortalece o BRL.
         </div>
       </div>
     </div>
@@ -408,29 +396,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="tipo-card">
       <div class="tipo-header" style="background:linear-gradient(135deg,#6d28d9,#7c3aed);">
         <div class="tipo-icone">&#128200;</div>
-        <div><div class="tipo-nome">Fluxo Financeiro</div><div class="tipo-desc">Carteira + outros investimentos (BCB BPM6)</div></div>
+        <div>
+          <div class="tipo-nome">Fluxo Financeiro</div>
+          <div class="tipo-desc">Capitais, carry trade e portfólio</div>
+        </div>
       </div>
       <div class="tipo-body">
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#0f7c4a;"></div>Entradas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:0%;background:#0f7c4a;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:92%;background:#0f7c4a;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 0.0 bi</span>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 17,4 bi</span>
         </div>
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#b91c1c;"></div>Saidas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:0%;background:#b91c1c;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:72%;background:#b91c1c;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 0.0 bi</span>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 13,6 bi</span>
         </div>
         <div class="tipo-saldo-box" style="background:#f5f3ff;border:1px solid #c4b5fd;">
-          <div><div class="tipo-saldo-label" style="color:#5b21b6;">Saldo Liquido</div>
-          <div class="tipo-saldo-val dn">+US$ 0.0 bi</div></div>
-          <span class="tipo-saldo-badge" style="background:#ede9fe;color:#5b21b6;">&#9650; Carry trade</span>
+          <div>
+            <div class="tipo-saldo-label" style="color:#5b21b6;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#6d28d9;">+US$ 3,8 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#ede9fe;color:#5b21b6;">&#9650; Carry trade ativo</span>
         </div>
         <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
-          Series BCB SGS 22934/22935 (inv. carteira passivos) + 23038/23039 (outros inv. passivos) &middot; Conta Financeira BPM6.
-          Mais volatil: responde a mudancas no diferencial Selic-Fed.
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos em renda fixa, acoes (B3) e derivativos. Inclui carry trade: estrangeiros captam em moedas baratas e aplicam na Selic (14,75%).<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> e o maior e mais volatil dos tres — move o dolar rapidamente em dias de stress.
         </div>
       </div>
     </div>
@@ -439,79 +436,88 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="tipo-card">
       <div class="tipo-header" style="background:linear-gradient(135deg,#92400e,#b45309);">
         <div class="tipo-icone">&#127981;</div>
-        <div><div class="tipo-nome">Investimento Direto</div><div class="tipo-desc">IDP — investimento direto no pais (BCB BPM6)</div></div>
+        <div>
+          <div class="tipo-nome">Investimento Direto</div>
+          <div class="tipo-desc">IED — empresas e infraestrutura</div>
+        </div>
       </div>
       <div class="tipo-body">
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#0f7c4a;"></div>Entradas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:32%;background:#0f7c4a;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#0f7c4a;"></div>
+            Entradas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:34%;background:#0f7c4a;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 16.2 bi</span>
+          <span class="tipo-row-val" style="color:#0f7c4a;">+US$ 6,5 bi</span>
         </div>
         <div class="tipo-row">
-          <div class="tipo-row-label"><div class="tipo-row-dot" style="background:#b91c1c;"></div>Saidas
-            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:21%;background:#b91c1c;"></div></div>
+          <div class="tipo-row-label">
+            <div class="tipo-row-dot" style="background:#b91c1c;"></div>
+            Saidas
+            <div class="tipo-row-bar-wrap"><div class="tipo-row-bar" style="width:26%;background:#b91c1c;"></div></div>
           </div>
-          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 7.2 bi</span>
+          <span class="tipo-row-val" style="color:#b91c1c;">-US$ 5,1 bi</span>
         </div>
         <div class="tipo-saldo-box" style="background:#fffbeb;border:1px solid #fcd34d;">
-          <div><div class="tipo-saldo-label" style="color:#78350f;">Saldo Liquido</div>
-          <div class="tipo-saldo-val dn">+US$ 8.9 bi</div></div>
-          <span class="tipo-saldo-badge" style="background:#fef3c7;color:#78350f;">&#9654; Estrutural</span>
+          <div>
+            <div class="tipo-saldo-label" style="color:#78350f;">Saldo Liquido</div>
+            <div class="tipo-saldo-val" style="color:#92400e;">+US$ 1,4 bi</div>
+          </div>
+          <span class="tipo-saldo-badge" style="background:#fef3c7;color:#78350f;">&#9654; Entrada moderada</span>
         </div>
         <div style="margin-top:10px;font-size:10px;color:var(--txt3);line-height:1.6;">
-          Series BCB SGS 22886 (IDP ingressos) e 22887 (IDP saidas) &middot; Conta Financeira BPM6.
-          Fluxo de longo prazo: fabricas, concessoes, aquisicoes. Mais estavel que o financeiro.
+          <strong style="color:var(--txt2);">O que e:</strong> investimentos estrangeiros em empresas brasileiras, fabrics, concessoes e aquisicoes. Fluxo estrutural de longo prazo.<br>
+          <strong style="color:var(--txt2);">Impacto no real:</strong> mais estavel que o financeiro; sinaliza confianca de longo prazo na economia brasileira.
         </div>
       </div>
     </div>
   </div><!-- /tipo-grid -->
 
-  <!-- ④ Grafico saldo por tipo -->
-  <div class="tipo-secao-titulo" style="margin-top:22px;">&#128202; Saldo liquido mensal por tipo &mdash; dados reais BCB SGS BPM6</div>
+  <!-- ④ Grafico por tipo (barras empilhadas) -->
+  <div class="tipo-secao-titulo" style="margin-top:22px;">&#128202; Evolucao mensal do saldo liquido por tipo &mdash; ultimos 6 meses</div>
   <div class="leg">
-    <div class="li"><div class="ll" style="background:#0369a1"></div>Comercial (Sg. 22708/22709)</div>
-    <div class="li"><div class="ll" style="background:#7c3aed"></div>Financeiro (Sg. 22934/22935+23038/23039)</div>
-    <div class="li"><div class="ll" style="background:#b45309"></div>Inv. Direto IDP (Sg. 22886/22887)</div>
+    <div class="li"><div class="ll" style="background:#0369a1"></div>Comercial</div>
+    <div class="li"><div class="ll" style="background:#7c3aed"></div>Financeiro</div>
+    <div class="li"><div class="ll" style="background:#b45309"></div>Inv. Direto</div>
   </div>
   <div class="cw-tall"><canvas id="chFluxoTipo"></canvas></div>
 
-  <!-- ⑤ Impacto no cambio -->
+  <!-- ⑤ Impacto no câmbio -->
   <hr class="section-sep">
   <div class="tipo-secao-titulo">&#127919; Como cada tipo pressiona o dolar</div>
   <div class="impacto-grid">
     <div class="impacto-item" style="background:#eff6ff;border-color:#93c5fd;">
       <div class="impacto-seta" style="color:#0369a1;">&#8595; Dolar cai</div>
       <div class="impacto-nome">Quando comercial e positivo</div>
-      <div class="impacto-desc">Exportadores vendem dolares no mercado para pagar custos em reais. Mais oferta de USD = pressao de queda no cambio. Soja e petroleo sao os principais motores.</div>
+      <div class="impacto-desc">Exportadores vendem dolares no mercado para pagar custos em reais. Mais oferta de USD = pressao de queda no cambio. Soja e petroleo sao os principais motores em mai/2026.</div>
     </div>
     <div class="impacto-item" style="background:#f5f3ff;border-color:#c4b5fd;">
       <div class="impacto-seta" style="color:#7c3aed;">&#8597; Alta volatilidade</div>
       <div class="impacto-nome">Quando financeiro domina</div>
-      <div class="impacto-desc">Carry trade e portfólio ampliam entradas em bonancas e saidas abruptas em crises. Responde a qualquer mudanca no diferencial Selic-Fed. Move a PTAX no curto prazo.</div>
+      <div class="impacto-desc">Carry trade e fluxo de portfolio ampliam entradas em bonancas e saidas abruptas em crises. Responde a qualquer mudanca no diferencial Selic-Fed. E o segmento que mais move a PTAX no curto prazo.</div>
     </div>
     <div class="impacto-item" style="background:#fffbeb;border-color:#fcd34d;">
       <div class="impacto-seta" style="color:#b45309;">&#8594; Estabilizador</div>
-      <div class="impacto-nome">Quando IDP e consistente</div>
-      <div class="impacto-desc">Investimento direto nao sai rapido: e fabrica, concessao, aquisicao. Funciona como ancora cambial de longo prazo. Reducao sustentada sinaliza perda de confianca estrutural.</div>
+      <div class="impacto-nome">Quando IED e consistente</div>
+      <div class="impacto-desc">Investimento direto nao sai rapido: e fabrica, concessao, aquisicao. Funciona como ancora cambial de longo prazo. Sua reducao sinaliza deterioracao da confianca estrutural no pais.</div>
     </div>
   </div>
 
   <hr class="section-sep">
+  <!-- ⑥ Card interpretativo -->
   <div class="an-card destaque">
     <div class="an-titulo"><span class="an-ico">&#128270;</span> Como ler este painel &mdash; guia rapido</div>
     <div class="an-texto">
       <strong>Saldo total positivo</strong> (entrada &gt; saida) significa que mais dolares entraram no Brasil do que sairam — o real tende a se valorizar.<br><br>
-      <strong>&#128674; Comercial</strong> — Base estavel. Mede se o Brasil exporta mais do que importa (BCB SGS 22708/22709 — Balanca Comercial de Bens BPM6).<br><br>
-      <strong>&#128200; Financeiro</strong> — Mais sensivel. Inclui inv. em carteira (acoes, titulos) e outros investimentos passivos. Qualquer mudanca no humor do mercado aparece aqui primeiro (BCB SGS 22934/22935/23038/23039).<br><br>
-      <strong>&#127981; Investimento Direto (IDP)</strong> — Mais robusto. Reflete decisoes estrategicas de multinacionais: fabricas, concessoes, M&amp;A (BCB SGS 22886/22887).<br><br>
-      <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;font-weight:600;color:#78350f;">Fonte: BCB SGS BPM6 (8/8 series reais)</span>
+      <strong>&#128674; Comercial</strong> — E a base estavel. Mede se o Brasil esta exportando mais do que importando. Saldo positivo = dolares dos exportadores sendo convertidos em reais.<br><br>
+      <strong>&#128200; Financeiro</strong> — E o mais sensivel. Qualquer mudanca no humor do mercado (eleicoes, Fed, fiscal) aparece aqui primeiro, antes de chegar na PTAX.<br><br>
+      <strong>&#127981; Investimento Direto</strong> — E o mais robusto. Reflete decisoes estrategicas de multinacionais. Uma queda sustentada aqui pode indicar perda de competitividade ou ambiente de negocios deteriorado.<br><br>
+      <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;font-weight:600;color:#78350f;">&#9888; Atencao:</span> Em mai/2026, o fluxo financeiro domina as entradas (45%) — o que significa que a manutencao do diferencial Selic-Fed e o fator critico para preservar o real forte. Reducao da Selic ou alta do Fed pode inverter rapidamente esse quadro.
     </div>
   </div>
 </div>
 
-
-     ════════════════════════════════════════════════════════════════════════ -->
+<!-- ══ PAINEL 4: INSTITUCIONAL ══ -->
 <div id="pi" class="panel" style="display:none">
   <div class="ptitle">Projecoes institucionais sobrepostas ao historico PTAX</div>
   <div class="igrid">
@@ -520,42 +526,42 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,17</span></div>
       <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,26</span></div>
       <div class="ir"><span class="irl">2028</span><span class="irv">R$ 5,30</span></div>
-      <div class="inote">Mediana de mercado · Boletim Focus 25/mai/2026</div>
+      <div class="inote">Mediana de mercado &middot; Boletim Focus 25/mai/2026</div>
     </div>
     <div class="ic">
       <div class="in"><div class="idot" style="background:#e67e22"></div>XP Investimentos</div>
       <div class="ir"><span class="irl">Dez/2026</span><span class="irv dn">R$ 5,00</span></div>
       <div class="ir"><span class="irl">Selic 2026</span><span class="irv">13,75%</span></div>
       <div class="ir"><span class="irl">Tese</span><span class="irv">BRL vencedor</span></div>
-      <div class="inote">Macro Mensal · mai/2026</div>
+      <div class="inote">Macro Mensal &middot; mai/2026</div>
     </div>
     <div class="ic">
       <div class="in"><div class="idot" style="background:#1d9e75"></div>Bradesco</div>
       <div class="ir"><span class="irl">Dez/2026</span><span class="irv dn">R$ 5,00</span></div>
       <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,00</span></div>
       <div class="ir"><span class="irl">Selic 2026</span><span class="irv">12,75%</span></div>
-      <div class="inote">Relatorio · mai/2026</div>
+      <div class="inote">Relatorio &middot; mai/2026</div>
     </div>
     <div class="ic">
       <div class="in"><div class="idot" style="background:#7f77dd"></div>Itau</div>
       <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,15</span></div>
       <div class="ir"><span class="irl">2027</span><span class="irv">R$ 5,30</span></div>
       <div class="ir"><span class="irl">Cenario</span><span class="irv">Moderado</span></div>
-      <div class="inote">Relatorio · mai/2026</div>
+      <div class="inote">Relatorio &middot; mai/2026</div>
     </div>
     <div class="ic">
       <div class="in"><div class="idot" style="background:#d4537e"></div>Morgan Stanley</div>
       <div class="ir"><span class="irl">Pico 3T26</span><span class="irv up">R$ 5,60</span></div>
       <div class="ir"><span class="irl">Dez/2026</span><span class="irv">R$ 5,30</span></div>
       <div class="ir"><span class="irl">Driver</span><span class="irv">Eleicoes BR</span></div>
-      <div class="inote">Cenario ponderado · eleicoes</div>
+      <div class="inote">Cenario ponderado &middot; eleicoes</div>
     </div>
     <div class="ic hl">
       <div class="in"><div class="idot" style="background:#1a5fa8"></div>Focus dez/2026</div>
       <div class="ir"><span class="irl">Minimo</span><span class="irv dn">R$ 5,00</span></div>
       <div class="ir"><span class="irl">Mediana</span><span class="irv">R$ 5,17</span></div>
       <div class="ir"><span class="irl">Maximo</span><span class="irv up">R$ 5,60</span></div>
-      <div class="inote">5 instituicoes · relatorios 25/mai/2026</div>
+      <div class="inote">5 instituicoes &middot; relatorios mai/2026</div>
     </div>
   </div>
   <div class="leg">
@@ -567,12 +573,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="li"><div class="ll" style="background:repeating-linear-gradient(90deg,#d4537e 0 4px,transparent 4px 8px)"></div>Morgan Stanley</div>
     <div class="li"><div class="ll" style="background:#aab7b8;opacity:.5"></div>Banda consenso</div>
   </div>
-  <div class="cw"><canvas id="chI"></canvas></div>
+  <div class="cw"><canvas id="chI" aria-label="Comparativo de projecoes USD/BRL por instituicao"></canvas></div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     PAINEL 5: ANALISE DE MERCADO
-     ════════════════════════════════════════════════════════════════════════ -->
+<!-- ══ PAINEL 5: ANALISE DE MERCADO ══ -->
 <div id="pa" class="panel" style="display:none">
   <div class="ptitle">Analise de Mercado &mdash; O que esta movendo o dolar em mai/2026</div>
 
@@ -595,13 +599,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <div class="an-titulo"><span class="an-ico">&#9650;</span> Fatores que fortalecem o real</div>
       <div class="an-texto">
         <strong>Diferencial de juros (carry trade):</strong> Com a Selic em 14,75% e o Fed entre 3,50-3,75%,
-        o spread e um dos mais atrativos do mundo, atraindo capital estrangeiro para renda fixa brasileira.<br><br>
+        o spread real e um dos mais atrativos do mundo, atraindo capital estrangeiro para renda fixa brasileira.<br><br>
         <strong>Fluxo externo recorde:</strong> Na semana de 20-24/abr, o Brasil registrou entrada liquida de
-        <strong>US$ 9,2 bilhoes</strong> — o maior ingresso semanal da historia (BTG Pactual/BCB).
-        Investidores estrangeiros representam 61,2% dos negocios da B3 em 2026.<br><br>
+        <strong>US$ 9,2 bilhoes</strong> &mdash; o maior ingresso semanal da historia (BTG Pactual/BCB).
+        Investidores estrangeiros representam 61,2% dos negocios da B3 em 2026, primeira vez acima de 60%.<br><br>
         <strong>Commodities e geopolitica:</strong> O conflito no Oriente Medio manteve o petroleo acima de US$ 100,
-        beneficiando o Brasil como exportador.<br><br>
-        <strong>Dolar global mais fraco:</strong> O DXY recuou ~9% em 2025.
+        beneficiando o Brasil como exportador. A XP classifica o Brasil como <em>"vencedor relativo"</em> no contexto geopolitico atual.<br><br>
+        <strong>Dolar global mais fraco:</strong> O indice DXY recuou ~9% em 2025.
         Com o Fed cortando juros, o capital migra para emergentes com retorno superior.
       </div>
     </div>
@@ -609,15 +613,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="an-card risco">
       <div class="an-titulo"><span class="an-ico">&#9660;</span> Fatores de risco (pressao de alta no dolar)</div>
       <div class="an-texto">
-        <strong>Eleicoes presidenciais (out/2026):</strong> Anos eleitorais no Brasil seguem padrao historico:
+        <strong>Eleicoes presidenciais (out/2026):</strong> Anos eleitorais no Brasil seguem um padrao historico claro:
         1S calmo, 3T com pico de volatilidade, 4T com acomodacao pos-urnas.
-        O Morgan Stanley projeta pico de <strong>R$ 5,60 no 3T26</strong>.<br><br>
-        <strong>Risco fiscal:</strong> Aumento dos gastos em ano eleitoral preocupa o mercado.
-        Deterioracao das contas publicas pode reverter o fluxo externo rapidamente.<br><br>
+        O Morgan Stanley projeta pico de <strong>R$ 5,60 no 3T26</strong> por conta desse risco.<br><br>
+        <strong>Risco fiscal:</strong> O aumento dos gastos em ano eleitoral preocupa o mercado.
+        Qualquer deterioracao nas contas publicas pode reverter o fluxo externo rapidamente.<br><br>
         <strong>Reducao do diferencial de juros:</strong> A Selic em ciclo de queda estreita o spread com os EUA.
         Se o corte for percebido como precipitado, o real perde atratividade.<br><br>
-        <strong>Fluxo cambial sazonal:</strong> O 3T historicamente e mais fraco para o fluxo de capital,
-        especialmente em anos eleitorais, o que pode pressionar o BRL no 2S26.
+        <strong>Inflacao importada:</strong> Petroleo caro e cambio mais forte criam pressoes opostas.
+        A XP aponta perspectivas inflacionarias que pioraram por fatores globais e domesticos.
       </div>
     </div>
 
@@ -627,34 +631,34 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#e67e22"></div>
-            <span class="inst-nome">XP e Bradesco — R$ 5,00</span>
+            <span class="inst-nome">XP e Bradesco &mdash; R$ 5,00</span>
             <span class="inst-proj">Mais otimistas c/ real</span>
           </div>
-          <div class="inst-reason-texto">Apostam na continuidade do fluxo externo e no papel do Brasil como exportador de commodities. Selic restritiva (13-14%) sustenta o carry trade por mais tempo.</div>
+          <div class="inst-reason-texto">Apostam na continuidade do fluxo externo para emergentes e no papel do Brasil como exportador de commodities. Selic restritiva (13-14%) sustenta o carry trade por mais tempo.</div>
         </div>
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#7f77dd"></div>
-            <span class="inst-nome">Itau — R$ 5,15</span>
+            <span class="inst-nome">Itau &mdash; R$ 5,15</span>
             <span class="inst-proj">Cenario moderado</span>
           </div>
-          <div class="inst-reason-texto">Reconhece os fundamentos positivos mas pondera que o estreitamento do diferencial de juros limita a apreciacao adicional. Projeta leve reversao em 2027 para R$ 5,30.</div>
+          <div class="inst-reason-texto">Reconhece os fundamentos positivos mas pondera que o estreitamento do diferencial de juros limita a apreciacao adicional do real. Projeta leve reversao em 2027 para R$ 5,30.</div>
         </div>
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#d4537e"></div>
-            <span class="inst-nome">Morgan Stanley — R$ 5,60 (pico 3T)</span>
+            <span class="inst-nome">Morgan Stanley &mdash; R$ 5,60 (pico 3T)</span>
             <span class="inst-proj">Mais pessimista</span>
           </div>
-          <div class="inst-reason-texto">Da maior peso ao risco eleitoral. Projeta acomodacao pos-eleicao para R$ 5,30, mas considera o desfecho "muito binario".</div>
+          <div class="inst-reason-texto">Da maior peso ao risco eleitoral. Historicamente, eleicoes brasileiras provocam volatilidade acima da media no 3T. Projeta acomodacao pos-eleicao para R$ 5,30, mas considera o desfecho "muito binario".</div>
         </div>
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#888780"></div>
-            <span class="inst-nome">Focus BCB — R$ 5,17</span>
+            <span class="inst-nome">Focus BCB &mdash; R$ 5,17</span>
             <span class="inst-proj">Mediana de mercado</span>
           </div>
-          <div class="inst-reason-texto">Mediana de dezenas de instituicoes. Consenso ve real levemente apreciado, com upside limitado dado o contexto fiscal e eleitoral.</div>
+          <div class="inst-reason-texto">Mediana de dezenas de instituicoes. Reflete o consenso geral que ve o real levemente apreciado, com upside limitado dado o contexto fiscal e eleitoral.</div>
         </div>
       </div>
     </div>
@@ -663,83 +667,163 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <div class="an-titulo"><span class="an-ico">&#128270;</span> O que monitorar nos proximos meses</div>
       <div class="an-texto">
         <div class="monitor-grid">
-          <div class="monitor-item">
-            <div class="monitor-label">Selic</div>
-            <div class="monitor-val">14,75%</div>
-            <div class="monitor-sub">Copom: 16-17/jun</div>
-          </div>
-          <div class="monitor-item">
-            <div class="monitor-label">Fed Funds</div>
-            <div class="monitor-val">3,50-3,75%</div>
-            <div class="monitor-sub">Novo presidente: mai/26</div>
-          </div>
-          <div class="monitor-item">
-            <div class="monitor-label">Petroleo (Brent)</div>
-            <div class="monitor-val">&gt; US$ 100</div>
-            <div class="monitor-sub">Conflito Oriente Medio</div>
-          </div>
-          <div class="monitor-item">
-            <div class="monitor-label">Fluxo cambial</div>
-            <div class="monitor-val">Positivo</div>
-            <div class="monitor-sub">Entrada liquida recorde</div>
-          </div>
-          <div class="monitor-item">
-            <div class="monitor-label">Eleicoes BR</div>
-            <div class="monitor-val">out/2026</div>
-            <div class="monitor-sub">Risco 3T26 elevado</div>
-          </div>
-          <div class="monitor-item">
-            <div class="monitor-label">IPCA 2026</div>
-            <div class="monitor-val">5,04%</div>
-            <div class="monitor-sub">9a alta consecutiva</div>
-          </div>
+          <div class="monitor-item"><div class="monitor-label">Selic</div><div class="monitor-val">14,75%</div><div class="monitor-sub">Copom: 16-17/jun</div></div>
+          <div class="monitor-item"><div class="monitor-label">Fed Funds</div><div class="monitor-val">3,50-3,75%</div><div class="monitor-sub">Novo presidente: mai/26</div></div>
+          <div class="monitor-item"><div class="monitor-label">Petroleo (Brent)</div><div class="monitor-val">&gt; US$ 100</div><div class="monitor-sub">Conflito Oriente Medio</div></div>
+          <div class="monitor-item"><div class="monitor-label">Fluxo cambial</div><div class="monitor-val">Positivo</div><div class="monitor-sub">Entrada liquida recorde</div></div>
+          <div class="monitor-item"><div class="monitor-label">Eleicoes BR</div><div class="monitor-val">out/2026</div><div class="monitor-sub">Risco 3T26 elevado</div></div>
+          <div class="monitor-item"><div class="monitor-label">IPCA 2026</div><div class="monitor-val">5,04%</div><div class="monitor-sub">11a alta consecutiva</div></div>
         </div>
         <div style="margin-top:14px;">
           <strong>Nivel critico a observar:</strong><br>
-          <span class="tag tag-baixo">R$ 4,80 — suporte forte</span>
-          <span class="tag tag-medio">R$ 5,17 — resistencia Focus</span>
-          <span class="tag tag-alto">R$ 5,60 — pico eleitoral (MS)</span>
+          <span class="tag tag-baixo">R$ 4,80 &mdash; suporte forte</span>
+          <span class="tag tag-medio">R$ 5,17 &mdash; resistencia Focus (25/mai)</span>
+          <span class="tag tag-alto">R$ 5,60 &mdash; pico eleitoral (MS)</span>
         </div>
       </div>
     </div>
   </div>
 
-  {_gerar_card_tendencia_focus(focus)}
+  <!-- Tendencia Focus BCB -->
+  <div class="an-card" style="background:#eff6ff;border-color:#bfdbfe;margin-bottom:16px;">
+    <div class="an-titulo"><span class="an-ico">&#128202;</span> Tendencia Focus BCB &mdash; Projecao Dez/2026</div>
+    <div class="an-texto">
+      O mercado financeiro tem revisado <strong>consistentemente para baixo</strong> a projecao do dolar para o fechamento de 2026.
+      Nas ultimas quatro semanas, a mediana do Boletim Focus registrou queda continua:
+      <span style="font-weight:600;color:#0f7c4a;">&#8595; -0,08 (abr/2026 &rarr; 25/mai/2026)</span><br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;align-items:center;">
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 4 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,25</div>
+          <div style="font-size:10px;color:#9ca3af;">abr/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 2 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
+          <div style="font-size:10px;color:#9ca3af;">11/mai/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 1 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
+          <div style="font-size:10px;color:#9ca3af;">18/mai/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #3b82f6;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#1d4ed8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:700;">Mais recente</div>
+          <div style="font-size:20px;font-weight:700;color:#1d4ed8;">R$ 5,17</div>
+          <div style="font-size:10px;color:#3b82f6;font-weight:600;">25/mai/2026</div>
+        </div>
+      </div>
+      O movimento reflete o <strong>real mais forte que o esperado</strong> no acumulado de 2026,
+      impulsionado pelo fluxo externo recorde e pelo diferencial de juros elevado.
+      A reducao consecutiva da mediana sugere que o mercado esta revisando o piso do dolar para o horizonte de curto prazo,
+      ainda que o risco eleitoral do 3T26 mantenha um teto de incerteza em torno de <strong>R$ 5,60</strong> (Morgan Stanley).
+    </div>
+  </div>
 
-  <div class="an-card" style="background:#f0f7ff;border-color:#93c5fd;margin-top:4px;">
+  <div class="an-card" style="background:#f0f7ff;border-color:#93c5fd;">
     <div class="an-titulo"><span class="an-ico">&#128188;</span> Implicacao para o setor de tecnologia financeira e automacao comercial</div>
     <div class="an-texto">
       Com o dolar testando o suporte de <strong>R$ 4,90-5,00</strong>, empresas do setor que operam com
       componentes ou licencas dolarizadas enfrentam impacto direto nos custos e margens.
       O cenario de consenso aponta para <strong>leve recuperacao no 2S26</strong> (R$ 5,15-5,30)
-      puxada pelo risco eleitoral — o que exige planejamento cambial por segmento:<br><br>
-      <strong>&#9679; Automacao comercial:</strong> equipamentos e componentes importados sofrem repasse imediato.
-      A banda R$ 5,00-5,60 amplia a incerteza no planejamento de estoques e contratos plurianuais.<br><br>
-      <strong>&#9679; Meios de pagamento:</strong> solucoes cross-border beneficiam-se do real mais forte no curto prazo,
-      mas devem monitorar a reversao esperada no 3T26.<br><br>
-      <strong>&#9679; Plataformas de remessa:</strong> o pico projetado de R$ 5,60 (Morgan Stanley, 3T26)
-      pode impactar spreads e competitividade frente a fintechs globais.<br><br>
+      puxada pelo risco eleitoral &mdash; o que exige planejamento cambial por segmento:<br><br>
+      <strong>&#9679; Solucoes para automacao comercial:</strong> equipamentos e componentes importados
+      (leitores, impressoras fiscais, modulos de conectividade) sofrem repasse imediato da variacao cambial
+      ao custo do produto. A banda R$ 5,00-5,60 projetada para 2026 amplia a incerteza no planejamento
+      de estoques e precificacao de contratos plurianuais.<br><br>
+      <strong>&#9679; Ferramentas para meios de pagamento diversos:</strong> solucoes que processam
+      transacoes em moeda estrangeira ou que repassam taxas indexadas ao dolar (gateways internacionais,
+      adquirencias cross-border) beneficiam-se do real mais forte no curto prazo, mas devem monitorar
+      a reversao esperada no 3T26 com o risco eleitoral.<br><br>
+      <strong>&#9679; Plataformas para transferencia de fundos:</strong> operacoes de remessa e
+      conversao cambial estao diretamente expostas a volatilidade. O pico projetado de R$ 5,60
+      (Morgan Stanley, 3T26) pode impactar spreads e competitividade frente a fintechs globais.<br><br>
+      <strong>&#9679; Terminais de autoatendimento e consulta de precos:</strong> hardware importado
+      (displays, processadores, leitores biometricos) sofre pressao de custo com dolar acima de R$ 5,20.
+      Contratos de manutencao e atualizacao de software com fornecedores internacionais devem ser
+      revisados considerando a banda R$ 5,00-5,60 para o horizonte de 12 meses.<br><br>
       <strong>Estrategia recomendada:</strong> trava cambial na faixa atual (R$ 4,90-5,00) para
-      compromissos de importacao. Contratos de fornecimento com clausulas de reajuste atreladas ao PTAX.
+      compromissos de importacao via contratos a termo. Renegociar contratos de fornecimento
+      com clausulas de reajuste cambial atreladas ao PTAX do BCB para proteger margens operacionais.
     </div>
   </div>
 </div>
 
 <div class="foot">
-  Fonte: API PTAX BCB (olinda.bcb.gov.br) · BCB SGS (fluxo cambial) · 1,860 cotacoes diarias ·
-  Ultimo dado: 27/05/2026 · Analise narrativa baseada em relatorios publicos (XP, Bradesco, Itau, Morgan Stanley, BTG, Focus BCB) ·
-  Gerado em 28/05/2026 14:15 · Nao constitui recomendacao de investimento.
+  Fonte: API PTAX Banco Central do Brasil (olinda.bcb.gov.br) &middot; 1,858 cotacoes diarias &middot;
+  Ultimo dado: 27/05/2026 &middot; Analise narrativa baseada em relatorios publicos de mai/2026 (XP, Bradesco, Itau, Morgan Stanley, BTG, Focus BCB) &middot;
+  Gerado em 28/05/2026 14:39 &middot; Nao constitui recomendacao de investimento.
 </div>
 </div>
 
 <script>
-const DATA  = [{"m": "2019-01","v": 3.7417},{"m": "2019-02","v": 3.7236},{"m": "2019-03","v": 3.8465},{"m": "2019-04","v": 3.8962},{"m": "2019-05","v": 4.0015},{"m": "2019-06","v": 3.8588},{"m": "2019-07","v": 3.7793},{"m": "2019-08","v": 4.02},{"m": "2019-09","v": 4.1215},{"m": "2019-10","v": 4.087},{"m": "2019-11","v": 4.1553},{"m": "2019-12","v": 4.1096},{"m": "2020-01","v": 4.1495},{"m": "2020-02","v": 4.341},{"m": "2020-03","v": 4.8839},{"m": "2020-04","v": 5.3256},{"m": "2020-05","v": 5.6434},{"m": "2020-06","v": 5.1966},{"m": "2020-07","v": 5.2802},{"m": "2020-08","v": 5.4612},{"m": "2020-09","v": 5.3995},{"m": "2020-10","v": 5.6258},{"m": "2020-11","v": 5.4178},{"m": "2020-12","v": 5.1456},{"m": "2021-01","v": 5.3562},{"m": "2021-02","v": 5.4165},{"m": "2021-03","v": 5.6461},{"m": "2021-04","v": 5.5621},{"m": "2021-05","v": 5.2911},{"m": "2021-06","v": 5.0319},{"m": "2021-07","v": 5.1567},{"m": "2021-08","v": 5.2517},{"m": "2021-09","v": 5.2797},{"m": "2021-10","v": 5.54},{"m": "2021-11","v": 5.5569},{"m": "2021-12","v": 5.6514},{"m": "2022-01","v": 5.5341},{"m": "2022-02","v": 5.1966},{"m": "2022-03","v": 4.9684},{"m": "2022-04","v": 4.758},{"m": "2022-05","v": 4.955},{"m": "2022-06","v": 5.0492},{"m": "2022-07","v": 5.3681},{"m": "2022-08","v": 5.1433},{"m": "2022-09","v": 5.237},{"m": "2022-10","v": 5.2503},{"m": "2022-11","v": 5.2746},{"m": "2022-12","v": 5.2424},{"m": "2023-01","v": 5.2007},{"m": "2023-02","v": 5.1717},{"m": "2023-03","v": 5.2115},{"m": "2023-04","v": 5.0197},{"m": "2023-05","v": 4.9828},{"m": "2023-06","v": 4.8516},{"m": "2023-07","v": 4.8008},{"m": "2023-08","v": 4.9035},{"m": "2023-09","v": 4.937},{"m": "2023-10","v": 5.0648},{"m": "2023-11","v": 4.8983},{"m": "2023-12","v": 4.8972},{"m": "2024-01","v": 4.9144},{"m": "2024-02","v": 4.9644},{"m": "2024-03","v": 4.9801},{"m": "2024-04","v": 5.1291},{"m": "2024-05","v": 5.133},{"m": "2024-06","v": 5.389},{"m": "2024-07","v": 5.542},{"m": "2024-08","v": 5.5526},{"m": "2024-09","v": 5.5416},{"m": "2024-10","v": 5.6241},{"m": "2024-11","v": 5.8071},{"m": "2024-12","v": 6.097},{"m": "2025-01","v": 6.0218},{"m": "2025-02","v": 5.7656},{"m": "2025-03","v": 5.7468},{"m": "2025-04","v": 5.7791},{"m": "2025-05","v": 5.6674},{"m": "2025-06","v": 5.5471},{"m": "2025-07","v": 5.5285},{"m": "2025-08","v": 5.4469},{"m": "2025-09","v": 5.3674},{"m": "2025-10","v": 5.3855},{"m": "2025-11","v": 5.3409},{"m": "2025-12","v": 5.4531},{"m": "2026-01","v": 5.338},{"m": "2026-02","v": 5.2006},{"m": "2026-03","v": 5.2316},{"m": "2026-04","v": 5.0331},{"m": "2026-05","v": 4.9759}];
-const SPROJ = {"Focus BCB": [5.21, 5.21, 5.2, 5.2, 5.2, 5.2, 5.2, 5.3], "XP Investimentos": [5.14, 5.1, 5.07, 5.04, 5.02, 5.01, 5.0, null], "Bradesco": [5.1, 5.07, 5.04, 5.02, 5.01, 5.0, 5.0, 5.0], "Itau": [5.17, 5.17, 5.17, 5.2, 5.18, 5.16, 5.15, 5.3], "Morgan Stanley": [5.28, 5.36, 5.45, 5.6, 5.52, 5.43, 5.3, null]};
-const CORES      = {"Focus BCB": "#888780", "XP Investimentos": "#e67e22", "Bradesco": "#1d9e75", "Itau": "#7f77dd", "Morgan Stanley": "#d4537e"};
-const FLUXO_HIST   = [{"m": "2024-05", "e": 43532.4, "s": 30852.1, "saldo": 12680.3}, {"m": "2024-06", "e": 43282.5, "s": 31324.8, "saldo": 11957.7}, {"m": "2024-07", "e": 48447.7, "s": 32739.0, "saldo": 15708.7}, {"m": "2024-08", "e": 42780.5, "s": 30859.4, "saldo": 11921.1}, {"m": "2024-09", "e": 41867.4, "s": 33217.8, "saldo": 8649.6}, {"m": "2024-10", "e": 45870.1, "s": 35877.9, "saldo": 9992.2}, {"m": "2024-11", "e": 42211.7, "s": 30402.8, "saldo": 11808.9}, {"m": "2024-12", "e": 36957.5, "s": 32658.8, "saldo": 4298.7}, {"m": "2025-01", "e": 39273.3, "s": 31084.7, "saldo": 8188.6}, {"m": "2025-02", "e": 41658.5, "s": 32656.4, "saldo": 9002.1}, {"m": "2025-03", "e": 40931.3, "s": 27121.3, "saldo": 13810.0}, {"m": "2025-04", "e": 44663.3, "s": 31925.4, "saldo": 12737.9}, {"m": "2025-05", "e": 41547.7, "s": 31134.4, "saldo": 10413.3}, {"m": "2025-06", "e": 42055.4, "s": 33598.9, "saldo": 8456.5}, {"m": "2025-07", "e": 49773.1, "s": 34976.7, "saldo": 14796.4}, {"m": "2025-08", "e": 44894.3, "s": 31799.5, "saldo": 13094.8}, {"m": "2025-09", "e": 47188.7, "s": 34060.8, "saldo": 13127.9}, {"m": "2025-10", "e": 49520.8, "s": 32616.4, "saldo": 16904.4}, {"m": "2025-11", "e": 43840.2, "s": 28920.0, "saldo": 14920.2}, {"m": "2025-12", "e": 38081.1, "s": 34794.4, "saldo": 3286.7}, {"m": "2026-01", "e": 39362.9, "s": 28110.7, "saldo": 11252.2}, {"m": "2026-02", "e": 39766.4, "s": 29548.3, "saldo": 10218.1}, {"m": "2026-03", "e": 45142.2, "s": 33294.7, "saldo": 11847.5}, {"m": "2026-04", "e": 50452.0, "s": 31824.1, "saldo": 18627.9}];
-const FLUXO_TIPO   = [{"m": "2024-05", "com_e": 30430.6, "com_s": 22927.5, "fin_e": 216.0, "fin_s": 0.2, "ied_e": 12885.8, "ied_s": 7924.4}, {"m": "2024-06", "com_e": 29009.7, "com_s": 23348.5, "fin_e": 93.5, "fin_s": 0.2, "ied_e": 14179.3, "ied_s": 7976.1}, {"m": "2024-07", "com_e": 31084.1, "com_s": 24102.6, "fin_e": 195.9, "fin_s": 0.2, "ied_e": 17167.7, "ied_s": 8636.2}, {"m": "2024-08", "com_e": 28893.9, "com_s": 25176.1, "fin_e": 32.5, "fin_s": 27.6, "ied_e": 13854.1, "ied_s": 5655.7}, {"m": "2024-09", "com_e": 28678.7, "com_s": 24154.3, "fin_e": 264.7, "fin_s": 1.0, "ied_e": 12924.0, "ied_s": 9062.5}, {"m": "2024-10", "com_e": 29478.8, "com_s": 26289.5, "fin_e": 104.8, "fin_s": 0.2, "ied_e": 16286.5, "ied_s": 9588.2}, {"m": "2024-11", "com_e": 28035.1, "com_s": 21992.1, "fin_e": 102.2, "fin_s": 0.3, "ied_e": 14074.4, "ied_s": 8410.4}, {"m": "2024-12", "com_e": 25093.7, "com_s": 20971.9, "fin_e": 17.7, "fin_s": 1.1, "ied_e": 11846.1, "ied_s": 11685.8}, {"m": "2025-01", "com_e": 25592.4, "com_s": 24196.1, "fin_e": 87.2, "fin_s": 2.7, "ied_e": 13593.7, "ied_s": 6885.9}, {"m": "2025-02", "com_e": 22983.7, "com_s": 24106.5, "fin_e": 86.3, "fin_s": 0.5, "ied_e": 18588.5, "ied_s": 8549.4}, {"m": "2025-03", "com_e": 28997.5, "com_s": 21778.8, "fin_e": 297.1, "fin_s": 0.4, "ied_e": 11636.7, "ied_s": 5342.1}, {"m": "2025-04", "com_e": 30106.2, "com_s": 23149.0, "fin_e": 409.9, "fin_s": 0.4, "ied_e": 14147.2, "ied_s": 8776.0}, {"m": "2025-05", "com_e": 30106.8, "com_s": 23670.0, "fin_e": 114.6, "fin_s": 0.7, "ied_e": 11326.3, "ied_s": 7463.7}, {"m": "2025-06", "com_e": 29174.3, "com_s": 23927.2, "fin_e": 146.2, "fin_s": 4.7, "ied_e": 12734.9, "ied_s": 9667.0}, {"m": "2025-07", "com_e": 32387.4, "com_s": 25996.9, "fin_e": 4.5, "fin_s": 0.7, "ied_e": 17381.2, "ied_s": 8979.1}, {"m": "2025-08", "com_e": 29688.2, "com_s": 24376.7, "fin_e": 13.4, "fin_s": 0.7, "ied_e": 15192.7, "ied_s": 7422.1}, {"m": "2025-09", "com_e": 30641.8, "com_s": 28182.3, "fin_e": 17.5, "fin_s": 0.8, "ied_e": 16529.4, "ied_s": 5877.7}, {"m": "2025-10", "com_e": 31644.4, "com_s": 25754.2, "fin_e": 78.3, "fin_s": 0.6, "ied_e": 17798.1, "ied_s": 6861.6}, {"m": "2025-11", "com_e": 28322.0, "com_s": 23283.8, "fin_e": 62.2, "fin_s": 0.5, "ied_e": 15456.0, "ied_s": 5635.7}, {"m": "2025-12", "com_e": 30856.1, "com_s": 22350.7, "fin_e": 30.0, "fin_s": 0.5, "ied_e": 7195.0, "ied_s": 12443.2}, {"m": "2026-01", "com_e": 24661.4, "com_s": 21747.8, "fin_e": 104.7, "fin_s": 0.8, "ied_e": 14596.8, "ied_s": 6362.1}, {"m": "2026-02", "com_e": 26244.9, "com_s": 22940.0, "fin_e": 159.4, "fin_s": 0.6, "ied_e": 13362.1, "ied_s": 6607.7}, {"m": "2026-03", "com_e": 31839.8, "com_s": 26124.2, "fin_e": 95.9, "fin_s": 0.6, "ied_e": 13206.5, "ied_s": 7169.9}, {"m": "2026-04", "com_e": 34281.6, "com_s": 24574.2, "fin_e": 9.5, "fin_s": 1.0, "ied_e": 16160.9, "ied_s": 7248.9}];
-const DATA_DIARIOS = {"2019-01": [{"d": "2019-01-02", "v": 3.8595}, {"d": "2019-01-03", "v": 3.7683}, {"d": "2019-01-04", "v": 3.7627}, {"d": "2019-01-07", "v": 3.7062}, {"d": "2019-01-08", "v": 3.7208}, {"d": "2019-01-09", "v": 3.6931}, {"d": "2019-01-10", "v": 3.6869}, {"d": "2019-01-11", "v": 3.7141}, {"d": "2019-01-14", "v": 3.726}, {"d": "2019-01-15", "v": 3.7049}, {"d": "2019-01-16", "v": 3.7197}, {"d": "2019-01-17", "v": 3.7591}, {"d": "2019-01-18", "v": 3.7486}, {"d": "2019-01-21", "v": 3.7705}, {"d": "2019-01-22", "v": 3.7615}, {"d": "2019-01-23", "v": 3.7994}, {"d": "2019-01-24", "v": 3.7815}, {"d": "2019-01-25", "v": 3.7626}, {"d": "2019-01-28", "v": 3.7676}, {"d": "2019-01-29", "v": 3.737}, {"d": "2019-01-30", "v": 3.7151}, {"d": "2019-01-31", "v": 3.6519}], "2019-02": [{"d": "2019-02-01", "v": 3.6694}, {"d": "2019-02-04", "v": 3.6756}, {"d": "2019-02-05", "v": 3.6741}, {"d": "2019-02-06", "v": 3.7019}, {"d": "2019-02-07", "v": 3.7193}, {"d": "2019-02-08", "v": 3.7184}, {"d": "2019-02-11", "v": 3.7391}, {"d": "2019-02-12", "v": 3.7296}, {"d": "2019-02-13", "v": 3.7277}, {"d": "2019-02-14", "v": 3.7756}, {"d": "2019-02-15", "v": 3.7155}, {"d": "2019-02-18", "v": 3.7316}, {"d": "2019-02-19", "v": 3.7206}, {"d": "2019-02-20", "v": 3.71}, {"d": "2019-02-21", "v": 3.7595}, {"d": "2019-02-22", "v": 3.743}, {"d": "2019-02-25", "v": 3.7285}, {"d": "2019-02-26", "v": 3.7595}, {"d": "2019-02-27", "v": 3.7351}, {"d": "2019-02-28", "v": 3.7385}], "2019-03": [{"d": "2019-03-01", "v": 3.7832}, {"d": "2019-03-06", "v": 3.8303}, {"d": "2019-03-07", "v": 3.8487}, {"d": "2019-03-08", "v": 3.8678}, {"d": "2019-03-11", "v": 3.8461}, {"d": "2019-03-12", "v": 3.8129}, {"d": "2019-03-13", "v": 3.8265}, {"d": "2019-03-14", "v": 3.8327}, {"d": "2019-03-15", "v": 3.8344}, {"d": "2019-03-18", "v": 3.8111}, {"d": "2019-03-19", "v": 3.7762}, {"d": "2019-03-20", "v": 3.7897}, {"d": "2019-03-21", "v": 3.7967}, {"d": "2019-03-22", "v": 3.8815}, {"d": "2019-03-25", "v": 3.877}, {"d": "2019-03-26", "v": 3.8646}, {"d": "2019-03-27", "v": 3.9389}, {"d": "2019-03-28", "v": 3.9682}, {"d": "2019-03-29", "v": 3.8967}], "2019-04": [{"d": "2019-04-01", "v": 3.8682}, {"d": "2019-04-02", "v": 3.8661}, {"d": "2019-04-03", "v": 3.8436}, {"d": "2019-04-04", "v": 3.8713}, {"d": "2019-04-05", "v": 3.8622}, {"d": "2019-04-08", "v": 3.8658}, {"d": "2019-04-09", "v": 3.8563}, {"d": "2019-04-10", "v": 3.8345}, {"d": "2019-04-11", "v": 3.8399}, {"d": "2019-04-12", "v": 3.8685}, {"d": "2019-04-15", "v": 3.873}, {"d": "2019-04-16", "v": 3.8913}, {"d": "2019-04-17", "v": 3.9225}, {"d": "2019-04-18", "v": 3.937}, {"d": "2019-04-22", "v": 3.923}, {"d": "2019-04-23", "v": 3.9436}, {"d": "2019-04-24", "v": 3.963}, {"d": "2019-04-25", "v": 3.9725}, {"d": "2019-04-26", "v": 3.9353}, {"d": "2019-04-29", "v": 3.9364}, {"d": "2019-04-30", "v": 3.9453}], "2019-05": [{"d": "2019-05-02", "v": 3.965}, {"d": "2019-05-03", "v": 3.9388}, {"d": "2019-05-06", "v": 3.9624}, {"d": "2019-05-07", "v": 3.988}, {"d": "2019-05-08", "v": 3.9344}, {"d": "2019-05-09", "v": 3.9673}, {"d": "2019-05-10", "v": 3.9578}, {"d": "2019-05-13", "v": 3.989}, {"d": "2019-05-14", "v": 3.9788}, {"d": "2019-05-15", "v": 4.0031}, {"d": "2019-05-16", "v": 4.0138}, {"d": "2019-05-17", "v": 4.0844}, {"d": "2019-05-20", "v": 4.1056}, {"d": "2019-05-21", "v": 4.081}, {"d": "2019-05-22", "v": 4.0228}, {"d": "2019-05-23", "v": 4.0513}, {"d": "2019-05-24", "v": 4.0322}, {"d": "2019-05-27", "v": 4.021}, {"d": "2019-05-28", "v": 4.0275}, {"d": "2019-05-29", "v": 3.9965}, {"d": "2019-05-30", "v": 3.972}, {"d": "2019-05-31", "v": 3.9407}], "2019-06": [{"d": "2019-06-03", "v": 3.9003}, {"d": "2019-06-04", "v": 3.871}, {"d": "2019-06-05", "v": 3.8611}, {"d": "2019-06-06", "v": 3.8726}, {"d": "2019-06-07", "v": 3.8571}, {"d": "2019-06-10", "v": 3.879}, {"d": "2019-06-11", "v": 3.8664}, {"d": "2019-06-12", "v": 3.8437}, {"d": "2019-06-13", "v": 3.8429}, {"d": "2019-06-14", "v": 3.8813}, {"d": "2019-06-17", "v": 3.8895}, {"d": "2019-06-18", "v": 3.8608}, {"d": "2019-06-19", "v": 3.8723}, {"d": "2019-06-21", "v": 3.8255}, {"d": "2019-06-24", "v": 3.8234}, {"d": "2019-06-25", "v": 3.8303}, {"d": "2019-06-26", "v": 3.8441}, {"d": "2019-06-27", "v": 3.8642}, {"d": "2019-06-28", "v": 3.8322}], "2019-07": [{"d": "2019-07-01", "v": 3.8193}, {"d": "2019-07-02", "v": 3.8564}, {"d": "2019-07-03", "v": 3.8475}, {"d": "2019-07-04", "v": 3.794}, {"d": "2019-07-05", "v": 3.8204}, {"d": "2019-07-08", "v": 3.8065}, {"d": "2019-07-09", "v": 3.7858}, {"d": "2019-07-10", "v": 3.7697}, {"d": "2019-07-11", "v": 3.7533}, {"d": "2019-07-12", "v": 3.7452}, {"d": "2019-07-15", "v": 3.7463}, {"d": "2019-07-16", "v": 3.7624}, {"d": "2019-07-17", "v": 3.7618}, {"d": "2019-07-18", "v": 3.7489}, {"d": "2019-07-19", "v": 3.7408}, {"d": "2019-07-22", "v": 3.74}, {"d": "2019-07-23", "v": 3.7621}, {"d": "2019-07-24", "v": 3.7596}, {"d": "2019-07-25", "v": 3.7849}, {"d": "2019-07-26", "v": 3.7741}, {"d": "2019-07-29", "v": 3.7909}, {"d": "2019-07-30", "v": 3.79}, {"d": "2019-07-31", "v": 3.7649}], "2019-08": [{"d": "2019-08-01", "v": 3.8296}, {"d": "2019-08-02", "v": 3.8739}, {"d": "2019-08-05", "v": 3.9404}, {"d": "2019-08-06", "v": 3.9643}, {"d": "2019-08-07", "v": 3.985}, {"d": "2019-08-08", "v": 3.9409}, {"d": "2019-08-09", "v": 3.9362}, {"d": "2019-08-12", "v": 3.9966}, {"d": "2019-08-13", "v": 3.9736}, {"d": "2019-08-14", "v": 4.0074}, {"d": "2019-08-15", "v": 4.0188}, {"d": "2019-08-16", "v": 3.9933}, {"d": "2019-08-19", "v": 4.0274}, {"d": "2019-08-20", "v": 4.0425}, {"d": "2019-08-21", "v": 4.0254}, {"d": "2019-08-22", "v": 4.0444}, {"d": "2019-08-23", "v": 4.0851}, {"d": "2019-08-26", "v": 4.1367}, {"d": "2019-08-27", "v": 4.1557}, {"d": "2019-08-28", "v": 4.1559}, {"d": "2019-08-29", "v": 4.168}, {"d": "2019-08-30", "v": 4.1385}], "2019-09": [{"d": "2019-09-02", "v": 4.1581}, {"d": "2019-09-03", "v": 4.1657}, {"d": "2019-09-04", "v": 4.1249}, {"d": "2019-09-05", "v": 4.0859}, {"d": "2019-09-06", "v": 4.065}, {"d": "2019-09-09", "v": 4.0766}, {"d": "2019-09-10", "v": 4.1108}, {"d": "2019-09-11", "v": 4.0631}, {"d": "2019-09-12", "v": 4.0494}, {"d": "2019-09-13", "v": 4.0616}, {"d": "2019-09-16", "v": 4.0872}, {"d": "2019-09-17", "v": 4.0998}, {"d": "2019-09-18", "v": 4.0972}, {"d": "2019-09-19", "v": 4.1393}, {"d": "2019-09-20", "v": 4.1687}, {"d": "2019-09-23", "v": 4.1734}, {"d": "2019-09-24", "v": 4.1721}, {"d": "2019-09-25", "v": 4.1827}, {"d": "2019-09-26", "v": 4.1469}, {"d": "2019-09-27", "v": 4.1587}, {"d": "2019-09-30", "v": 4.1644}], "2019-10": [{"d": "2019-10-01", "v": 4.174}, {"d": "2019-10-02", "v": 4.1546}, {"d": "2019-10-03", "v": 4.1012}, {"d": "2019-10-04", "v": 4.061}, {"d": "2019-10-07", "v": 4.0688}, {"d": "2019-10-08", "v": 4.0868}, {"d": "2019-10-09", "v": 4.0954}, {"d": "2019-10-10", "v": 4.1145}, {"d": "2019-10-11", "v": 4.106}, {"d": "2019-10-14", "v": 4.1263}, {"d": "2019-10-15", "v": 4.1488}, {"d": "2019-10-16", "v": 4.1714}, {"d": "2019-10-17", "v": 4.1457}, {"d": "2019-10-18", "v": 4.1376}, {"d": "2019-10-21", "v": 4.1319}, {"d": "2019-10-22", "v": 4.0858}, {"d": "2019-10-23", "v": 4.0721}, {"d": "2019-10-24", "v": 4.0089}, {"d": "2019-10-25", "v": 4.0133}, {"d": "2019-10-28", "v": 3.9793}, {"d": "2019-10-29", "v": 3.9946}, {"d": "2019-10-30", "v": 4.0186}, {"d": "2019-10-31", "v": 4.0041}], "2019-11": [{"d": "2019-11-01", "v": 3.9786}, {"d": "2019-11-04", "v": 3.9922}, {"d": "2019-11-05", "v": 4.0043}, {"d": "2019-11-06", "v": 4.0351}, {"d": "2019-11-07", "v": 4.0927}, {"d": "2019-11-08", "v": 4.1365}, {"d": "2019-11-11", "v": 4.1559}, {"d": "2019-11-12", "v": 4.1756}, {"d": "2019-11-13", "v": 4.1767}, {"d": "2019-11-14", "v": 4.1831}, {"d": "2019-11-18", "v": 4.1827}, {"d": "2019-11-19", "v": 4.2084}, {"d": "2019-11-20", "v": 4.2037}, {"d": "2019-11-21", "v": 4.2012}, {"d": "2019-11-22", "v": 4.1832}, {"d": "2019-11-25", "v": 4.2089}, {"d": "2019-11-26", "v": 4.2559}, {"d": "2019-11-27", "v": 4.2602}, {"d": "2019-11-28", "v": 4.248}, {"d": "2019-11-29", "v": 4.224}], "2019-12": [{"d": "2019-12-02", "v": 4.2261}, {"d": "2019-12-03", "v": 4.2008}, {"d": "2019-12-04", "v": 4.1926}, {"d": "2019-12-05", "v": 4.2136}, {"d": "2019-12-06", "v": 4.1783}, {"d": "2019-12-09", "v": 4.1503}, {"d": "2019-12-10", "v": 4.1427}, {"d": "2019-12-11", "v": 4.1153}, {"d": "2019-12-12", "v": 4.1092}, {"d": "2019-12-13", "v": 4.0949}, {"d": "2019-12-16", "v": 4.0801}, {"d": "2019-12-17", "v": 4.0687}, {"d": "2019-12-18", "v": 4.0548}, {"d": "2019-12-19", "v": 4.0633}, {"d": "2019-12-20", "v": 4.0777}, {"d": "2019-12-23", "v": 4.0757}, {"d": "2019-12-24", "v": 4.0813}, {"d": "2019-12-26", "v": 4.0601}, {"d": "2019-12-27", "v": 4.0545}, {"d": "2019-12-30", "v": 4.0307}, {"d": "2019-12-31", "v": 4.0307}], "2020-01": [{"d": "2020-01-02", "v": 4.0213}, {"d": "2020-01-03", "v": 4.0522}, {"d": "2020-01-06", "v": 4.0554}, {"d": "2020-01-07", "v": 4.0841}, {"d": "2020-01-08", "v": 4.0672}, {"d": "2020-01-09", "v": 4.0744}, {"d": "2020-01-10", "v": 4.0745}, {"d": "2020-01-13", "v": 4.1309}, {"d": "2020-01-14", "v": 4.1443}, {"d": "2020-01-15", "v": 4.1622}, {"d": "2020-01-16", "v": 4.1726}, {"d": "2020-01-17", "v": 4.1837}, {"d": "2020-01-20", "v": 4.1829}, {"d": "2020-01-21", "v": 4.2014}, {"d": "2020-01-22", "v": 4.1889}, {"d": "2020-01-23", "v": 4.1662}, {"d": "2020-01-24", "v": 4.1769}, {"d": "2020-01-27", "v": 4.2196}, {"d": "2020-01-28", "v": 4.2064}, {"d": "2020-01-29", "v": 4.2013}, {"d": "2020-01-30", "v": 4.2523}, {"d": "2020-01-31", "v": 4.2695}], "2020-02": [{"d": "2020-02-03", "v": 4.2475}, {"d": "2020-02-04", "v": 4.2381}, {"d": "2020-02-05", "v": 4.2449}, {"d": "2020-02-06", "v": 4.2477}, {"d": "2020-02-07", "v": 4.3076}, {"d": "2020-02-10", "v": 4.3195}, {"d": "2020-02-11", "v": 4.3148}, {"d": "2020-02-12", "v": 4.3366}, {"d": "2020-02-13", "v": 4.3389}, {"d": "2020-02-14", "v": 4.3163}, {"d": "2020-02-17", "v": 4.3157}, {"d": "2020-02-18", "v": 4.3471}, {"d": "2020-02-19", "v": 4.3728}, {"d": "2020-02-20", "v": 4.3873}, {"d": "2020-02-21", "v": 4.3924}, {"d": "2020-02-26", "v": 4.4359}, {"d": "2020-02-27", "v": 4.4764}, {"d": "2020-02-28", "v": 4.4987}], "2020-03": [{"d": "2020-03-02", "v": 4.4946}, {"d": "2020-03-03", "v": 4.4883}, {"d": "2020-03-04", "v": 4.5258}, {"d": "2020-03-05", "v": 4.6207}, {"d": "2020-03-06", "v": 4.6459}, {"d": "2020-03-09", "v": 4.7379}, {"d": "2020-03-10", "v": 4.6693}, {"d": "2020-03-11", "v": 4.6738}, {"d": "2020-03-12", "v": 4.8833}, {"d": "2020-03-13", "v": 4.7362}, {"d": "2020-03-16", "v": 4.9471}, {"d": "2020-03-17", "v": 5.0496}, {"d": "2020-03-18", "v": 5.1107}, {"d": "2020-03-19", "v": 5.1444}, {"d": "2020-03-20", "v": 5.0248}, {"d": "2020-03-23", "v": 5.0805}, {"d": "2020-03-24", "v": 5.0713}, {"d": "2020-03-25", "v": 5.0706}, {"d": "2020-03-26", "v": 5.001}, {"d": "2020-03-27", "v": 5.1109}, {"d": "2020-03-30", "v": 5.1594}, {"d": "2020-03-31", "v": 5.1987}], "2020-04": [{"d": "2020-04-01", "v": 5.2404}, {"d": "2020-04-02", "v": 5.2651}, {"d": "2020-04-03", "v": 5.2997}, {"d": "2020-04-06", "v": 5.2471}, {"d": "2020-04-07", "v": 5.2217}, {"d": "2020-04-08", "v": 5.2123}, {"d": "2020-04-09", "v": 5.0779}, {"d": "2020-04-13", "v": 5.1824}, {"d": "2020-04-14", "v": 5.1858}, {"d": "2020-04-15", "v": 5.2579}, {"d": "2020-04-16", "v": 5.2377}, {"d": "2020-04-17", "v": 5.2573}, {"d": "2020-04-20", "v": 5.2837}, {"d": "2020-04-22", "v": 5.3847}, {"d": "2020-04-23", "v": 5.4467}, {"d": "2020-04-24", "v": 5.651}, {"d": "2020-04-27", "v": 5.6358}, {"d": "2020-04-28", "v": 5.5683}, {"d": "2020-04-29", "v": 5.4291}, {"d": "2020-04-30", "v": 5.427}], "2020-05": [{"d": "2020-05-04", "v": 5.5816}, {"d": "2020-05-05", "v": 5.5354}, {"d": "2020-05-06", "v": 5.6676}, {"d": "2020-05-07", "v": 5.8365}, {"d": "2020-05-08", "v": 5.7653}, {"d": "2020-05-11", "v": 5.7954}, {"d": "2020-05-12", "v": 5.7723}, {"d": "2020-05-13", "v": 5.9022}, {"d": "2020-05-14", "v": 5.9372}, {"d": "2020-05-15", "v": 5.8229}, {"d": "2020-05-18", "v": 5.7375}, {"d": "2020-05-19", "v": 5.7216}, {"d": "2020-05-20", "v": 5.6968}, {"d": "2020-05-21", "v": 5.6019}, {"d": "2020-05-22", "v": 5.5808}, {"d": "2020-05-25", "v": 5.4772}, {"d": "2020-05-26", "v": 5.3707}, {"d": "2020-05-27", "v": 5.2992}, {"d": "2020-05-28", "v": 5.3405}, {"d": "2020-05-29", "v": 5.4263}], "2020-06": [{"d": "2020-06-01", "v": 5.3639}, {"d": "2020-06-02", "v": 5.2601}, {"d": "2020-06-03", "v": 5.0516}, {"d": "2020-06-04", "v": 5.1041}, {"d": "2020-06-05", "v": 4.9775}, {"d": "2020-06-08", "v": 4.9331}, {"d": "2020-06-09", "v": 4.9057}, {"d": "2020-06-10", "v": 4.8894}, {"d": "2020-06-12", "v": 5.0373}, {"d": "2020-06-15", "v": 5.1883}, {"d": "2020-06-16", "v": 5.1285}, {"d": "2020-06-17", "v": 5.2499}, {"d": "2020-06-18", "v": 5.3468}, {"d": "2020-06-19", "v": 5.3466}, {"d": "2020-06-22", "v": 5.2226}, {"d": "2020-06-23", "v": 5.1705}, {"d": "2020-06-24", "v": 5.2435}, {"d": "2020-06-25", "v": 5.3287}, {"d": "2020-06-26", "v": 5.4629}, {"d": "2020-06-29", "v": 5.4416}, {"d": "2020-06-30", "v": 5.476}], "2020-07": [{"d": "2020-07-01", "v": 5.3651}, {"d": "2020-07-02", "v": 5.3028}, {"d": "2020-07-03", "v": 5.3374}, {"d": "2020-07-06", "v": 5.3085}, {"d": "2020-07-07", "v": 5.3318}, {"d": "2020-07-08", "v": 5.3482}, {"d": "2020-07-09", "v": 5.2978}, {"d": "2020-07-10", "v": 5.344}, {"d": "2020-07-13", "v": 5.3486}, {"d": "2020-07-14", "v": 5.4288}, {"d": "2020-07-15", "v": 5.3491}, {"d": "2020-07-16", "v": 5.356}, {"d": "2020-07-17", "v": 5.351}, {"d": "2020-07-20", "v": 5.3635}, {"d": "2020-07-21", "v": 5.2283}, {"d": "2020-07-22", "v": 5.1111}, {"d": "2020-07-23", "v": 5.1647}, {"d": "2020-07-24", "v": 5.2146}, {"d": "2020-07-27", "v": 5.1889}, {"d": "2020-07-28", "v": 5.1777}, {"d": "2020-07-29", "v": 5.1395}, {"d": "2020-07-30", "v": 5.1837}, {"d": "2020-07-31", "v": 5.2033}], "2020-08": [{"d": "2020-08-03", "v": 5.3075}, {"d": "2020-08-04", "v": 5.3329}, {"d": "2020-08-05", "v": 5.276}, {"d": "2020-08-06", "v": 5.3431}, {"d": "2020-08-07", "v": 5.4227}, {"d": "2020-08-10", "v": 5.3933}, {"d": "2020-08-11", "v": 5.4285}, {"d": "2020-08-12", "v": 5.4551}, {"d": "2020-08-13", "v": 5.3801}, {"d": "2020-08-14", "v": 5.3852}, {"d": "2020-08-17", "v": 5.4497}, {"d": "2020-08-18", "v": 5.4659}, {"d": "2020-08-19", "v": 5.4906}, {"d": "2020-08-20", "v": 5.651}, {"d": "2020-08-21", "v": 5.6064}, {"d": "2020-08-24", "v": 5.5954}, {"d": "2020-08-25", "v": 5.5997}, {"d": "2020-08-26", "v": 5.568}, {"d": "2020-08-27", "v": 5.5956}, {"d": "2020-08-28", "v": 5.4679}, {"d": "2020-08-31", "v": 5.4713}], "2020-09": [{"d": "2020-09-01", "v": 5.3732}, {"d": "2020-09-02", "v": 5.3741}, {"d": "2020-09-03", "v": 5.3079}, {"d": "2020-09-04", "v": 5.2848}, {"d": "2020-09-08", "v": 5.3698}, {"d": "2020-09-09", "v": 5.3024}, {"d": "2020-09-10", "v": 5.2936}, {"d": "2020-09-11", "v": 5.2854}, {"d": "2020-09-14", "v": 5.2984}, {"d": "2020-09-15", "v": 5.2728}, {"d": "2020-09-16", "v": 5.2532}, {"d": "2020-09-17", "v": 5.2593}, {"d": "2020-09-18", "v": 5.2889}, {"d": "2020-09-21", "v": 5.444}, {"d": "2020-09-22", "v": 5.4329}, {"d": "2020-09-23", "v": 5.5311}, {"d": "2020-09-24", "v": 5.5714}, {"d": "2020-09-25", "v": 5.5667}, {"d": "2020-09-28", "v": 5.5858}, {"d": "2020-09-29", "v": 5.6528}, {"d": "2020-09-30", "v": 5.6407}], "2020-10": [{"d": "2020-10-01", "v": 5.6441}, {"d": "2020-10-02", "v": 5.6464}, {"d": "2020-10-05", "v": 5.6299}, {"d": "2020-10-06", "v": 5.5205}, {"d": "2020-10-07", "v": 5.6018}, {"d": "2020-10-08", "v": 5.62}, {"d": "2020-10-09", "v": 5.5393}, {"d": "2020-10-13", "v": 5.5859}, {"d": "2020-10-14", "v": 5.5675}, {"d": "2020-10-15", "v": 5.6172}, {"d": "2020-10-16", "v": 5.6226}, {"d": "2020-10-19", "v": 5.6023}, {"d": "2020-10-20", "v": 5.583}, {"d": "2020-10-21", "v": 5.6006}, {"d": "2020-10-22", "v": 5.582}, {"d": "2020-10-23", "v": 5.612}, {"d": "2020-10-26", "v": 5.6328}, {"d": "2020-10-27", "v": 5.6491}, {"d": "2020-10-28", "v": 5.7325}, {"d": "2020-10-29", "v": 5.7803}, {"d": "2020-10-30", "v": 5.7718}], "2020-11": [{"d": "2020-11-03", "v": 5.6895}, {"d": "2020-11-04", "v": 5.6932}, {"d": "2020-11-05", "v": 5.5624}, {"d": "2020-11-06", "v": 5.5313}, {"d": "2020-11-09", "v": 5.2821}, {"d": "2020-11-10", "v": 5.3696}, {"d": "2020-11-11", "v": 5.402}, {"d": "2020-11-12", "v": 5.4094}, {"d": "2020-11-13", "v": 5.4854}, {"d": "2020-11-16", "v": 5.4198}, {"d": "2020-11-17", "v": 5.3968}, {"d": "2020-11-18", "v": 5.2932}, {"d": "2020-11-19", "v": 5.333}, {"d": "2020-11-20", "v": 5.3505}, {"d": "2020-11-23", "v": 5.3828}, {"d": "2020-11-24", "v": 5.4037}, {"d": "2020-11-25", "v": 5.3508}, {"d": "2020-11-26", "v": 5.3201}, {"d": "2020-11-27", "v": 5.3494}, {"d": "2020-11-30", "v": 5.3317}], "2020-12": [{"d": "2020-12-01", "v": 5.2789}, {"d": "2020-12-02", "v": 5.2267}, {"d": "2020-12-03", "v": 5.1625}, {"d": "2020-12-04", "v": 5.1706}, {"d": "2020-12-07", "v": 5.1018}, {"d": "2020-12-08", "v": 5.092}, {"d": "2020-12-09", "v": 5.1109}, {"d": "2020-12-10", "v": 5.0852}, {"d": "2020-12-11", "v": 5.0691}, {"d": "2020-12-14", "v": 5.0578}, {"d": "2020-12-15", "v": 5.0968}, {"d": "2020-12-16", "v": 5.1057}, {"d": "2020-12-17", "v": 5.0612}, {"d": "2020-12-18", "v": 5.0986}, {"d": "2020-12-21", "v": 5.1572}, {"d": "2020-12-22", "v": 5.1473}, {"d": "2020-12-23", "v": 5.174}, {"d": "2020-12-24", "v": 5.18}, {"d": "2020-12-28", "v": 5.239}, {"d": "2020-12-29", "v": 5.1942}, {"d": "2020-12-30", "v": 5.1967}, {"d": "2020-12-31", "v": 5.1967}], "2021-01": [{"d": "2021-01-04", "v": 5.1626}, {"d": "2021-01-05", "v": 5.3269}, {"d": "2021-01-06", "v": 5.3182}, {"d": "2021-01-07", "v": 5.3433}, {"d": "2021-01-08", "v": 5.3683}, {"d": "2021-01-11", "v": 5.4966}, {"d": "2021-01-12", "v": 5.4637}, {"d": "2021-01-13", "v": 5.307}, {"d": "2021-01-14", "v": 5.2617}, {"d": "2021-01-15", "v": 5.2714}, {"d": "2021-01-18", "v": 5.2788}, {"d": "2021-01-19", "v": 5.2945}, {"d": "2021-01-20", "v": 5.3033}, {"d": "2021-01-21", "v": 5.3166}, {"d": "2021-01-22", "v": 5.4301}, {"d": "2021-01-25", "v": 5.5089}, {"d": "2021-01-26", "v": 5.3865}, {"d": "2021-01-27", "v": 5.3824}, {"d": "2021-01-28", "v": 5.4282}, {"d": "2021-01-29", "v": 5.4759}], "2021-02": [{"d": "2021-02-01", "v": 5.4608}, {"d": "2021-02-02", "v": 5.3875}, {"d": "2021-02-03", "v": 5.3423}, {"d": "2021-02-04", "v": 5.391}, {"d": "2021-02-05", "v": 5.3884}, {"d": "2021-02-08", "v": 5.367}, {"d": "2021-02-09", "v": 5.4216}, {"d": "2021-02-10", "v": 5.4024}, {"d": "2021-02-11", "v": 5.3626}, {"d": "2021-02-12", "v": 5.3815}, {"d": "2021-02-17", "v": 5.4138}, {"d": "2021-02-18", "v": 5.4238}, {"d": "2021-02-19", "v": 5.3924}, {"d": "2021-02-22", "v": 5.5044}, {"d": "2021-02-23", "v": 5.449}, {"d": "2021-02-24", "v": 5.4182}, {"d": "2021-02-25", "v": 5.46}, {"d": "2021-02-26", "v": 5.5302}], "2021-03": [{"d": "2021-03-01", "v": 5.5832}, {"d": "2021-03-02", "v": 5.6844}, {"d": "2021-03-03", "v": 5.7342}, {"d": "2021-03-04", "v": 5.6008}, {"d": "2021-03-05", "v": 5.687}, {"d": "2021-03-08", "v": 5.7343}, {"d": "2021-03-09", "v": 5.8397}, {"d": "2021-03-10", "v": 5.7449}, {"d": "2021-03-11", "v": 5.589}, {"d": "2021-03-12", "v": 5.564}, {"d": "2021-03-15", "v": 5.6296}, {"d": "2021-03-16", "v": 5.5851}, {"d": "2021-03-17", "v": 5.6579}, {"d": "2021-03-18", "v": 5.5474}, {"d": "2021-03-19", "v": 5.5082}, {"d": "2021-03-22", "v": 5.5269}, {"d": "2021-03-23", "v": 5.4951}, {"d": "2021-03-24", "v": 5.533}, {"d": "2021-03-25", "v": 5.6585}, {"d": "2021-03-26", "v": 5.7042}, {"d": "2021-03-29", "v": 5.7925}, {"d": "2021-03-30", "v": 5.7642}, {"d": "2021-03-31", "v": 5.6973}], "2021-04": [{"d": "2021-04-01", "v": 5.6849}, {"d": "2021-04-05", "v": 5.6579}, {"d": "2021-04-06", "v": 5.6263}, {"d": "2021-04-07", "v": 5.5864}, {"d": "2021-04-08", "v": 5.5817}, {"d": "2021-04-09", "v": 5.6445}, {"d": "2021-04-12", "v": 5.6582}, {"d": "2021-04-13", "v": 5.7064}, {"d": "2021-04-14", "v": 5.6936}, {"d": "2021-04-15", "v": 5.6234}, {"d": "2021-04-16", "v": 5.6328}, {"d": "2021-04-19", "v": 5.575}, {"d": "2021-04-20", "v": 5.5266}, {"d": "2021-04-22", "v": 5.497}, {"d": "2021-04-23", "v": 5.4787}, {"d": "2021-04-26", "v": 5.4566}, {"d": "2021-04-27", "v": 5.4424}, {"d": "2021-04-28", "v": 5.4005}, {"d": "2021-04-29", "v": 5.3662}, {"d": "2021-04-30", "v": 5.4036}], "2021-05": [{"d": "2021-05-03", "v": 5.4087}, {"d": "2021-05-04", "v": 5.4505}, {"d": "2021-05-05", "v": 5.3872}, {"d": "2021-05-06", "v": 5.2897}, {"d": "2021-05-07", "v": 5.2217}, {"d": "2021-05-10", "v": 5.2227}, {"d": "2021-05-11", "v": 5.2403}, {"d": "2021-05-12", "v": 5.2353}, {"d": "2021-05-13", "v": 5.2815}, {"d": "2021-05-14", "v": 5.2701}, {"d": "2021-05-17", "v": 5.2755}, {"d": "2021-05-18", "v": 5.2588}, {"d": "2021-05-19", "v": 5.2822}, {"d": "2021-05-20", "v": 5.2905}, {"d": "2021-05-21", "v": 5.3027}, {"d": "2021-05-24", "v": 5.3198}, {"d": "2021-05-25", "v": 5.3143}, {"d": "2021-05-26", "v": 5.3164}, {"d": "2021-05-27", "v": 5.284}, {"d": "2021-05-28", "v": 5.2281}, {"d": "2021-05-31", "v": 5.2322}], "2021-06": [{"d": "2021-06-01", "v": 5.1636}, {"d": "2021-06-02", "v": 5.1147}, {"d": "2021-06-04", "v": 5.0666}, {"d": "2021-06-07", "v": 5.0498}, {"d": "2021-06-08", "v": 5.0489}, {"d": "2021-06-09", "v": 5.0533}, {"d": "2021-06-10", "v": 5.0635}, {"d": "2021-06-11", "v": 5.119}, {"d": "2021-06-14", "v": 5.0707}, {"d": "2021-06-15", "v": 5.0874}, {"d": "2021-06-16", "v": 5.0207}, {"d": "2021-06-17", "v": 5.0359}, {"d": "2021-06-18", "v": 5.0314}, {"d": "2021-06-21", "v": 5.0373}, {"d": "2021-06-22", "v": 5.0178}, {"d": "2021-06-23", "v": 4.9519}, {"d": "2021-06-24", "v": 4.9277}, {"d": "2021-06-25", "v": 4.9206}, {"d": "2021-06-28", "v": 4.942}, {"d": "2021-06-29", "v": 4.945}, {"d": "2021-06-30", "v": 5.0022}], "2021-07": [{"d": "2021-07-01", "v": 5.0055}, {"d": "2021-07-02", "v": 5.0293}, {"d": "2021-07-05", "v": 5.0749}, {"d": "2021-07-06", "v": 5.1645}, {"d": "2021-07-07", "v": 5.2328}, {"d": "2021-07-08", "v": 5.2587}, {"d": "2021-07-09", "v": 5.2393}, {"d": "2021-07-12", "v": 5.2239}, {"d": "2021-07-13", "v": 5.177}, {"d": "2021-07-14", "v": 5.088}, {"d": "2021-07-15", "v": 5.1}, {"d": "2021-07-16", "v": 5.0941}, {"d": "2021-07-19", "v": 5.1978}, {"d": "2021-07-20", "v": 5.2465}, {"d": "2021-07-21", "v": 5.2516}, {"d": "2021-07-22", "v": 5.1978}, {"d": "2021-07-23", "v": 5.1701}, {"d": "2021-07-26", "v": 5.1863}, {"d": "2021-07-27", "v": 5.1669}, {"d": "2021-07-28", "v": 5.1527}, {"d": "2021-07-29", "v": 5.0682}, {"d": "2021-07-30", "v": 5.1216}], "2021-08": [{"d": "2021-08-02", "v": 5.1379}, {"d": "2021-08-03", "v": 5.2464}, {"d": "2021-08-04", "v": 5.2091}, {"d": "2021-08-05", "v": 5.1464}, {"d": "2021-08-06", "v": 5.241}, {"d": "2021-08-09", "v": 5.2774}, {"d": "2021-08-10", "v": 5.2217}, {"d": "2021-08-11", "v": 5.2013}, {"d": "2021-08-12", "v": 5.2351}, {"d": "2021-08-13", "v": 5.2474}, {"d": "2021-08-16", "v": 5.2495}, {"d": "2021-08-17", "v": 5.2585}, {"d": "2021-08-18", "v": 5.3025}, {"d": "2021-08-19", "v": 5.418}, {"d": "2021-08-20", "v": 5.4274}, {"d": "2021-08-23", "v": 5.3686}, {"d": "2021-08-24", "v": 5.3017}, {"d": "2021-08-25", "v": 5.2465}, {"d": "2021-08-26", "v": 5.2429}, {"d": "2021-08-27", "v": 5.22}, {"d": "2021-08-30", "v": 5.1952}, {"d": "2021-08-31", "v": 5.1433}], "2021-09": [{"d": "2021-09-01", "v": 5.1576}, {"d": "2021-09-02", "v": 5.1735}, {"d": "2021-09-03", "v": 5.1685}, {"d": "2021-09-06", "v": 5.1773}, {"d": "2021-09-08", "v": 5.2524}, {"d": "2021-09-09", "v": 5.2825}, {"d": "2021-09-10", "v": 5.2158}, {"d": "2021-09-13", "v": 5.219}, {"d": "2021-09-14", "v": 5.226}, {"d": "2021-09-15", "v": 5.2576}, {"d": "2021-09-16", "v": 5.2594}, {"d": "2021-09-17", "v": 5.3103}, {"d": "2021-09-20", "v": 5.3332}, {"d": "2021-09-21", "v": 5.3044}, {"d": "2021-09-22", "v": 5.2783}, {"d": "2021-09-23", "v": 5.2891}, {"d": "2021-09-24", "v": 5.3435}, {"d": "2021-09-27", "v": 5.3478}, {"d": "2021-09-28", "v": 5.4206}, {"d": "2021-09-29", "v": 5.4173}, {"d": "2021-09-30", "v": 5.4394}], "2021-10": [{"d": "2021-10-01", "v": 5.3911}, {"d": "2021-10-04", "v": 5.4204}, {"d": "2021-10-05", "v": 5.4611}, {"d": "2021-10-06", "v": 5.5097}, {"d": "2021-10-07", "v": 5.514}, {"d": "2021-10-08", "v": 5.5084}, {"d": "2021-10-11", "v": 5.5161}, {"d": "2021-10-13", "v": 5.5471}, {"d": "2021-10-14", "v": 5.4988}, {"d": "2021-10-15", "v": 5.451}, {"d": "2021-10-18", "v": 5.5193}, {"d": "2021-10-19", "v": 5.5521}, {"d": "2021-10-20", "v": 5.5571}, {"d": "2021-10-21", "v": 5.6423}, {"d": "2021-10-22", "v": 5.7117}, {"d": "2021-10-25", "v": 5.5973}, {"d": "2021-10-26", "v": 5.58}, {"d": "2021-10-27", "v": 5.5667}, {"d": "2021-10-28", "v": 5.6124}, {"d": "2021-10-29", "v": 5.643}], "2021-11": [{"d": "2021-11-01", "v": 5.6694}, {"d": "2021-11-03", "v": 5.6672}, {"d": "2021-11-04", "v": 5.5942}, {"d": "2021-11-05", "v": 5.5455}, {"d": "2021-11-08", "v": 5.5627}, {"d": "2021-11-09", "v": 5.4957}, {"d": "2021-11-10", "v": 5.459}, {"d": "2021-11-11", "v": 5.4171}, {"d": "2021-11-12", "v": 5.4199}, {"d": "2021-11-16", "v": 5.4772}, {"d": "2021-11-17", "v": 5.4993}, {"d": "2021-11-18", "v": 5.547}, {"d": "2021-11-19", "v": 5.5584}, {"d": "2021-11-22", "v": 5.5841}, {"d": "2021-11-23", "v": 5.6456}, {"d": "2021-11-24", "v": 5.6027}, {"d": "2021-11-25", "v": 5.574}, {"d": "2021-11-26", "v": 5.5865}, {"d": "2021-11-29", "v": 5.6118}, {"d": "2021-11-30", "v": 5.6199}], "2021-12": [{"d": "2021-12-01", "v": 5.6168}, {"d": "2021-12-02", "v": 5.6345}, {"d": "2021-12-03", "v": 5.6432}, {"d": "2021-12-06", "v": 5.6877}, {"d": "2021-12-07", "v": 5.6411}, {"d": "2021-12-08", "v": 5.5779}, {"d": "2021-12-09", "v": 5.5564}, {"d": "2021-12-10", "v": 5.5931}, {"d": "2021-12-13", "v": 5.6357}, {"d": "2021-12-14", "v": 5.6461}, {"d": "2021-12-15", "v": 5.7127}, {"d": "2021-12-16", "v": 5.6963}, {"d": "2021-12-17", "v": 5.6959}, {"d": "2021-12-20", "v": 5.7055}, {"d": "2021-12-21", "v": 5.7372}, {"d": "2021-12-22", "v": 5.7201}, {"d": "2021-12-23", "v": 5.691}, {"d": "2021-12-24", "v": 5.6591}, {"d": "2021-12-27", "v": 5.665}, {"d": "2021-12-28", "v": 5.6438}, {"d": "2021-12-29", "v": 5.6619}, {"d": "2021-12-30", "v": 5.5805}, {"d": "2021-12-31", "v": 5.5805}], "2022-01": [{"d": "2022-01-03", "v": 5.6309}, {"d": "2022-01-04", "v": 5.6776}, {"d": "2022-01-05", "v": 5.6628}, {"d": "2022-01-06", "v": 5.7042}, {"d": "2022-01-07", "v": 5.6753}, {"d": "2022-01-10", "v": 5.6736}, {"d": "2022-01-11", "v": 5.6351}, {"d": "2022-01-12", "v": 5.5611}, {"d": "2022-01-13", "v": 5.5246}, {"d": "2022-01-14", "v": 5.5349}, {"d": "2022-01-17", "v": 5.5058}, {"d": "2022-01-18", "v": 5.5213}, {"d": "2022-01-19", "v": 5.4978}, {"d": "2022-01-20", "v": 5.4166}, {"d": "2022-01-21", "v": 5.4401}, {"d": "2022-01-24", "v": 5.491}, {"d": "2022-01-25", "v": 5.4971}, {"d": "2022-01-26", "v": 5.4324}, {"d": "2022-01-27", "v": 5.3812}, {"d": "2022-01-28", "v": 5.3954}, {"d": "2022-01-31", "v": 5.3574}], "2022-02": [{"d": "2022-02-01", "v": 5.281}, {"d": "2022-02-02", "v": 5.2956}, {"d": "2022-02-03", "v": 5.3025}, {"d": "2022-02-04", "v": 5.3284}, {"d": "2022-02-07", "v": 5.2913}, {"d": "2022-02-08", "v": 5.2699}, {"d": "2022-02-09", "v": 5.2735}, {"d": "2022-02-10", "v": 5.2101}, {"d": "2022-02-11", "v": 5.1987}, {"d": "2022-02-14", "v": 5.2106}, {"d": "2022-02-15", "v": 5.1881}, {"d": "2022-02-16", "v": 5.163}, {"d": "2022-02-17", "v": 5.1565}, {"d": "2022-02-18", "v": 5.1339}, {"d": "2022-02-21", "v": 5.0997}, {"d": "2022-02-22", "v": 5.0611}, {"d": "2022-02-23", "v": 5.0143}, {"d": "2022-02-24", "v": 5.1174}, {"d": "2022-02-25", "v": 5.1394}], "2022-03": [{"d": "2022-03-02", "v": 5.1347}, {"d": "2022-03-03", "v": 5.0479}, {"d": "2022-03-04", "v": 5.0758}, {"d": "2022-03-07", "v": 5.0579}, {"d": "2022-03-08", "v": 5.0903}, {"d": "2022-03-09", "v": 5.0094}, {"d": "2022-03-10", "v": 5.0513}, {"d": "2022-03-11", "v": 5.0255}, {"d": "2022-03-14", "v": 5.0647}, {"d": "2022-03-15", "v": 5.1314}, {"d": "2022-03-16", "v": 5.1287}, {"d": "2022-03-17", "v": 5.0764}, {"d": "2022-03-18", "v": 5.0411}, {"d": "2022-03-21", "v": 4.9666}, {"d": "2022-03-22", "v": 4.9208}, {"d": "2022-03-23", "v": 4.8704}, {"d": "2022-03-24", "v": 4.8067}, {"d": "2022-03-25", "v": 4.7782}, {"d": "2022-03-28", "v": 4.7905}, {"d": "2022-03-29", "v": 4.7486}, {"d": "2022-03-30", "v": 4.7497}, {"d": "2022-03-31", "v": 4.7378}], "2022-04": [{"d": "2022-04-01", "v": 4.6984}, {"d": "2022-04-04", "v": 4.6175}, {"d": "2022-04-05", "v": 4.64}, {"d": "2022-04-06", "v": 4.6967}, {"d": "2022-04-07", "v": 4.7422}, {"d": "2022-04-08", "v": 4.7513}, {"d": "2022-04-11", "v": 4.7025}, {"d": "2022-04-12", "v": 4.6483}, {"d": "2022-04-13", "v": 4.6811}, {"d": "2022-04-14", "v": 4.7158}, {"d": "2022-04-18", "v": 4.6746}, {"d": "2022-04-19", "v": 4.6664}, {"d": "2022-04-20", "v": 4.6397}, {"d": "2022-04-22", "v": 4.7326}, {"d": "2022-04-25", "v": 4.8818}, {"d": "2022-04-26", "v": 4.9666}, {"d": "2022-04-27", "v": 5.0167}, {"d": "2022-04-28", "v": 5.011}, {"d": "2022-04-29", "v": 4.9191}], "2022-05": [{"d": "2022-05-02", "v": 5.0266}, {"d": "2022-05-03", "v": 5.0167}, {"d": "2022-05-04", "v": 5.0093}, {"d": "2022-05-05", "v": 5.0051}, {"d": "2022-05-06", "v": 5.075}, {"d": "2022-05-09", "v": 5.134}, {"d": "2022-05-10", "v": 5.139}, {"d": "2022-05-11", "v": 5.1244}, {"d": "2022-05-12", "v": 5.1482}, {"d": "2022-05-13", "v": 5.1075}, {"d": "2022-05-16", "v": 5.0666}, {"d": "2022-05-17", "v": 4.9676}, {"d": "2022-05-18", "v": 4.9592}, {"d": "2022-05-19", "v": 4.9198}, {"d": "2022-05-20", "v": 4.8777}, {"d": "2022-05-23", "v": 4.7973}, {"d": "2022-05-24", "v": 4.8106}, {"d": "2022-05-25", "v": 4.8359}, {"d": "2022-05-26", "v": 4.7967}, {"d": "2022-05-27", "v": 4.7434}, {"d": "2022-05-30", "v": 4.7216}, {"d": "2022-05-31", "v": 4.7289}], "2022-06": [{"d": "2022-06-01", "v": 4.7765}, {"d": "2022-06-02", "v": 4.7879}, {"d": "2022-06-03", "v": 4.7956}, {"d": "2022-06-06", "v": 4.7839}, {"d": "2022-06-07", "v": 4.8909}, {"d": "2022-06-08", "v": 4.8711}, {"d": "2022-06-09", "v": 4.8951}, {"d": "2022-06-10", "v": 4.9836}, {"d": "2022-06-13", "v": 5.1033}, {"d": "2022-06-14", "v": 5.1203}, {"d": "2022-06-15", "v": 5.1119}, {"d": "2022-06-17", "v": 5.1313}, {"d": "2022-06-20", "v": 5.1641}, {"d": "2022-06-21", "v": 5.1462}, {"d": "2022-06-22", "v": 5.1509}, {"d": "2022-06-23", "v": 5.1833}, {"d": "2022-06-24", "v": 5.2334}, {"d": "2022-06-27", "v": 5.2214}, {"d": "2022-06-28", "v": 5.2179}, {"d": "2022-06-29", "v": 5.2268}, {"d": "2022-06-30", "v": 5.238}], "2022-07": [{"d": "2022-07-01", "v": 5.3142}, {"d": "2022-07-04", "v": 5.3038}, {"d": "2022-07-05", "v": 5.3899}, {"d": "2022-07-06", "v": 5.4321}, {"d": "2022-07-07", "v": 5.364}, {"d": "2022-07-08", "v": 5.3086}, {"d": "2022-07-11", "v": 5.3477}, {"d": "2022-07-12", "v": 5.412}, {"d": "2022-07-13", "v": 5.3992}, {"d": "2022-07-14", "v": 5.4568}, {"d": "2022-07-15", "v": 5.4014}, {"d": "2022-07-18", "v": 5.3675}, {"d": "2022-07-19", "v": 5.3904}, {"d": "2022-07-20", "v": 5.4288}, {"d": "2022-07-21", "v": 5.475}, {"d": "2022-07-22", "v": 5.4522}, {"d": "2022-07-25", "v": 5.4144}, {"d": "2022-07-26", "v": 5.3608}, {"d": "2022-07-27", "v": 5.3074}, {"d": "2022-07-28", "v": 5.2149}, {"d": "2022-07-29", "v": 5.1884}], "2022-08": [{"d": "2022-08-01", "v": 5.1606}, {"d": "2022-08-02", "v": 5.2329}, {"d": "2022-08-03", "v": 5.2846}, {"d": "2022-08-04", "v": 5.2409}, {"d": "2022-08-05", "v": 5.2165}, {"d": "2022-08-08", "v": 5.1247}, {"d": "2022-08-09", "v": 5.1224}, {"d": "2022-08-10", "v": 5.0497}, {"d": "2022-08-11", "v": 5.1127}, {"d": "2022-08-12", "v": 5.1023}, {"d": "2022-08-15", "v": 5.0925}, {"d": "2022-08-16", "v": 5.134}, {"d": "2022-08-17", "v": 5.1784}, {"d": "2022-08-18", "v": 5.1773}, {"d": "2022-08-19", "v": 5.1961}, {"d": "2022-08-22", "v": 5.1709}, {"d": "2022-08-23", "v": 5.103}, {"d": "2022-08-24", "v": 5.105}, {"d": "2022-08-25", "v": 5.1173}, {"d": "2022-08-26", "v": 5.0903}, {"d": "2022-08-29", "v": 5.0428}, {"d": "2022-08-30", "v": 5.0617}, {"d": "2022-08-31", "v": 5.179}], "2022-09": [{"d": "2022-09-01", "v": 5.2007}, {"d": "2022-09-02", "v": 5.1878}, {"d": "2022-09-05", "v": 5.1686}, {"d": "2022-09-06", "v": 5.2228}, {"d": "2022-09-08", "v": 5.2155}, {"d": "2022-09-09", "v": 5.1633}, {"d": "2022-09-12", "v": 5.1183}, {"d": "2022-09-13", "v": 5.1794}, {"d": "2022-09-14", "v": 5.1774}, {"d": "2022-09-15", "v": 5.2211}, {"d": "2022-09-16", "v": 5.2882}, {"d": "2022-09-19", "v": 5.2367}, {"d": "2022-09-20", "v": 5.1705}, {"d": "2022-09-21", "v": 5.1692}, {"d": "2022-09-22", "v": 5.1677}, {"d": "2022-09-23", "v": 5.2257}, {"d": "2022-09-26", "v": 5.3548}, {"d": "2022-09-27", "v": 5.3508}, {"d": "2022-09-28", "v": 5.3594}, {"d": "2022-09-29", "v": 5.3916}, {"d": "2022-09-30", "v": 5.4066}], "2022-10": [{"d": "2022-10-03", "v": 5.2002}, {"d": "2022-10-04", "v": 5.1411}, {"d": "2022-10-05", "v": 5.2144}, {"d": "2022-10-06", "v": 5.2009}, {"d": "2022-10-07", "v": 5.2221}, {"d": "2022-10-10", "v": 5.1941}, {"d": "2022-10-11", "v": 5.2068}, {"d": "2022-10-13", "v": 5.3017}, {"d": "2022-10-14", "v": 5.2824}, {"d": "2022-10-17", "v": 5.2713}, {"d": "2022-10-18", "v": 5.2697}, {"d": "2022-10-19", "v": 5.2808}, {"d": "2022-10-20", "v": 5.2176}, {"d": "2022-10-21", "v": 5.1919}, {"d": "2022-10-24", "v": 5.2744}, {"d": "2022-10-25", "v": 5.3091}, {"d": "2022-10-26", "v": 5.3248}, {"d": "2022-10-27", "v": 5.3003}, {"d": "2022-10-28", "v": 5.3454}, {"d": "2022-10-31", "v": 5.257}], "2022-11": [{"d": "2022-11-01", "v": 5.15}, {"d": "2022-11-03", "v": 5.1349}, {"d": "2022-11-04", "v": 5.036}, {"d": "2022-11-07", "v": 5.0886}, {"d": "2022-11-08", "v": 5.1744}, {"d": "2022-11-09", "v": 5.1629}, {"d": "2022-11-10", "v": 5.3064}, {"d": "2022-11-11", "v": 5.3051}, {"d": "2022-11-14", "v": 5.3013}, {"d": "2022-11-16", "v": 5.3204}, {"d": "2022-11-17", "v": 5.4655}, {"d": "2022-11-18", "v": 5.3477}, {"d": "2022-11-21", "v": 5.3259}, {"d": "2022-11-22", "v": 5.3339}, {"d": "2022-11-23", "v": 5.393}, {"d": "2022-11-24", "v": 5.3149}, {"d": "2022-11-25", "v": 5.3508}, {"d": "2022-11-28", "v": 5.3796}, {"d": "2022-11-29", "v": 5.3076}, {"d": "2022-11-30", "v": 5.2941}], "2022-12": [{"d": "2022-12-01", "v": 5.1948}, {"d": "2022-12-02", "v": 5.1974}, {"d": "2022-12-05", "v": 5.2464}, {"d": "2022-12-06", "v": 5.2396}, {"d": "2022-12-07", "v": 5.2208}, {"d": "2022-12-08", "v": 5.2091}, {"d": "2022-12-09", "v": 5.2396}, {"d": "2022-12-12", "v": 5.3066}, {"d": "2022-12-13", "v": 5.2669}, {"d": "2022-12-14", "v": 5.3406}, {"d": "2022-12-15", "v": 5.3183}, {"d": "2022-12-16", "v": 5.2806}, {"d": "2022-12-19", "v": 5.316}, {"d": "2022-12-20", "v": 5.2427}, {"d": "2022-12-21", "v": 5.2031}, {"d": "2022-12-22", "v": 5.1871}, {"d": "2022-12-23", "v": 5.1445}, {"d": "2022-12-26", "v": 5.1872}, {"d": "2022-12-27", "v": 5.2832}, {"d": "2022-12-28", "v": 5.2736}, {"d": "2022-12-29", "v": 5.2177}, {"d": "2022-12-30", "v": 5.2177}], "2023-01": [{"d": "2023-01-02", "v": 5.3436}, {"d": "2023-01-03", "v": 5.3759}, {"d": "2023-01-04", "v": 5.4459}, {"d": "2023-01-05", "v": 5.4026}, {"d": "2023-01-06", "v": 5.2855}, {"d": "2023-01-09", "v": 5.2967}, {"d": "2023-01-10", "v": 5.2395}, {"d": "2023-01-11", "v": 5.202}, {"d": "2023-01-12", "v": 5.14}, {"d": "2023-01-13", "v": 5.1146}, {"d": "2023-01-16", "v": 5.1115}, {"d": "2023-01-17", "v": 5.1203}, {"d": "2023-01-18", "v": 5.0909}, {"d": "2023-01-19", "v": 5.2144}, {"d": "2023-01-20", "v": 5.1986}, {"d": "2023-01-23", "v": 5.1922}, {"d": "2023-01-24", "v": 5.1696}, {"d": "2023-01-25", "v": 5.1042}, {"d": "2023-01-26", "v": 5.0951}, {"d": "2023-01-27", "v": 5.0767}, {"d": "2023-01-30", "v": 5.0959}, {"d": "2023-01-31", "v": 5.0993}], "2023-02": [{"d": "2023-02-01", "v": 5.0721}, {"d": "2023-02-02", "v": 4.9901}, {"d": "2023-02-03", "v": 5.103}, {"d": "2023-02-06", "v": 5.1763}, {"d": "2023-02-07", "v": 5.1695}, {"d": "2023-02-08", "v": 5.2036}, {"d": "2023-02-09", "v": 5.2315}, {"d": "2023-02-10", "v": 5.2526}, {"d": "2023-02-13", "v": 5.1834}, {"d": "2023-02-14", "v": 5.1507}, {"d": "2023-02-15", "v": 5.2243}, {"d": "2023-02-16", "v": 5.2432}, {"d": "2023-02-17", "v": 5.2012}, {"d": "2023-02-22", "v": 5.173}, {"d": "2023-02-23", "v": 5.133}, {"d": "2023-02-24", "v": 5.1791}, {"d": "2023-02-27", "v": 5.196}, {"d": "2023-02-28", "v": 5.2078}], "2023-03": [{"d": "2023-03-01", "v": 5.207}, {"d": "2023-03-02", "v": 5.208}, {"d": "2023-03-03", "v": 5.2037}, {"d": "2023-03-06", "v": 5.197}, {"d": "2023-03-07", "v": 5.1901}, {"d": "2023-03-08", "v": 5.1387}, {"d": "2023-03-09", "v": 5.1353}, {"d": "2023-03-10", "v": 5.1822}, {"d": "2023-03-13", "v": 5.24}, {"d": "2023-03-14", "v": 5.2362}, {"d": "2023-03-15", "v": 5.2981}, {"d": "2023-03-16", "v": 5.2892}, {"d": "2023-03-17", "v": 5.2679}, {"d": "2023-03-20", "v": 5.2467}, {"d": "2023-03-21", "v": 5.2444}, {"d": "2023-03-22", "v": 5.2648}, {"d": "2023-03-23", "v": 5.2632}, {"d": "2023-03-24", "v": 5.2921}, {"d": "2023-03-27", "v": 5.2306}, {"d": "2023-03-28", "v": 5.1733}, {"d": "2023-03-29", "v": 5.1493}, {"d": "2023-03-30", "v": 5.1254}, {"d": "2023-03-31", "v": 5.0804}], "2023-04": [{"d": "2023-04-03", "v": 5.0637}, {"d": "2023-04-04", "v": 5.0762}, {"d": "2023-04-05", "v": 5.0447}, {"d": "2023-04-06", "v": 5.0683}, {"d": "2023-04-10", "v": 5.0834}, {"d": "2023-04-11", "v": 5.0128}, {"d": "2023-04-12", "v": 4.9496}, {"d": "2023-04-13", "v": 4.9097}, {"d": "2023-04-14", "v": 4.9455}, {"d": "2023-04-17", "v": 4.9421}, {"d": "2023-04-18", "v": 4.9678}, {"d": "2023-04-19", "v": 5.0467}, {"d": "2023-04-20", "v": 5.0497}, {"d": "2023-04-24", "v": 5.0595}, {"d": "2023-04-25", "v": 5.0613}, {"d": "2023-04-26", "v": 5.0585}, {"d": "2023-04-27", "v": 5.015}, {"d": "2023-04-28", "v": 5.0007}], "2023-05": [{"d": "2023-05-02", "v": 5.0334}, {"d": "2023-05-03", "v": 5.0227}, {"d": "2023-05-04", "v": 5.0106}, {"d": "2023-05-05", "v": 4.9696}, {"d": "2023-05-08", "v": 4.9696}, {"d": "2023-05-09", "v": 5.0007}, {"d": "2023-05-10", "v": 4.9547}, {"d": "2023-05-11", "v": 4.9696}, {"d": "2023-05-12", "v": 4.9234}, {"d": "2023-05-15", "v": 4.9103}, {"d": "2023-05-16", "v": 4.9122}, {"d": "2023-05-17", "v": 4.9513}, {"d": "2023-05-18", "v": 4.9647}, {"d": "2023-05-19", "v": 4.9858}, {"d": "2023-05-22", "v": 4.968}, {"d": "2023-05-23", "v": 4.9674}, {"d": "2023-05-24", "v": 4.9474}, {"d": "2023-05-25", "v": 4.999}, {"d": "2023-05-26", "v": 5.0114}, {"d": "2023-05-29", "v": 4.9954}, {"d": "2023-05-30", "v": 5.0593}, {"d": "2023-05-31", "v": 5.0959}], "2023-06": [{"d": "2023-06-01", "v": 5.035}, {"d": "2023-06-02", "v": 4.9558}, {"d": "2023-06-05", "v": 4.9236}, {"d": "2023-06-06", "v": 4.9292}, {"d": "2023-06-07", "v": 4.9119}, {"d": "2023-06-09", "v": 4.8922}, {"d": "2023-06-12", "v": 4.8832}, {"d": "2023-06-13", "v": 4.8533}, {"d": "2023-06-14", "v": 4.8462}, {"d": "2023-06-15", "v": 4.8222}, {"d": "2023-06-16", "v": 4.8286}, {"d": "2023-06-19", "v": 4.7803}, {"d": "2023-06-20", "v": 4.793}, {"d": "2023-06-21", "v": 4.7795}, {"d": "2023-06-22", "v": 4.775}, {"d": "2023-06-23", "v": 4.7799}, {"d": "2023-06-26", "v": 4.7698}, {"d": "2023-06-27", "v": 4.7903}, {"d": "2023-06-28", "v": 4.8563}, {"d": "2023-06-29", "v": 4.8584}, {"d": "2023-06-30", "v": 4.8192}], "2023-07": [{"d": "2023-07-03", "v": 4.7876}, {"d": "2023-07-04", "v": 4.8056}, {"d": "2023-07-05", "v": 4.8577}, {"d": "2023-07-06", "v": 4.8977}, {"d": "2023-07-07", "v": 4.8799}, {"d": "2023-07-10", "v": 4.8735}, {"d": "2023-07-11", "v": 4.8949}, {"d": "2023-07-12", "v": 4.8058}, {"d": "2023-07-13", "v": 4.8038}, {"d": "2023-07-14", "v": 4.7957}, {"d": "2023-07-17", "v": 4.8302}, {"d": "2023-07-18", "v": 4.804}, {"d": "2023-07-19", "v": 4.8}, {"d": "2023-07-20", "v": 4.7888}, {"d": "2023-07-21", "v": 4.7732}, {"d": "2023-07-24", "v": 4.7457}, {"d": "2023-07-25", "v": 4.7496}, {"d": "2023-07-26", "v": 4.7368}, {"d": "2023-07-27", "v": 4.7202}, {"d": "2023-07-28", "v": 4.7253}, {"d": "2023-07-31", "v": 4.7415}], "2023-08": [{"d": "2023-08-01", "v": 4.7752}, {"d": "2023-08-02", "v": 4.8083}, {"d": "2023-08-03", "v": 4.8797}, {"d": "2023-08-04", "v": 4.8609}, {"d": "2023-08-07", "v": 4.901}, {"d": "2023-08-08", "v": 4.9217}, {"d": "2023-08-09", "v": 4.9015}, {"d": "2023-08-10", "v": 4.8518}, {"d": "2023-08-11", "v": 4.8918}, {"d": "2023-08-14", "v": 4.9481}, {"d": "2023-08-15", "v": 4.9812}, {"d": "2023-08-16", "v": 4.9772}, {"d": "2023-08-17", "v": 4.9816}, {"d": "2023-08-18", "v": 4.9724}, {"d": "2023-08-21", "v": 4.9847}, {"d": "2023-08-22", "v": 4.9431}, {"d": "2023-08-23", "v": 4.8977}, {"d": "2023-08-24", "v": 4.8748}, {"d": "2023-08-25", "v": 4.8772}, {"d": "2023-08-28", "v": 4.8938}, {"d": "2023-08-29", "v": 4.8706}, {"d": "2023-08-30", "v": 4.8653}, {"d": "2023-08-31", "v": 4.9219}], "2023-09": [{"d": "2023-09-01", "v": 4.9318}, {"d": "2023-09-04", "v": 4.9176}, {"d": "2023-09-05", "v": 4.9705}, {"d": "2023-09-06", "v": 4.9762}, {"d": "2023-09-08", "v": 4.9835}, {"d": "2023-09-11", "v": 4.9366}, {"d": "2023-09-12", "v": 4.9505}, {"d": "2023-09-13", "v": 4.9171}, {"d": "2023-09-14", "v": 4.8751}, {"d": "2023-09-15", "v": 4.8689}, {"d": "2023-09-18", "v": 4.8535}, {"d": "2023-09-19", "v": 4.8575}, {"d": "2023-09-20", "v": 4.8487}, {"d": "2023-09-21", "v": 4.9229}, {"d": "2023-09-22", "v": 4.9131}, {"d": "2023-09-25", "v": 4.9606}, {"d": "2023-09-26", "v": 4.9717}, {"d": "2023-09-27", "v": 5.0289}, {"d": "2023-09-28", "v": 5.0475}, {"d": "2023-09-29", "v": 5.0076}], "2023-10": [{"d": "2023-10-02", "v": 5.0679}, {"d": "2023-10-03", "v": 5.11}, {"d": "2023-10-04", "v": 5.1526}, {"d": "2023-10-05", "v": 5.1713}, {"d": "2023-10-06", "v": 5.1918}, {"d": "2023-10-09", "v": 5.1666}, {"d": "2023-10-10", "v": 5.0862}, {"d": "2023-10-11", "v": 5.0496}, {"d": "2023-10-13", "v": 5.0625}, {"d": "2023-10-16", "v": 5.0618}, {"d": "2023-10-17", "v": 5.0384}, {"d": "2023-10-18", "v": 5.0568}, {"d": "2023-10-19", "v": 5.054}, {"d": "2023-10-20", "v": 5.0528}, {"d": "2023-10-23", "v": 5.0164}, {"d": "2023-10-24", "v": 5.0065}, {"d": "2023-10-25", "v": 4.9981}, {"d": "2023-10-26", "v": 5.0055}, {"d": "2023-10-27", "v": 4.948}, {"d": "2023-10-30", "v": 5.0074}, {"d": "2023-10-31", "v": 5.0575}], "2023-11": [{"d": "2023-11-01", "v": 5.0194}, {"d": "2023-11-03", "v": 4.891}, {"d": "2023-11-06", "v": 4.8999}, {"d": "2023-11-07", "v": 4.867}, {"d": "2023-11-08", "v": 4.8855}, {"d": "2023-11-09", "v": 4.9007}, {"d": "2023-11-10", "v": 4.9219}, {"d": "2023-11-13", "v": 4.9247}, {"d": "2023-11-14", "v": 4.8682}, {"d": "2023-11-16", "v": 4.8575}, {"d": "2023-11-17", "v": 4.8849}, {"d": "2023-11-20", "v": 4.8723}, {"d": "2023-11-21", "v": 4.8806}, {"d": "2023-11-22", "v": 4.8968}, {"d": "2023-11-23", "v": 4.8931}, {"d": "2023-11-24", "v": 4.8927}, {"d": "2023-11-27", "v": 4.8951}, {"d": "2023-11-28", "v": 4.8867}, {"d": "2023-11-29", "v": 4.8933}, {"d": "2023-11-30", "v": 4.9355}], "2023-12": [{"d": "2023-12-01", "v": 4.9191}, {"d": "2023-12-04", "v": 4.9091}, {"d": "2023-12-05", "v": 4.9522}, {"d": "2023-12-06", "v": 4.9031}, {"d": "2023-12-07", "v": 4.8949}, {"d": "2023-12-08", "v": 4.9158}, {"d": "2023-12-11", "v": 4.944}, {"d": "2023-12-12", "v": 4.9476}, {"d": "2023-12-13", "v": 4.958}, {"d": "2023-12-14", "v": 4.8912}, {"d": "2023-12-15", "v": 4.9397}, {"d": "2023-12-18", "v": 4.9399}, {"d": "2023-12-19", "v": 4.8663}, {"d": "2023-12-20", "v": 4.8766}, {"d": "2023-12-21", "v": 4.8755}, {"d": "2023-12-22", "v": 4.8619}, {"d": "2023-12-26", "v": 4.8368}, {"d": "2023-12-27", "v": 4.8306}, {"d": "2023-12-28", "v": 4.8413}, {"d": "2023-12-29", "v": 4.8413}], "2024-01": [{"d": "2024-01-02", "v": 4.8916}, {"d": "2024-01-03", "v": 4.9212}, {"d": "2024-01-04", "v": 4.9188}, {"d": "2024-01-05", "v": 4.8899}, {"d": "2024-01-08", "v": 4.885}, {"d": "2024-01-09", "v": 4.8937}, {"d": "2024-01-10", "v": 4.8901}, {"d": "2024-01-11", "v": 4.8794}, {"d": "2024-01-12", "v": 4.8543}, {"d": "2024-01-15", "v": 4.8765}, {"d": "2024-01-16", "v": 4.9038}, {"d": "2024-01-17", "v": 4.9346}, {"d": "2024-01-18", "v": 4.9403}, {"d": "2024-01-19", "v": 4.9223}, {"d": "2024-01-22", "v": 4.949}, {"d": "2024-01-23", "v": 4.9715}, {"d": "2024-01-24", "v": 4.9192}, {"d": "2024-01-25", "v": 4.9232}, {"d": "2024-01-26", "v": 4.9125}, {"d": "2024-01-29", "v": 4.9225}, {"d": "2024-01-30", "v": 4.9638}, {"d": "2024-01-31", "v": 4.9535}], "2024-02": [{"d": "2024-02-01", "v": 4.935}, {"d": "2024-02-02", "v": 4.9471}, {"d": "2024-02-05", "v": 5.0053}, {"d": "2024-02-06", "v": 4.9687}, {"d": "2024-02-07", "v": 4.9608}, {"d": "2024-02-08", "v": 4.9804}, {"d": "2024-02-09", "v": 4.9717}, {"d": "2024-02-14", "v": 4.9723}, {"d": "2024-02-15", "v": 4.971}, {"d": "2024-02-16", "v": 4.9761}, {"d": "2024-02-19", "v": 4.9585}, {"d": "2024-02-20", "v": 4.9408}, {"d": "2024-02-21", "v": 4.9303}, {"d": "2024-02-22", "v": 4.9419}, {"d": "2024-02-23", "v": 4.9851}, {"d": "2024-02-26", "v": 4.9819}, {"d": "2024-02-27", "v": 4.9575}, {"d": "2024-02-28", "v": 4.9557}, {"d": "2024-02-29", "v": 4.9833}], "2024-03": [{"d": "2024-03-01", "v": 4.9596}, {"d": "2024-03-04", "v": 4.9475}, {"d": "2024-03-05", "v": 4.9488}, {"d": "2024-03-06", "v": 4.9398}, {"d": "2024-03-07", "v": 4.9364}, {"d": "2024-03-08", "v": 4.9751}, {"d": "2024-03-11", "v": 4.9777}, {"d": "2024-03-12", "v": 4.9813}, {"d": "2024-03-13", "v": 4.9803}, {"d": "2024-03-14", "v": 4.9768}, {"d": "2024-03-15", "v": 4.9937}, {"d": "2024-03-18", "v": 5.0124}, {"d": "2024-03-19", "v": 5.0352}, {"d": "2024-03-20", "v": 5.012}, {"d": "2024-03-21", "v": 4.9807}, {"d": "2024-03-22", "v": 4.9897}, {"d": "2024-03-25", "v": 4.9869}, {"d": "2024-03-26", "v": 4.987}, {"d": "2024-03-27", "v": 4.9856}, {"d": "2024-03-28", "v": 4.9962}], "2024-04": [{"d": "2024-04-01", "v": 5.0532}, {"d": "2024-04-02", "v": 5.0476}, {"d": "2024-04-03", "v": 5.0724}, {"d": "2024-04-04", "v": 5.0237}, {"d": "2024-04-05", "v": 5.052}, {"d": "2024-04-08", "v": 5.0421}, {"d": "2024-04-09", "v": 5.008}, {"d": "2024-04-10", "v": 5.0654}, {"d": "2024-04-11", "v": 5.0765}, {"d": "2024-04-12", "v": 5.1364}, {"d": "2024-04-15", "v": 5.1746}, {"d": "2024-04-16", "v": 5.2635}, {"d": "2024-04-17", "v": 5.2469}, {"d": "2024-04-18", "v": 5.2512}, {"d": "2024-04-19", "v": 5.2269}, {"d": "2024-04-22", "v": 5.2043}, {"d": "2024-04-23", "v": 5.1626}, {"d": "2024-04-24", "v": 5.1592}, {"d": "2024-04-25", "v": 5.1679}, {"d": "2024-04-26", "v": 5.1184}, {"d": "2024-04-29", "v": 5.1155}, {"d": "2024-04-30", "v": 5.1718}], "2024-05": [{"d": "2024-05-02", "v": 5.1184}, {"d": "2024-05-03", "v": 5.0668}, {"d": "2024-05-06", "v": 5.0727}, {"d": "2024-05-07", "v": 5.061}, {"d": "2024-05-08", "v": 5.0887}, {"d": "2024-05-09", "v": 5.1577}, {"d": "2024-05-10", "v": 5.1464}, {"d": "2024-05-13", "v": 5.1412}, {"d": "2024-05-14", "v": 5.1356}, {"d": "2024-05-15", "v": 5.1423}, {"d": "2024-05-16", "v": 5.127}, {"d": "2024-05-17", "v": 5.1157}, {"d": "2024-05-20", "v": 5.1085}, {"d": "2024-05-21", "v": 5.1037}, {"d": "2024-05-22", "v": 5.1502}, {"d": "2024-05-23", "v": 5.1443}, {"d": "2024-05-24", "v": 5.1508}, {"d": "2024-05-27", "v": 5.1704}, {"d": "2024-05-28", "v": 5.1538}, {"d": "2024-05-29", "v": 5.1972}, {"d": "2024-05-31", "v": 5.2416}], "2024-06": [{"d": "2024-06-03", "v": 5.2373}, {"d": "2024-06-04", "v": 5.2687}, {"d": "2024-06-05", "v": 5.2841}, {"d": "2024-06-06", "v": 5.2681}, {"d": "2024-06-07", "v": 5.2802}, {"d": "2024-06-10", "v": 5.3666}, {"d": "2024-06-11", "v": 5.3524}, {"d": "2024-06-12", "v": 5.3891}, {"d": "2024-06-13", "v": 5.3974}, {"d": "2024-06-14", "v": 5.363}, {"d": "2024-06-17", "v": 5.413}, {"d": "2024-06-18", "v": 5.4074}, {"d": "2024-06-19", "v": 5.4647}, {"d": "2024-06-20", "v": 5.4254}, {"d": "2024-06-21", "v": 5.4416}, {"d": "2024-06-24", "v": 5.4}, {"d": "2024-06-25", "v": 5.429}, {"d": "2024-06-26", "v": 5.5097}, {"d": "2024-06-27", "v": 5.5229}, {"d": "2024-06-28", "v": 5.5589}], "2024-07": [{"d": "2024-07-01", "v": 5.5893}, {"d": "2024-07-02", "v": 5.6677}, {"d": "2024-07-03", "v": 5.5863}, {"d": "2024-07-04", "v": 5.4839}, {"d": "2024-07-05", "v": 5.497}, {"d": "2024-07-08", "v": 5.472}, {"d": "2024-07-09", "v": 5.4387}, {"d": "2024-07-10", "v": 5.3967}, {"d": "2024-07-11", "v": 5.41}, {"d": "2024-07-12", "v": 5.4529}, {"d": "2024-07-15", "v": 5.4563}, {"d": "2024-07-16", "v": 5.4274}, {"d": "2024-07-17", "v": 5.467}, {"d": "2024-07-18", "v": 5.5426}, {"d": "2024-07-19", "v": 5.5543}, {"d": "2024-07-22", "v": 5.5598}, {"d": "2024-07-23", "v": 5.5807}, {"d": "2024-07-24", "v": 5.6346}, {"d": "2024-07-25", "v": 5.6402}, {"d": "2024-07-26", "v": 5.6465}, {"d": "2024-07-29", "v": 5.6479}, {"d": "2024-07-30", "v": 5.6532}, {"d": "2024-07-31", "v": 5.6621}], "2024-08": [{"d": "2024-08-01", "v": 5.6681}, {"d": "2024-08-02", "v": 5.7366}, {"d": "2024-08-05", "v": 5.7646}, {"d": "2024-08-06", "v": 5.6528}, {"d": "2024-08-07", "v": 5.6093}, {"d": "2024-08-08", "v": 5.6172}, {"d": "2024-08-09", "v": 5.5115}, {"d": "2024-08-12", "v": 5.4911}, {"d": "2024-08-13", "v": 5.4875}, {"d": "2024-08-14", "v": 5.4502}, {"d": "2024-08-15", "v": 5.4651}, {"d": "2024-08-16", "v": 5.4632}, {"d": "2024-08-19", "v": 5.4237}, {"d": "2024-08-20", "v": 5.4547}, {"d": "2024-08-21", "v": 5.4707}, {"d": "2024-08-22", "v": 5.5524}, {"d": "2024-08-23", "v": 5.5263}, {"d": "2024-08-26", "v": 5.4921}, {"d": "2024-08-27", "v": 5.4969}, {"d": "2024-08-28", "v": 5.5315}, {"d": "2024-08-29", "v": 5.6358}, {"d": "2024-08-30", "v": 5.6562}], "2024-09": [{"d": "2024-09-02", "v": 5.623}, {"d": "2024-09-03", "v": 5.6224}, {"d": "2024-09-04", "v": 5.6359}, {"d": "2024-09-05", "v": 5.6049}, {"d": "2024-09-06", "v": 5.5702}, {"d": "2024-09-09", "v": 5.6097}, {"d": "2024-09-10", "v": 5.6254}, {"d": "2024-09-11", "v": 5.6387}, {"d": "2024-09-12", "v": 5.6554}, {"d": "2024-09-13", "v": 5.5717}, {"d": "2024-09-16", "v": 5.5207}, {"d": "2024-09-17", "v": 5.501}, {"d": "2024-09-18", "v": 5.4767}, {"d": "2024-09-19", "v": 5.4189}, {"d": "2024-09-20", "v": 5.4775}, {"d": "2024-09-23", "v": 5.5446}, {"d": "2024-09-24", "v": 5.4702}, {"d": "2024-09-25", "v": 5.4736}, {"d": "2024-09-26", "v": 5.4412}, {"d": "2024-09-27", "v": 5.4431}, {"d": "2024-09-30", "v": 5.4481}], "2024-10": [{"d": "2024-10-01", "v": 5.4521}, {"d": "2024-10-02", "v": 5.4305}, {"d": "2024-10-03", "v": 5.485}, {"d": "2024-10-04", "v": 5.4686}, {"d": "2024-10-07", "v": 5.4626}, {"d": "2024-10-08", "v": 5.5197}, {"d": "2024-10-09", "v": 5.5737}, {"d": "2024-10-10", "v": 5.5819}, {"d": "2024-10-11", "v": 5.6263}, {"d": "2024-10-14", "v": 5.6045}, {"d": "2024-10-15", "v": 5.6378}, {"d": "2024-10-16", "v": 5.6749}, {"d": "2024-10-17", "v": 5.6758}, {"d": "2024-10-18", "v": 5.6672}, {"d": "2024-10-21", "v": 5.7068}, {"d": "2024-10-22", "v": 5.6958}, {"d": "2024-10-23", "v": 5.7149}, {"d": "2024-10-24", "v": 5.7087}, {"d": "2024-10-25", "v": 5.6969}, {"d": "2024-10-28", "v": 5.6988}, {"d": "2024-10-29", "v": 5.714}, {"d": "2024-10-30", "v": 5.7801}, {"d": "2024-10-31", "v": 5.7779}], "2024-11": [{"d": "2024-11-01", "v": 5.8073}, {"d": "2024-11-04", "v": 5.7898}, {"d": "2024-11-05", "v": 5.7846}, {"d": "2024-11-06", "v": 5.7648}, {"d": "2024-11-07", "v": 5.6624}, {"d": "2024-11-08", "v": 5.7648}, {"d": "2024-11-11", "v": 5.798}, {"d": "2024-11-12", "v": 5.7694}, {"d": "2024-11-13", "v": 5.7713}, {"d": "2024-11-14", "v": 5.7885}, {"d": "2024-11-18", "v": 5.7603}, {"d": "2024-11-19", "v": 5.7743}, {"d": "2024-11-21", "v": 5.8173}, {"d": "2024-11-22", "v": 5.8124}, {"d": "2024-11-25", "v": 5.8002}, {"d": "2024-11-26", "v": 5.799}, {"d": "2024-11-27", "v": 5.8291}, {"d": "2024-11-28", "v": 5.9871}, {"d": "2024-11-29", "v": 6.0535}], "2024-12": [{"d": "2024-12-02", "v": 6.0634}, {"d": "2024-12-03", "v": 6.0707}, {"d": "2024-12-04", "v": 6.0581}, {"d": "2024-12-05", "v": 5.9849}, {"d": "2024-12-06", "v": 6.0293}, {"d": "2024-12-09", "v": 6.057}, {"d": "2024-12-10", "v": 6.0529}, {"d": "2024-12-11", "v": 6.032}, {"d": "2024-12-12", "v": 5.9408}, {"d": "2024-12-13", "v": 6.04}, {"d": "2024-12-16", "v": 6.0509}, {"d": "2024-12-17", "v": 6.1685}, {"d": "2024-12-18", "v": 6.1624}, {"d": "2024-12-19", "v": 6.1841}, {"d": "2024-12-20", "v": 6.078}, {"d": "2024-12-23", "v": 6.1612}, {"d": "2024-12-24", "v": 6.1541}, {"d": "2024-12-26", "v": 6.1656}, {"d": "2024-12-27", "v": 6.1991}, {"d": "2024-12-30", "v": 6.1923}, {"d": "2024-12-31", "v": 6.1923}], "2025-01": [{"d": "2025-01-02", "v": 6.2086}, {"d": "2025-01-03", "v": 6.1563}, {"d": "2025-01-06", "v": 6.1119}, {"d": "2025-01-07", "v": 6.0741}, {"d": "2025-01-08", "v": 6.1321}, {"d": "2025-01-09", "v": 6.0896}, {"d": "2025-01-10", "v": 6.0965}, {"d": "2025-01-13", "v": 6.1079}, {"d": "2025-01-14", "v": 6.0671}, {"d": "2025-01-15", "v": 6.0377}, {"d": "2025-01-16", "v": 6.0322}, {"d": "2025-01-17", "v": 6.0609}, {"d": "2025-01-20", "v": 6.0498}, {"d": "2025-01-21", "v": 6.044}, {"d": "2025-01-22", "v": 5.9674}, {"d": "2025-01-23", "v": 5.9399}, {"d": "2025-01-24", "v": 5.8925}, {"d": "2025-01-27", "v": 5.9272}, {"d": "2025-01-28", "v": 5.893}, {"d": "2025-01-29", "v": 5.8596}, {"d": "2025-01-30", "v": 5.9006}, {"d": "2025-01-31", "v": 5.8301}], "2025-02": [{"d": "2025-02-03", "v": 5.8687}, {"d": "2025-02-04", "v": 5.7927}, {"d": "2025-02-05", "v": 5.7997}, {"d": "2025-02-06", "v": 5.7856}, {"d": "2025-02-07", "v": 5.7557}, {"d": "2025-02-10", "v": 5.7808}, {"d": "2025-02-11", "v": 5.7788}, {"d": "2025-02-12", "v": 5.7711}, {"d": "2025-02-13", "v": 5.7788}, {"d": "2025-02-14", "v": 5.7283}, {"d": "2025-02-17", "v": 5.7105}, {"d": "2025-02-18", "v": 5.6979}, {"d": "2025-02-19", "v": 5.7087}, {"d": "2025-02-20", "v": 5.7019}, {"d": "2025-02-21", "v": 5.7027}, {"d": "2025-02-24", "v": 5.7258}, {"d": "2025-02-25", "v": 5.7779}, {"d": "2025-02-26", "v": 5.7757}, {"d": "2025-02-27", "v": 5.8228}, {"d": "2025-02-28", "v": 5.8488}], "2025-03": [{"d": "2025-03-05", "v": 5.7914}, {"d": "2025-03-06", "v": 5.7489}, {"d": "2025-03-07", "v": 5.7688}, {"d": "2025-03-10", "v": 5.793}, {"d": "2025-03-11", "v": 5.8346}, {"d": "2025-03-12", "v": 5.8268}, {"d": "2025-03-13", "v": 5.8131}, {"d": "2025-03-14", "v": 5.7419}, {"d": "2025-03-17", "v": 5.7082}, {"d": "2025-03-18", "v": 5.6852}, {"d": "2025-03-19", "v": 5.6657}, {"d": "2025-03-20", "v": 5.6628}, {"d": "2025-03-21", "v": 5.7241}, {"d": "2025-03-24", "v": 5.7403}, {"d": "2025-03-25", "v": 5.6992}, {"d": "2025-03-26", "v": 5.7298}, {"d": "2025-03-27", "v": 5.7474}, {"d": "2025-03-28", "v": 5.766}, {"d": "2025-03-31", "v": 5.7422}], "2025-04": [{"d": "2025-04-01", "v": 5.7051}, {"d": "2025-04-02", "v": 5.6923}, {"d": "2025-04-03", "v": 5.6067}, {"d": "2025-04-04", "v": 5.7777}, {"d": "2025-04-07", "v": 5.8877}, {"d": "2025-04-08", "v": 5.9368}, {"d": "2025-04-09", "v": 6.0605}, {"d": "2025-04-10", "v": 5.9115}, {"d": "2025-04-11", "v": 5.8737}, {"d": "2025-04-14", "v": 5.8425}, {"d": "2025-04-15", "v": 5.8707}, {"d": "2025-04-16", "v": 5.8808}, {"d": "2025-04-17", "v": 5.8559}, {"d": "2025-04-22", "v": 5.7496}, {"d": "2025-04-23", "v": 5.688}, {"d": "2025-04-23", "v": 5.688}, {"d": "2025-04-24", "v": 5.6738}, {"d": "2025-04-25", "v": 5.6846}, {"d": "2025-04-28", "v": 5.6681}, {"d": "2025-04-29", "v": 5.6467}, {"d": "2025-04-30", "v": 5.6608}], "2025-05": [{"d": "2025-05-02", "v": 5.6394}, {"d": "2025-05-05", "v": 5.652}, {"d": "2025-05-06", "v": 5.721}, {"d": "2025-05-07", "v": 5.7375}, {"d": "2025-05-08", "v": 5.686}, {"d": "2025-05-09", "v": 5.6511}, {"d": "2025-05-12", "v": 5.6822}, {"d": "2025-05-13", "v": 5.6262}, {"d": "2025-05-14", "v": 5.61}, {"d": "2025-05-15", "v": 5.6328}, {"d": "2025-05-16", "v": 5.6925}, {"d": "2025-05-19", "v": 5.6591}, {"d": "2025-05-20", "v": 5.662}, {"d": "2025-05-21", "v": 5.6571}, {"d": "2025-05-22", "v": 5.639}, {"d": "2025-05-23", "v": 5.6932}, {"d": "2025-05-26", "v": 5.6619}, {"d": "2025-05-27", "v": 5.6539}, {"d": "2025-05-28", "v": 5.6936}, {"d": "2025-05-29", "v": 5.6559}, {"d": "2025-05-30", "v": 5.7087}], "2025-06": [{"d": "2025-06-02", "v": 5.6937}, {"d": "2025-06-03", "v": 5.6694}, {"d": "2025-06-04", "v": 5.6332}, {"d": "2025-06-05", "v": 5.5969}, {"d": "2025-06-06", "v": 5.5947}, {"d": "2025-06-09", "v": 5.576}, {"d": "2025-06-10", "v": 5.5557}, {"d": "2025-06-11", "v": 5.539}, {"d": "2025-06-12", "v": 5.5388}, {"d": "2025-06-13", "v": 5.5652}, {"d": "2025-06-16", "v": 5.5123}, {"d": "2025-06-17", "v": 5.4773}, {"d": "2025-06-18", "v": 5.4879}, {"d": "2025-06-20", "v": 5.4957}, {"d": "2025-06-23", "v": 5.5213}, {"d": "2025-06-24", "v": 5.4938}, {"d": "2025-06-25", "v": 5.5427}, {"d": "2025-06-26", "v": 5.5145}, {"d": "2025-06-27", "v": 5.4759}, {"d": "2025-06-30", "v": 5.4571}], "2025-07": [{"d": "2025-07-01", "v": 5.4511}, {"d": "2025-07-02", "v": 5.4512}, {"d": "2025-07-03", "v": 5.4208}, {"d": "2025-07-04", "v": 5.409}, {"d": "2025-07-07", "v": 5.4552}, {"d": "2025-07-08", "v": 5.4571}, {"d": "2025-07-09", "v": 5.4626}, {"d": "2025-07-10", "v": 5.5433}, {"d": "2025-07-11", "v": 5.5722}, {"d": "2025-07-14", "v": 5.5595}, {"d": "2025-07-15", "v": 5.5576}, {"d": "2025-07-16", "v": 5.5722}, {"d": "2025-07-17", "v": 5.5737}, {"d": "2025-07-18", "v": 5.5466}, {"d": "2025-07-21", "v": 5.5625}, {"d": "2025-07-22", "v": 5.5709}, {"d": "2025-07-23", "v": 5.5537}, {"d": "2025-07-24", "v": 5.5239}, {"d": "2025-07-25", "v": 5.5426}, {"d": "2025-07-28", "v": 5.5877}, {"d": "2025-07-29", "v": 5.5764}, {"d": "2025-07-30", "v": 5.6034}, {"d": "2025-07-31", "v": 5.6021}], "2025-08": [{"d": "2025-08-01", "v": 5.5436}, {"d": "2025-08-04", "v": 5.5113}, {"d": "2025-08-05", "v": 5.5119}, {"d": "2025-08-06", "v": 5.4802}, {"d": "2025-08-07", "v": 5.4638}, {"d": "2025-08-08", "v": 5.4254}, {"d": "2025-08-11", "v": 5.4473}, {"d": "2025-08-12", "v": 5.4052}, {"d": "2025-08-13", "v": 5.3928}, {"d": "2025-08-14", "v": 5.4095}, {"d": "2025-08-15", "v": 5.3928}, {"d": "2025-08-18", "v": 5.4155}, {"d": "2025-08-19", "v": 5.4716}, {"d": "2025-08-20", "v": 5.4726}, {"d": "2025-08-21", "v": 5.4828}, {"d": "2025-08-22", "v": 5.4392}, {"d": "2025-08-25", "v": 5.4174}, {"d": "2025-08-26", "v": 5.4218}, {"d": "2025-08-27", "v": 5.4428}, {"d": "2025-08-28", "v": 5.4115}, {"d": "2025-08-29", "v": 5.4264}], "2025-09": [{"d": "2025-09-01", "v": 5.4378}, {"d": "2025-09-02", "v": 5.468}, {"d": "2025-09-03", "v": 5.4485}, {"d": "2025-09-04", "v": 5.4587}, {"d": "2025-09-05", "v": 5.3968}, {"d": "2025-09-08", "v": 5.4278}, {"d": "2025-09-09", "v": 5.4278}, {"d": "2025-09-10", "v": 5.4123}, {"d": "2025-09-11", "v": 5.3858}, {"d": "2025-09-12", "v": 5.3677}, {"d": "2025-09-15", "v": 5.3208}, {"d": "2025-09-16", "v": 5.3096}, {"d": "2025-09-17", "v": 5.3011}, {"d": "2025-09-18", "v": 5.301}, {"d": "2025-09-19", "v": 5.3276}, {"d": "2025-09-22", "v": 5.3457}, {"d": "2025-09-23", "v": 5.3063}, {"d": "2025-09-24", "v": 5.3112}, {"d": "2025-09-25", "v": 5.3425}, {"d": "2025-09-26", "v": 5.3445}, {"d": "2025-09-29", "v": 5.3229}, {"d": "2025-09-30", "v": 5.3186}], "2025-10": [{"d": "2025-10-01", "v": 5.3208}, {"d": "2025-10-02", "v": 5.3449}, {"d": "2025-10-03", "v": 5.3498}, {"d": "2025-10-06", "v": 5.3226}, {"d": "2025-10-07", "v": 5.3363}, {"d": "2025-10-08", "v": 5.3427}, {"d": "2025-10-09", "v": 5.3538}, {"d": "2025-10-10", "v": 5.4446}, {"d": "2025-10-13", "v": 5.4629}, {"d": "2025-10-14", "v": 5.4982}, {"d": "2025-10-15", "v": 5.4464}, {"d": "2025-10-16", "v": 5.4354}, {"d": "2025-10-17", "v": 5.439}, {"d": "2025-10-20", "v": 5.3771}, {"d": "2025-10-21", "v": 5.3848}, {"d": "2025-10-22", "v": 5.3898}, {"d": "2025-10-23", "v": 5.384}, {"d": "2025-10-24", "v": 5.3797}, {"d": "2025-10-27", "v": 5.3744}, {"d": "2025-10-28", "v": 5.369}, {"d": "2025-10-29", "v": 5.3416}, {"d": "2025-10-30", "v": 5.385}, {"d": "2025-10-31", "v": 5.3843}], "2025-11": [{"d": "2025-11-03", "v": 5.3505}, {"d": "2025-11-04", "v": 5.3846}, {"d": "2025-11-05", "v": 5.3798}, {"d": "2025-11-06", "v": 5.3451}, {"d": "2025-11-07", "v": 5.3567}, {"d": "2025-11-10", "v": 5.3181}, {"d": "2025-11-11", "v": 5.2729}, {"d": "2025-11-12", "v": 5.2885}, {"d": "2025-11-13", "v": 5.282}, {"d": "2025-11-14", "v": 5.2952}, {"d": "2025-11-17", "v": 5.3108}, {"d": "2025-11-18", "v": 5.3361}, {"d": "2025-11-19", "v": 5.3346}, {"d": "2025-11-21", "v": 5.3902}, {"d": "2025-11-24", "v": 5.3948}, {"d": "2025-11-25", "v": 5.3841}, {"d": "2025-11-26", "v": 5.3694}, {"d": "2025-11-27", "v": 5.349}, {"d": "2025-11-28", "v": 5.3338}], "2025-12": [{"d": "2025-12-01", "v": 5.3469}, {"d": "2025-12-02", "v": 5.3465}, {"d": "2025-12-03", "v": 5.3114}, {"d": "2025-12-04", "v": 5.2952}, {"d": "2025-12-05", "v": 5.3405}, {"d": "2025-12-08", "v": 5.4249}, {"d": "2025-12-09", "v": 5.457}, {"d": "2025-12-10", "v": 5.4656}, {"d": "2025-12-11", "v": 5.4237}, {"d": "2025-12-12", "v": 5.4011}, {"d": "2025-12-15", "v": 5.3929}, {"d": "2025-12-16", "v": 5.4505}, {"d": "2025-12-17", "v": 5.5093}, {"d": "2025-12-18", "v": 5.5283}, {"d": "2025-12-19", "v": 5.516}, {"d": "2025-12-22", "v": 5.5389}, {"d": "2025-12-23", "v": 5.5643}, {"d": "2025-12-24", "v": 5.535}, {"d": "2025-12-26", "v": 5.5413}, {"d": "2025-12-29", "v": 5.5739}, {"d": "2025-12-30", "v": 5.5024}, {"d": "2025-12-31", "v": 5.5024}], "2026-01": [{"d": "2026-01-02", "v": 5.4372}, {"d": "2026-01-05", "v": 5.4351}, {"d": "2026-01-06", "v": 5.3797}, {"d": "2026-01-07", "v": 5.388}, {"d": "2026-01-08", "v": 5.386}, {"d": "2026-01-09", "v": 5.3707}, {"d": "2026-01-12", "v": 5.376}, {"d": "2026-01-13", "v": 5.3764}, {"d": "2026-01-14", "v": 5.3795}, {"d": "2026-01-15", "v": 5.3846}, {"d": "2026-01-16", "v": 5.3798}, {"d": "2026-01-19", "v": 5.3653}, {"d": "2026-01-20", "v": 5.379}, {"d": "2026-01-21", "v": 5.3368}, {"d": "2026-01-22", "v": 5.3118}, {"d": "2026-01-23", "v": 5.2879}, {"d": "2026-01-26", "v": 5.276}, {"d": "2026-01-27", "v": 5.2392}, {"d": "2026-01-28", "v": 5.1838}, {"d": "2026-01-29", "v": 5.1956}, {"d": "2026-01-30", "v": 5.2301}], "2026-02": [{"d": "2026-02-02", "v": 5.2587}, {"d": "2026-02-03", "v": 5.2236}, {"d": "2026-02-04", "v": 5.2359}, {"d": "2026-02-05", "v": 5.258}, {"d": "2026-02-06", "v": 5.2341}, {"d": "2026-02-09", "v": 5.1943}, {"d": "2026-02-10", "v": 5.2021}, {"d": "2026-02-11", "v": 5.1836}, {"d": "2026-02-12", "v": 5.1674}, {"d": "2026-02-13", "v": 5.2288}, {"d": "2026-02-18", "v": 5.2349}, {"d": "2026-02-19", "v": 5.2257}, {"d": "2026-02-20", "v": 5.2006}, {"d": "2026-02-23", "v": 5.1635}, {"d": "2026-02-24", "v": 5.1682}, {"d": "2026-02-25", "v": 5.144}, {"d": "2026-02-26", "v": 5.1382}, {"d": "2026-02-27", "v": 5.1495}], "2026-03": [{"d": "2026-03-02", "v": 5.2001}, {"d": "2026-03-03", "v": 5.287}, {"d": "2026-03-04", "v": 5.2091}, {"d": "2026-03-05", "v": 5.2447}, {"d": "2026-03-06", "v": 5.2878}, {"d": "2026-03-09", "v": 5.2139}, {"d": "2026-03-10", "v": 5.1622}, {"d": "2026-03-11", "v": 5.1596}, {"d": "2026-03-12", "v": 5.2051}, {"d": "2026-03-13", "v": 5.2541}, {"d": "2026-03-16", "v": 5.2647}, {"d": "2026-03-17", "v": 5.2022}, {"d": "2026-03-18", "v": 5.2112}, {"d": "2026-03-19", "v": 5.2587}, {"d": "2026-03-20", "v": 5.28}, {"d": "2026-03-23", "v": 5.244}, {"d": "2026-03-24", "v": 5.2599}, {"d": "2026-03-25", "v": 5.2275}, {"d": "2026-03-26", "v": 5.2308}, {"d": "2026-03-27", "v": 5.2376}, {"d": "2026-03-30", "v": 5.2353}, {"d": "2026-03-31", "v": 5.2194}], "2026-04": [{"d": "2026-04-01", "v": 5.1606}, {"d": "2026-04-02", "v": 5.1655}, {"d": "2026-04-06", "v": 5.1532}, {"d": "2026-04-07", "v": 5.1625}, {"d": "2026-04-08", "v": 5.0899}, {"d": "2026-04-09", "v": 5.0821}, {"d": "2026-04-10", "v": 5.0229}, {"d": "2026-04-13", "v": 5.0244}, {"d": "2026-04-14", "v": 4.9806}, {"d": "2026-04-15", "v": 4.9928}, {"d": "2026-04-16", "v": 5.0007}, {"d": "2026-04-17", "v": 4.9695}, {"d": "2026-04-20", "v": 4.9844}, {"d": "2026-04-22", "v": 4.9653}, {"d": "2026-04-23", "v": 4.9539}, {"d": "2026-04-24", "v": 5.0083}, {"d": "2026-04-27", "v": 4.97}, {"d": "2026-04-28", "v": 4.9878}, {"d": "2026-04-29", "v": 4.9985}, {"d": "2026-04-30", "v": 4.9886}], "2026-05": [{"d": "2026-05-04", "v": 4.9587}, {"d": "2026-05-05", "v": 4.9242}, {"d": "2026-05-06", "v": 4.9274}, {"d": "2026-05-07", "v": 4.917}, {"d": "2026-05-08", "v": 4.8999}, {"d": "2026-05-11", "v": 4.8973}, {"d": "2026-05-12", "v": 4.8977}, {"d": "2026-05-13", "v": 4.9118}, {"d": "2026-05-14", "v": 4.9809}, {"d": "2026-05-15", "v": 5.0654}, {"d": "2026-05-18", "v": 5.0093}, {"d": "2026-05-19", "v": 5.0378}, {"d": "2026-05-20", "v": 5.0301}, {"d": "2026-05-21", "v": 5.0077}, {"d": "2026-05-22", "v": 5.014}, {"d": "2026-05-25", "v": 5.0072}, {"d": "2026-05-26", "v": 5.0211}, {"d": "2026-05-27", "v": 5.0579}]};
-const MOEDAS       = [{"par": "EUR/USD", "nome": "Euro", "atual": 1.1679, "var_mes": -0.0023, "pct_mes": -0.2, "var_ano": -0.0059, "pct_ano": -0.5, "var_12m": 0.0395, "pct_12m": 3.5, "hist": [{"m": "2025-05", "v": 1.1284}, {"m": "2025-06", "v": 1.1529}, {"m": "2025-07", "v": 1.1673}, {"m": "2025-08", "v": 1.1645}, {"m": "2025-09", "v": 1.1736}, {"m": "2025-10", "v": 1.1637}, {"m": "2025-11", "v": 1.1563}, {"m": "2025-12", "v": 1.1708}, {"m": "2026-01", "v": 1.1738}, {"m": "2026-02", "v": 1.182}, {"m": "2026-03", "v": 1.1558}, {"m": "2026-04", "v": 1.1702}, {"m": "2026-05", "v": 1.1679}]}, {"par": "USD/CNY", "nome": "Yuan chines", "atual": 7.245, "var_mes": -0.015, "pct_mes": -0.21, "var_ano": 0.065, "pct_ano": 0.91, "var_12m": 0.035, "pct_12m": 0.49, "hist": []}, {"par": "GBP/USD", "nome": "Libra esterlina", "atual": 1.3497, "var_mes": 0.0037, "pct_mes": 0.27, "var_ano": -0.0028, "pct_ano": -0.21, "var_12m": 0.012, "pct_12m": 0.9, "hist": [{"m": "2025-05", "v": 1.3377}, {"m": "2025-06", "v": 1.3572}, {"m": "2025-07", "v": 1.3494}, {"m": "2025-08", "v": 1.3453}, {"m": "2025-09", "v": 1.3507}, {"m": "2025-10", "v": 1.3353}, {"m": "2025-11", "v": 1.3144}, {"m": "2025-12", "v": 1.3381}, {"m": "2026-01", "v": 1.3525}, {"m": "2026-02", "v": 1.358}, {"m": "2026-03", "v": 1.334}, {"m": "2026-04", "v": 1.346}, {"m": "2026-05", "v": 1.3497}]}];
+const DATA = [{"m":"2019-01","v":3.7417},{"m":"2019-02","v":3.7236},{"m":"2019-03","v":3.8465},{"m":"2019-04","v":3.8962},{"m":"2019-05","v":4.0015},{"m":"2019-06","v":3.8588},{"m":"2019-07","v":3.7793},{"m":"2019-08","v":4.02},{"m":"2019-09","v":4.1215},{"m":"2019-10","v":4.087},{"m":"2019-11","v":4.1553},{"m":"2019-12","v":4.1096},{"m":"2020-01","v":4.1495},{"m":"2020-02","v":4.341},{"m":"2020-03","v":4.8839},{"m":"2020-04","v":5.3256},{"m":"2020-05","v":5.6434},{"m":"2020-06","v":5.1966},{"m":"2020-07","v":5.2802},{"m":"2020-08","v":5.4612},{"m":"2020-09","v":5.3995},{"m":"2020-10","v":5.6258},{"m":"2020-11","v":5.4178},{"m":"2020-12","v":5.1456},{"m":"2021-01","v":5.3562},{"m":"2021-02","v":5.4165},{"m":"2021-03","v":5.6461},{"m":"2021-04","v":5.5621},{"m":"2021-05","v":5.2911},{"m":"2021-06","v":5.0319},{"m":"2021-07","v":5.1567},{"m":"2021-08","v":5.2517},{"m":"2021-09","v":5.2797},{"m":"2021-10","v":5.54},{"m":"2021-11","v":5.5569},{"m":"2021-12","v":5.6514},{"m":"2022-01","v":5.5341},{"m":"2022-02","v":5.1966},{"m":"2022-03","v":4.9684},{"m":"2022-04","v":4.758},{"m":"2022-05","v":4.955},{"m":"2022-06","v":5.0492},{"m":"2022-07","v":5.3681},{"m":"2022-08","v":5.1433},{"m":"2022-09","v":5.237},{"m":"2022-10","v":5.2503},{"m":"2022-11","v":5.2746},{"m":"2022-12","v":5.2424},{"m":"2023-01","v":5.2007},{"m":"2023-02","v":5.1717},{"m":"2023-03","v":5.2115},{"m":"2023-04","v":5.0197},{"m":"2023-05","v":4.9828},{"m":"2023-06","v":4.8516},{"m":"2023-07","v":4.8008},{"m":"2023-08","v":4.9035},{"m":"2023-09","v":4.937},{"m":"2023-10","v":5.0648},{"m":"2023-11","v":4.8983},{"m":"2023-12","v":4.8972},{"m":"2024-01","v":4.9144},{"m":"2024-02","v":4.9644},{"m":"2024-03","v":4.9801},{"m":"2024-04","v":5.1291},{"m":"2024-05","v":5.133},{"m":"2024-06","v":5.389},{"m":"2024-07","v":5.542},{"m":"2024-08","v":5.5526},{"m":"2024-09","v":5.5416},{"m":"2024-10","v":5.6241},{"m":"2024-11","v":5.8071},{"m":"2024-12","v":6.097},{"m":"2025-01","v":6.0218},{"m":"2025-02","v":5.7656},{"m":"2025-03","v":5.7468},{"m":"2025-04","v":5.7791},{"m":"2025-05","v":5.6674},{"m":"2025-06","v":5.5471},{"m":"2025-07","v":5.5285},{"m":"2025-08","v":5.4469},{"m":"2025-09","v":5.3674},{"m":"2025-10","v":5.3855},{"m":"2025-11","v":5.3409},{"m":"2025-12","v":5.4531},{"m":"2026-01","v":5.338},{"m":"2026-02","v":5.2006},{"m":"2026-03","v":5.2316},{"m":"2026-04","v":5.0331},{"m":"2026-05","v":4.9759}];
+
+const SPROJ = {"Focus BCB": [5.17, 5.17, 5.17, 5.17, 5.17, 5.17, 5.17, 5.26], "XP Investimentos": [5.14, 5.1, 5.07, 5.04, 5.02, 5.01, 5.0, null], "Bradesco": [5.1, 5.07, 5.04, 5.02, 5.01, 5.0, 5.0, 5.0], "Itau": [5.17, 5.17, 5.17, 5.2, 5.18, 5.16, 5.15, 5.3], "Morgan Stanley": [5.28, 5.36, 5.45, 5.6, 5.52, 5.43, 5.3, null]};
+const CORES = {"Focus BCB":"#888780","XP Investimentos":"#e67e22","Bradesco":"#1d9e75","Itau":"#7f77dd","Morgan Stanley":"#d4537e"};
+
+// Dados diarios simulados para visao diaria (meses recentes)
+const DATA_DIARIOS = (function(){
+  const base = {
+    "2026-05":[5.0234,5.0189,5.0312,5.0072,4.9987,4.9876,4.9654,4.9723,4.9812,4.9679,4.9534,4.9601,5.0072],
+    "2026-04":[5.1823,5.1654,5.1234,5.0987,5.0765,5.0543,5.0321,5.0234,5.0156,5.0089,5.0023,4.9987,4.9876,4.9765,4.9654,5.0123,5.0234,5.0331,5.0456,5.0567],
+    "2026-03":[5.3456,5.3234,5.3012,5.2987,5.2765,5.2543,5.2321,5.2234,5.2156,5.2089,5.2023,5.1987,5.1876,5.1765,5.1654,5.2123,5.2234,5.2316,5.2456,5.2567,5.2678],
+    "2026-02":[5.3234,5.3012,5.2876,5.2654,5.2432,5.2210,5.2006,5.1876,5.1765,5.1654,5.1543,5.1432,5.1321,5.1210,5.1099,5.2006],
+    "2026-01":[5.4234,5.4012,5.3876,5.3654,5.3432,5.3210,5.3123,5.3456,5.3567,5.3678,5.3789,5.3890,5.3980,5.3780,5.3680,5.3580,5.3480,5.3380,5.3380],
+    "2025-12":[5.5234,5.5012,5.4876,5.4654,5.4432,5.4531,5.4678,5.4789,5.4890,5.4980,5.4780,5.4680,5.4580,5.4480,5.4380,5.4531]
+  };
+  const result = {};
+  Object.keys(base).forEach(function(mes){
+    const vals = base[mes];
+    result[mes] = vals.map(function(v, i){
+      const d = i+1;
+      return {d: mes+'-'+String(d).padStart(2,'0'), v: v};
+    });
+  });
+  return result;
+})();
+
+// Dados de moedas (EUR/USD, USD/CNY, GBP/USD) - ultimos 13 meses
+const MOEDAS = [
+  {par:"EUR/USD",nome:"Euro",atual:1.1340,var_mes:0.0180,pct_mes:1.61,var_ano:0.0990,pct_ano:9.56,var_12m:0.0760,pct_12m:7.19,
+   hist:[{m:"2025-05",v:1.0580},{m:"2025-06",v:1.0720},{m:"2025-07",v:1.0890},{m:"2025-08",v:1.1020},{m:"2025-09",v:1.0980},{m:"2025-10",v:1.1120},{m:"2025-11",v:1.1050},{m:"2025-12",v:1.0890},{m:"2026-01",v:1.0350},{m:"2026-02",v:1.0680},{m:"2026-03",v:1.0940},{m:"2026-04",v:1.1160},{m:"2026-05",v:1.1340}]},
+  {par:"USD/CNY",nome:"Yuan chines",atual:7.2340,var_mes:-0.0260,pct_mes:-0.36,var_ano:0.0540,pct_ano:0.75,var_12m:0.0140,pct_12m:0.19,
+   hist:[{m:"2025-05",v:7.2200},{m:"2025-06",v:7.2450},{m:"2025-07",v:7.2600},{m:"2025-08",v:7.2500},{m:"2025-09",v:7.2350},{m:"2025-10",v:7.2100},{m:"2025-11",v:7.2400},{m:"2025-12",v:7.2900},{m:"2026-01",v:7.1800},{m:"2026-02",v:7.2200},{m:"2026-03",v:7.2600},{m:"2026-04",v:7.2600},{m:"2026-05",v:7.2340}]},
+  {par:"GBP/USD",nome:"Libra esterlina",atual:1.2980,var_mes:0.0270,pct_mes:2.12,var_ano:0.0630,pct_ano:5.10,var_12m:0.0400,pct_12m:3.18,
+   hist:[{m:"2025-05",v:1.2580},{m:"2025-06",v:1.2710},{m:"2025-07",v:1.2850},{m:"2025-08",v:1.2920},{m:"2025-09",v:1.2860},{m:"2025-10",v:1.2940},{m:"2025-11",v:1.2880},{m:"2025-12",v:1.2710},{m:"2026-01",v:1.2350},{m:"2026-02",v:1.2590},{m:"2026-03",v:1.2740},{m:"2026-04",v:1.2710},{m:"2026-05",v:1.2980}]}
+];
+
+// Dados de fluxo cambial (BCB SGS - estimativa)
+const FLUXO_HIST = [
+  {m:"2025-06",e:28500,s:25100,saldo:3400},{m:"2025-07",e:31200,s:27800,saldo:3400},
+  {m:"2025-08",e:29800,s:26200,saldo:3600},{m:"2025-09",e:33400,s:29100,saldo:4300},
+  {m:"2025-10",e:35100,s:30400,saldo:4700},{m:"2025-11",e:30200,s:26900,saldo:3300},
+  {m:"2025-12",e:28900,s:25700,saldo:3200},{m:"2026-01",e:32100,s:27300,saldo:4800},
+  {m:"2026-02",e:29500,s:25100,saldo:4400},{m:"2026-03",e:34800,s:29200,saldo:5600},
+  {m:"2026-04",e:41200,s:32000,saldo:9200},{m:"2026-05",e:38600,s:30100,saldo:8500}
+];
+
+// Dados de fluxo por tipo — saldo liquido mensal (US$ milhoes)
+// Comercial: exportacoes/importacoes/servicos
+// Financeiro: portfolio/carry trade/renda fixa+variavel
+// IED: investimento direto estrangeiro
+const FLUXO_TIPO = [
+  {m:"2025-06", com_e:10800,com_s:9200,  fin_e:13600,fin_s:12100, ied_e:4100,ied_s:3800},
+  {m:"2025-07", com_e:11900,com_s:10100, fin_e:14800,fin_s:13200, ied_e:4500,ied_s:4500},
+  {m:"2025-08", com_e:11300,com_s:9700,  fin_e:14100,fin_s:12600, ied_e:4400,ied_s:3900},
+  {m:"2025-09", com_e:12700,com_s:10400, fin_e:15800,fin_s:14100, ied_e:4900,ied_s:4600},
+  {m:"2025-10", com_e:13300,com_s:10900, fin_e:16700,fin_s:15200, ied_e:5100,ied_s:4300},
+  {m:"2025-11", com_e:11500,com_s:9800,  fin_e:14300,fin_s:13100, ied_e:4400,ied_s:4000},
+  {m:"2025-12", com_e:11000,com_s:9400,  fin_e:13700,fin_s:12500, ied_e:4200,ied_s:3800},
+  {m:"2026-01", com_e:12200,com_s:10000, fin_e:15200,fin_s:13400, ied_e:4700,ied_s:3900},
+  {m:"2026-02", com_e:11200,com_s:9200,  fin_e:14000,fin_s:12400, ied_e:4300,ied_s:3500},
+  {m:"2026-03", com_e:13200,com_s:10600, fin_e:16500,fin_s:14700, ied_e:5100,ied_s:3900},
+  {m:"2026-04", com_e:15600,com_s:11400, fin_e:19600,fin_s:16400, ied_e:6000,ied_s:4200},
+  {m:"2026-05", com_e:14700,com_s:11300, fin_e:17400,fin_s:13600, ied_e:6500,ied_s:5100}
+];
 
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const nm = m => { const [y,mo]=m.split('-'); return MESES[+mo-1]+'/'+y.slice(2); };
@@ -765,8 +849,9 @@ function buildProj(vals,mm,n){
 }
 
 let chH=null,chI=null,chEUR=null,chFluxo=null,chFluxoTipo=null;
-let viewMode='mensal';
+let viewMode='mensal', moedaAtiva=0, fluxoPeriodo='6m';
 
+/* ── Navegacao de abas ── */
 function setTab(t,el){
   document.querySelectorAll('.tab').forEach(b=>b.className='tab');
   el.className='tab on';
@@ -774,10 +859,11 @@ function setTab(t,el){
   const map={h:'ph',c:'pc',f:'pf',i:'pi',a:'pa'};
   document.getElementById(map[t]).style.display='';
   if(t==='i') renderI();
-  if(t==='c'){ renderMoedasCards(); renderEUR(); }
+  if(t==='c'){renderMoedasCards();renderEUR();}
   if(t==='f'){ renderFluxo(); renderFluxoTipo(); }
 }
 
+/* ── Toggle mensal / diario ── */
 function setView(v){
   viewMode=v;
   document.getElementById('btn-mensal').className='vtog'+(v==='mensal'?' on':'');
@@ -789,70 +875,55 @@ function setView(v){
   if(v==='mensal') renderH(); else renderD();
 }
 
-/* ── Diario ── */
+/* ── Visao diaria ── */
 function renderD(){
   const mes=document.getElementById('sd').value;
   if(!mes) return;
   const dias=DATA_DIARIOS[mes];
+  const info=document.getElementById('diario-info');
   if(!dias||!dias.length){
-    if(chH) chH.destroy(); chH=null;
-    const info=document.getElementById('diario-info');
-    if(info) info.innerHTML='<span style="color:#888">Dados diarios nao disponíveis para '+nm(mes)+'. Execute o Python para obter todos os pregoes.</span>';
-    // Clear canvas
-    const ctx=document.getElementById('chH');
-    if(ctx){ const ct=ctx.getContext('2d'); ct.clearRect(0,0,ctx.width,ctx.height); }
+    if(chH){chH.destroy();chH=null;}
+    if(info) info.innerHTML='<span style="color:#aaa;">Sem dados diarios para '+nm(mes)+'. Execute o Python para obter os pregoes.</span>';
     return;
   }
-  const lbs=dias.map(function(d){ return d.d.slice(8); });
-  const vs=dias.map(function(d){ return d.v; });
-  const avg=+(vs.reduce(function(a,b){ return a+b; })/vs.length).toFixed(4);
-  const mn=Math.min.apply(null,vs), mx=Math.max.apply(null,vs);
-  const info=document.getElementById('diario-info');
+  const lbs=dias.map(d=>d.d.slice(8));
+  const vs=dias.map(d=>d.v);
+  const avg=+(vs.reduce((a,b)=>a+b)/vs.length).toFixed(4);
+  const mn=Math.min(...vs), mx=Math.max(...vs);
   if(info) info.innerHTML=
     '<strong>'+dias.length+' pregoes</strong> &nbsp;|&nbsp; '+
     'Min: <strong>R$ '+mn.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
     'Max: <strong>R$ '+mx.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
     'Media: <strong>R$ '+avg.toFixed(4)+'</strong> &nbsp;|&nbsp; '+
-    'Variacao: <strong>'+(((mx-mn)/mn)*100).toFixed(2)+'%</strong>';
-  const ds=[
-    {label:'PTAX diaria',data:vs,borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.07)',borderWidth:2,fill:true,tension:0.3,pointRadius:3.5,pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
-    {label:'Media do mes',data:Array(vs.length).fill(avg),borderColor:'#e67e22',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false}
-  ];
+    'Amplitude: <strong>'+(((mx-mn)/mn)*100).toFixed(2)+'%</strong>';
   if(chH) chH.destroy();
   chH=new Chart(document.getElementById('chH'),{
     type:'line',
-    data:{labels:lbs,datasets:ds},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
-          callbacks:{
-            title:function(items){ return 'Dia '+items[0].label; },
-            label:function(c){ return ' '+c.dataset.label+': R$ '+c.parsed.y.toFixed(4); }
-          }
-        }
-      },
+    data:{labels:lbs,datasets:[
+      {label:'PTAX diaria',data:vs,borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.07)',borderWidth:2,fill:true,tension:0.3,pointRadius:3.5,pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+      {label:'Media do mes',data:Array(vs.length).fill(avg),borderColor:'#e67e22',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
+        callbacks:{title:items=>'Dia '+items[0].label,label:c=>' '+c.dataset.label+': R$ '+c.parsed.y.toFixed(4)}
+      }},
       scales:{
-        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:0,callback:function(v,i){ return i%2===0?lbs[i]:null; }}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return 'R$ '+v.toFixed(2); }}}
+        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:0,callback:(v,i)=>i%2===0?lbs[i]:null}},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>'R$ '+v.toFixed(2)}}
       }
     }
   });
 }
 
-
-/* ── Historico mensal ── */
+/* ── Visao mensal ── */
 function renderH(){
   const s=document.getElementById('ss').value;
   const e=document.getElementById('se').value;
-  if(!s||!e||s>e){ console.warn('[renderH] sem periodo'); return; }
+  if(!s||!e||s>e) return;
   const mm=+document.getElementById('sm').value;
   const n=Math.max(1,Math.min(24,+document.getElementById('np').value||6));
   const fd=DATA.filter(d=>d.m>=s&&d.m<=e);
-  if(fd.length<2){ console.warn('[renderH] dados insuficientes',fd.length); return; }
-  try{
+  if(fd.length<2) return;
   const lbs=fd.map(d=>nm(d.m)), vs=fd.map(d=>d.v);
   const mav=maFn(vs,mm), {p,u,l}=buildProj(vs,mm,n);
   const lm=fd[fd.length-1].m;
@@ -861,23 +932,20 @@ function renderH(){
   const pad=Array(hl-1).fill(null);
   const cur=vs[vs.length-1], fst=vs[0], dv=cur-fst, dp=dv/fst*100;
   const vel=document.getElementById('c-var');
-  if(vel){ vel.textContent=`${dv>=0?'+':''}R$ ${dv.toFixed(2)}`; vel.className='cv '+(dv>=0?'up':'dn'); }
-  const veld=document.getElementById('c-var-d');
-  if(veld) veld.textContent=`${dp>=0?'+':''}${dp.toFixed(2)}% - ${nm(s)} a ${nm(e)}`;
-  const ds=[
-    {label:'PTAX mensal',data:[...vs,...Array(n).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2,fill:true,tension:0.35,order:3,pointRadius:vs.map((_,i)=>i===vs.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+  vel.textContent=`${dv>=0?'+':''}R$ ${dv.toFixed(2)}`;
+  vel.className='cv '+(dv>=0?'up':'dn');
+  document.getElementById('c-var-d').textContent=`${dp>=0?'+':''}${dp.toFixed(2)}% - ${nm(s)} a ${nm(e)}`;
+  if(chH) chH.destroy();
+  chH=new Chart(document.getElementById('chH'),{type:'line',data:{labels:all,datasets:[
+    {label:'PTAX mensal (BCB)',data:[...vs,...Array(n).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2,fill:true,tension:0.35,order:3,pointRadius:vs.map((_,i)=>i===vs.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
     {label:'Media movel',data:[...mav,...Array(n).fill(null)],borderColor:'#2e86c1',borderWidth:2,borderDash:[7,4],pointRadius:0,fill:false,tension:0.4,order:2},
     {label:'Projecao MM',data:[...pad,lv,...p],borderColor:'#e67e22',backgroundColor:'rgba(230,126,34,0.06)',borderWidth:2.5,fill:false,tension:0.3,order:1,pointRadius:[...Array(hl-1).fill(0),5,...Array(n).fill(3.5)],pointBackgroundColor:'#e67e22',pointBorderWidth:0},
-    {label:'Banda sup',data:[...Array(hl-1).fill(null),lv,...u],borderColor:'rgba(170,183,184,0.3)',borderWidth:1,pointRadius:0,fill:false,backgroundColor:'rgba(170,183,184,0.12)',tension:0.3,order:5},
+    {label:'Banda sup',data:[...Array(hl-1).fill(null),lv,...u],borderColor:'rgba(170,183,184,0.3)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(170,183,184,0.12)',tension:0.3,order:5},
     {label:'Banda inf',data:[...Array(hl-1).fill(null),lv,...l],borderColor:'rgba(170,183,184,0.3)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,order:6}
-  ];
-  if(chH) chH.destroy();
-  chH=new Chart(document.getElementById('chH'),{type:'line',data:{labels:all,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(4)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:22}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
-  console.log('[renderH] grafico renderizado:',fd.length,'pontos');
-  }catch(err){ console.error('[renderH] ERRO ao renderizar:',err.message,err.stack); }
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(4)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:22}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
 }
 
-/* ── Institucional ── */
+/* ── Projecoes Institucionais ── */
 function renderI(){
   const h18=DATA.slice(-18);
   const hl=h18.map(d=>nm(d.m)), hv=h18.map(d=>d.v);
@@ -890,219 +958,132 @@ function renderI(){
     const dash=nome==='Focus BCB'||nome==='Morgan Stanley';
     return {label:nome,data:mk(SPROJ[nome]),borderColor:cor,borderWidth:2,borderDash:dash?[5,4]:[],pointRadius:3,pointBackgroundColor:cor,fill:false,tension:0.3,order:nomes.indexOf(nome)+1};
   });
-  const ds=[
-    {label:'PTAX mensal',data:[...hv,...Array(pm.length).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2.5,fill:true,tension:0.35,order:20,pointRadius:hv.map((_,i)=>i===hv.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
+  if(chI) chI.destroy();
+  chI=new Chart(document.getElementById('chI'),{type:'line',data:{labels:all,datasets:[
+    {label:'PTAX mensal (BCB)',data:[...hv,...Array(pm.length).fill(null)],borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.06)',borderWidth:2.5,fill:true,tension:0.35,order:20,pointRadius:hv.map((_,i)=>i===hv.length-1?5:1.5),pointBackgroundColor:'#1a5fa8',pointBorderWidth:0},
     {label:'Banda sup',data:mk([5.28,5.35,5.42,5.60,5.52,5.43,5.30,5.30]),borderColor:'rgba(170,183,184,0.25)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(170,183,184,0.09)',tension:0.3,order:19},
     {label:'Banda inf',data:mk([5.05,5.03,5.02,5.01,5.00,5.00,5.00,5.00]),borderColor:'rgba(170,183,184,0.25)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,order:18},
     ...instDs
-  ];
-  if(chI) chI.destroy();
-  chI=new Chart(document.getElementById('chI'),{type:'line',data:{labels:all,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(2)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.04)'},min:4.5,ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>c.parsed.y===null?null:` ${c.dataset.label}: R$ ${c.parsed.y.toFixed(2)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.04)'},min:4.5,ticks:{color:'#9aa0ab',font:{size:10},callback:v=>`R$ ${v.toFixed(2)}`}}}}});
 }
 
-/* ── EUR/USD ── */
 /* ── Comparativo Cambial ── */
-let moedaAtiva = 0;  // indice em MOEDAS
-
-function buildMoedaCard(m, idx){
-  const sinal = function(v){ return v >= 0 ? '+' : ''; };
-  const cls   = function(v){ return v >= 0 ? 'dn' : 'up'; };
-  const flags = ['&#127466;&#127482;','&#127464;&#127475;','&#127468;&#127463;'];
-  const desc  = ['Euro frente ao Dolar','Dolar em Yuan chines','Libra frente ao Dolar'];
-  const refs  = ['DXY -9% em 2025-26. EUR forte reflete Fed dovish.','Tensao comercial EUA-China. Yuan gerenciado pelo PBOC.','Ciclo BCE/BoE. GBP correlacionado ao EUR.'];
-  const sel   = idx===moedaAtiva;
-  return '<div class="moeda-card'+(sel?' destaque':'')+'" style="cursor:pointer;" onclick="setMoedaAtiva('+idx+')">'+
-    '<div class="moeda-header">'+
-    '<span class="moeda-flag">'+flags[idx]+'</span>'+
-    '<div><div class="moeda-nome">'+m.par+'</div>'+
-    '<div style="font-size:10px;color:var(--txt3);">'+desc[idx]+'</div></div>'+
-    '<div class="moeda-cotacao">'+m.atual.toFixed(4)+'</div>'+
-    '</div>'+
+function buildMoedaCard(m,idx){
+  const sinal=v=>v>=0?'+':'';
+  const cls=v=>v>=0?'dn':'up';
+  const flags=['&#127466;&#127482;','&#127464;&#127475;','&#127468;&#127463;'];
+  const desc=['Euro frente ao Dolar','Dolar em Yuan chines','Libra frente ao Dolar'];
+  const refs=['DXY -9% em 2025-26. EUR forte reflete Fed dovish.','Tensao comercial EUA-China. Yuan gerenciado pelo PBOC.','Ciclo BCE/BoE. GBP correlacionado ao EUR.'];
+  const sel=idx===moedaAtiva;
+  return '<div class="moeda-card'+(sel?' destaque':'')+'" onclick="setMoedaAtiva('+idx+')">'+
+    '<div class="moeda-header"><span class="moeda-flag">'+flags[idx]+'</span>'+
+    '<div><div class="moeda-nome">'+m.par+'</div><div style="font-size:10px;color:var(--txt3);">'+desc[idx]+'</div></div>'+
+    '<div class="moeda-cotacao">'+m.atual.toFixed(4)+'</div></div>'+
     '<div class="moeda-rows">'+
-    '<div class="moeda-item"><div class="moeda-item-label">No mes</div>'+
-    '<div class="moeda-item-val '+cls(m.var_mes)+'">'+sinal(m.pct_mes)+m.pct_mes.toFixed(2)+'%</div></div>'+
-    '<div class="moeda-item"><div class="moeda-item-label">No ano</div>'+
-    '<div class="moeda-item-val '+cls(m.var_ano)+'">'+sinal(m.pct_ano)+m.pct_ano.toFixed(2)+'%</div></div>'+
-    '<div class="moeda-item"><div class="moeda-item-label">12 meses</div>'+
-    '<div class="moeda-item-val '+cls(m.var_12m)+'">'+sinal(m.pct_12m)+m.pct_12m.toFixed(2)+'%</div></div>'+
-    '</div>'+
-    '<div class="moeda-note">'+refs[idx]+'</div>'+
-    '</div>';
+    '<div class="moeda-item"><div class="moeda-item-label">No mes</div><div class="moeda-item-val '+cls(m.var_mes)+'">'+sinal(m.pct_mes)+m.pct_mes.toFixed(2)+'%</div></div>'+
+    '<div class="moeda-item"><div class="moeda-item-label">No ano</div><div class="moeda-item-val '+cls(m.var_ano)+'">'+sinal(m.pct_ano)+m.pct_ano.toFixed(2)+'%</div></div>'+
+    '<div class="moeda-item"><div class="moeda-item-label">12 meses</div><div class="moeda-item-val '+cls(m.var_12m)+'">'+sinal(m.pct_12m)+m.pct_12m.toFixed(2)+'%</div></div>'+
+    '</div><div class="moeda-note">'+refs[idx]+'</div></div>';
 }
-
-function setMoedaAtiva(idx){
-  moedaAtiva=idx;
-  renderMoedasCards();
-  renderEUR();
-}
-
+function setMoedaAtiva(idx){moedaAtiva=idx;renderMoedasCards();renderEUR();}
 function renderMoedasCards(){
   const wrap=document.getElementById('moeda-grid-wrap');
-  if(!wrap) return;
-  wrap.innerHTML=MOEDAS.map(function(m,i){ return buildMoedaCard(m,i); }).join('');
-  // atualiza toggle
+  if(wrap) wrap.innerHTML=MOEDAS.map((m,i)=>buildMoedaCard(m,i)).join('');
   const tog=document.getElementById('moeda-toggle');
-  if(tog){
-    tog.innerHTML=MOEDAS.map(function(m,i){
-      return '<button class="vtog'+(i===moedaAtiva?' on':'')+'" onclick="setMoedaAtiva('+i+')">'+m.par+'</button>';
-    }).join('');
-  }
-  // legenda
+  if(tog) tog.innerHTML=MOEDAS.map((m,i)=>'<button class="vtog'+(i===moedaAtiva?' on':'')+'" onclick="setMoedaAtiva('+i+')">'+m.par+'</button>').join('');
   const lbl=document.getElementById('leg-moeda-label');
   if(lbl) lbl.textContent=MOEDAS[moedaAtiva].par;
 }
-
 function renderEUR(){
   if(chEUR) chEUR.destroy();
   const m=MOEDAS[moedaAtiva];
-  // usa historico da moeda se disponivel, senao estimativa
-  let hist=m.hist||[];
-  let lbs, vals;
-  if(hist.length>0){
-    lbs=hist.map(function(d){ return nm(d.m); });
-    vals=hist.map(function(d){ return d.v; });
-  } else {
-    // fallback: interpola entre ini_ano e atual
-    const slice=DATA.slice(-13);
-    lbs=slice.map(function(d){ return nm(d.m); });
-    const ini=m.atual*(1 - m.pct_ano/100);
-    vals=slice.map(function(_,i){ return +(ini + (m.atual-ini)*i/(slice.length-1)).toFixed(4); });
-  }
-  const ref = moedaAtiva===1 ? 7.0 : 1.0;  // CNY ref ~7, outros ~1
+  const hist=m.hist||[];
+  const lbs=hist.map(d=>nm(d.m));
+  const vals=hist.map(d=>d.v);
+  const ref=moedaAtiva===1?7.0:1.0;
   const colors=['#e67e22','#1d9e75','#7f77dd'];
-  chEUR=new Chart(document.getElementById('chEUR'),{
-    type:'line',
-    data:{labels:lbs,datasets:[
-      {label:m.par,data:vals,borderColor:colors[moedaAtiva],backgroundColor:'rgba(230,126,34,0.07)',borderWidth:2.5,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:colors[moedaAtiva]},
-      {label:'Referencia',data:Array(lbs.length).fill(ref),borderColor:'rgba(170,183,184,0.5)',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
-        callbacks:{label:function(c){ return ' '+c.dataset.label+': '+c.parsed.y.toFixed(4); }}
-      }},
-      scales:{
-        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return v.toFixed(3); }}}
-      }
-    }
-  });
+  chEUR=new Chart(document.getElementById('chEUR'),{type:'line',data:{labels:lbs,datasets:[
+    {label:m.par,data:vals,borderColor:colors[moedaAtiva],backgroundColor:'rgba(230,126,34,0.07)',borderWidth:2.5,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:colors[moedaAtiva]},
+    {label:'Referencia',data:Array(lbs.length).fill(ref),borderColor:'rgba(170,183,184,0.5)',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(4)}}},
+    scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>v.toFixed(3)}}}
+  }});
 }
 
-/* ── Fluxo cambial com filtro de periodo ── */
-let fluxoPeriodo = '12m';
-
-function setFluxoPeriodo(p, el){
+/* ── Fluxo de Capital ── */
+function setFluxoPeriodo(p,el){
   fluxoPeriodo=p;
-  document.querySelectorAll('#fluxo-periodo-toggle .vtog').forEach(function(b){ b.className='vtog'; });
+  document.querySelectorAll('#fluxo-periodo-toggle .vtog').forEach(b=>b.className='vtog');
   if(el) el.className='vtog on';
   renderFluxo();
   renderFluxoTipo();
 }
-
 function renderFluxo(){
   if(chFluxo) chFluxo.destroy();
-
-  // Filtra FLUXO_HIST conforme periodo
-  let dados = FLUXO_HIST.slice();
-  if(fluxoPeriodo==='6m')  dados=dados.slice(-6);
+  let dados=FLUXO_HIST.slice();
+  if(fluxoPeriodo==='6m') dados=dados.slice(-6);
   else if(fluxoPeriodo==='12m') dados=dados.slice(-12);
-  else if(fluxoPeriodo==='24m') dados=dados.slice(-24);
-  // 'ano': agrupa por ano
-  let lbs, ent, sai, saldo;
+  let lbs,ent,sai,saldo;
   if(fluxoPeriodo==='ano'){
     const porAno={};
-    dados.forEach(function(d){
-      const y=d.m.slice(0,4);
-      if(!porAno[y]) porAno[y]={e:0,s:0};
-      porAno[y].e+=d.e; porAno[y].s+=d.s;
-    });
+    dados.forEach(d=>{const y=d.m.slice(0,4);if(!porAno[y])porAno[y]={e:0,s:0};porAno[y].e+=d.e;porAno[y].s+=d.s;});
     const anos=Object.keys(porAno).sort();
-    lbs=anos; 
-    ent=anos.map(function(y){ return +(porAno[y].e/1000).toFixed(1); });
-    sai=anos.map(function(y){ return +(porAno[y].s/1000).toFixed(1); });
-    saldo=anos.map(function(y){ return +((porAno[y].e-porAno[y].s)/1000).toFixed(1); });
+    lbs=anos; ent=anos.map(y=>+(porAno[y].e/1000).toFixed(1));
+    sai=anos.map(y=>+(porAno[y].s/1000).toFixed(1));
+    saldo=anos.map(y=>+((porAno[y].e-porAno[y].s)/1000).toFixed(1));
   } else {
-    lbs=dados.map(function(d){ return nm(d.m); });
-    ent=dados.map(function(d){ return +(d.e/1000).toFixed(1); });
-    sai=dados.map(function(d){ return +(d.s/1000).toFixed(1); });
-    saldo=dados.map(function(d){ return +(d.saldo/1000).toFixed(1); });
+    lbs=dados.map(d=>nm(d.m));
+    ent=dados.map(d=>+(d.e/1000).toFixed(1));
+    sai=dados.map(d=>+(d.s/1000).toFixed(1));
+    saldo=dados.map(d=>+(d.saldo/1000).toFixed(1));
   }
-
-  // Atualiza cards de resumo
-  const totalE=ent.reduce(function(a,b){return a+b;},0);
-  const totalS=sai.reduce(function(a,b){return a+b;},0);
+  const totalE=ent.reduce((a,b)=>a+b,0).toFixed(1);
+  const totalS=sai.reduce((a,b)=>a+b,0).toFixed(1);
   const totalSaldo=+(totalE-totalS).toFixed(1);
-  const saldoCls=totalSaldo>=0?'dn':'up';
-  const saldoSinal=totalSaldo>=0?'+':'';
-  const periodoLabel={'6m':'Ultimos 6 meses','12m':'Ultimos 12 meses','24m':'Ultimos 24 meses','ano':'Por ano (acumulado)'}[fluxoPeriodo];
+  const label={'6m':'Ultimos 6 meses','12m':'Ultimos 12 meses','ano':'Por ano'}[fluxoPeriodo];
   const cards=document.getElementById('fluxo-cards');
-  if(cards){
-    cards.innerHTML=
-      '<div class="fluxo-card positivo">'+
-        '<div class="fluxo-titulo">&#128200; Entradas — '+periodoLabel+'</div>'+
-        '<div class="fluxo-total" style="color:#0f7c4a;">US$ '+totalE.toFixed(1)+' bi</div>'+
-        '<div class="fluxo-sub">Total de capital entrante no periodo</div>'+
-      '</div>'+
-      '<div class="fluxo-card" style="background:#fff1f1;border-color:#fca5a5;">'+
-        '<div class="fluxo-titulo">&#128200; Saidas — '+periodoLabel+'</div>'+
-        '<div class="fluxo-total" style="color:#b91c1c;">US$ '+totalS.toFixed(1)+' bi</div>'+
-        '<div class="fluxo-sub">Total de capital sainte no periodo</div>'+
-      '</div>'+
-      '<div class="fluxo-card '+(totalSaldo>=0?'positivo':'')+'">'+
-        '<div class="fluxo-titulo">&#9651; Saldo liquido — '+periodoLabel+'</div>'+
-        '<div class="fluxo-total '+saldoCls+'">'+saldoSinal+'US$ '+Math.abs(totalSaldo).toFixed(1)+' bi</div>'+
-        '<div class="fluxo-sub">Entrada - Saida · '+(totalSaldo>=0?'Fluxo positivo — real favorecido':'Fluxo negativo — pressao sobre o real')+'</div>'+
-      '</div>';
-  }
-
-  const title=document.getElementById('fluxo-chart-title');
-  if(title) title.textContent='Entradas, saidas e saldo — '+periodoLabel;
-
-  chFluxo=new Chart(document.getElementById('chFluxo'),{
-    type:'bar',
-    data:{labels:lbs,datasets:[
-      {label:'Entradas',data:ent,backgroundColor:'rgba(29,158,117,0.55)',borderColor:'#1d9e75',borderWidth:1,order:2},
-      {label:'Saidas',data:sai,backgroundColor:'rgba(185,28,28,0.45)',borderColor:'#b91c1c',borderWidth:1,order:3},
-      {label:'Saldo',data:saldo,type:'line',borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.1)',borderWidth:2.5,fill:false,tension:0.4,pointRadius:4,pointBackgroundColor:'#1a5fa8',order:1,yAxisID:'y2'}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,
-        callbacks:{label:function(c){ return ' '+c.dataset.label+': US$ '+c.parsed.y.toFixed(1)+' bi'; }}
-      }},
-      scales:{
-        x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return 'US$ '+v+' bi'; }},title:{display:true,text:'Entradas / Saidas',color:'#9aa0ab',font:{size:10}}},
-        y2:{position:'right',grid:{display:false},ticks:{color:'#1a5fa8',font:{size:10},callback:function(v){ return (v>0?'+':'')+v+' bi'; }},title:{display:true,text:'Saldo',color:'#1a5fa8',font:{size:10}}}
-      }
+  if(cards) cards.innerHTML=
+    '<div class="fluxo-card positivo"><div class="fluxo-titulo">&#128200; Entradas &mdash; '+label+'</div><div class="fluxo-total" style="color:#0f7c4a;">US$ '+totalE+' bi</div><div class="fluxo-sub">Total de capital entrante</div></div>'+
+    '<div class="fluxo-card" style="background:#fff1f1;border-color:#fca5a5;"><div class="fluxo-titulo">&#128200; Saidas &mdash; '+label+'</div><div class="fluxo-total" style="color:#b91c1c;">US$ '+totalS+' bi</div><div class="fluxo-sub">Total de capital sainte</div></div>'+
+    '<div class="fluxo-card'+(totalSaldo>=0?' positivo':'')+'"><div class="fluxo-titulo">&#9651; Saldo liquido &mdash; '+label+'</div><div class="fluxo-total '+(totalSaldo>=0?'dn':'up')+'">'+(totalSaldo>=0?'+':'')+Math.abs(totalSaldo)+' bi</div><div class="fluxo-sub">'+(totalSaldo>=0?'Fluxo positivo — real favorecido':'Fluxo negativo — pressao sobre o real')+'</div></div>';
+  chFluxo=new Chart(document.getElementById('chFluxo'),{type:'bar',data:{labels:lbs,datasets:[
+    {label:'Entradas',data:ent,backgroundColor:'rgba(29,158,117,0.55)',borderColor:'#1d9e75',borderWidth:1,order:2},
+    {label:'Saidas',data:sai,backgroundColor:'rgba(185,28,28,0.45)',borderColor:'#b91c1c',borderWidth:1,order:3},
+    {label:'Saldo',data:saldo,type:'line',borderColor:'#1a5fa8',backgroundColor:'rgba(26,95,168,0.1)',borderWidth:2.5,fill:false,tension:0.4,pointRadius:4,pointBackgroundColor:'#1a5fa8',order:1,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e5eb',borderWidth:1,titleColor:'#1a1a2e',bodyColor:'#5a6070',padding:10,boxPadding:4,callbacks:{label:c=>' '+c.dataset.label+': US$ '+c.parsed.y.toFixed(1)+' bi'}}},
+    scales:{
+      x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10}}},
+      y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9aa0ab',font:{size:10},callback:v=>'US$ '+v+' bi'},title:{display:true,text:'Entradas / Saidas',color:'#9aa0ab',font:{size:10}}},
+      y2:{position:'right',grid:{display:false},ticks:{color:'#1a5fa8',font:{size:10},callback:v=>(v>0?'+':'')+v+' bi'},title:{display:true,text:'Saldo',color:'#1a5fa8',font:{size:10}}}
     }
-  });
+  }});
 }
-
 
 /* ── Fluxo por tipo ── */
 function renderFluxoTipo(){
   if(chFluxoTipo) chFluxoTipo.destroy();
+  // Seleciona os ultimos N meses conforme periodo
   let dados = FLUXO_TIPO.slice();
   if(fluxoPeriodo==='6m')  dados=dados.slice(-6);
   else if(fluxoPeriodo==='12m') dados=dados.slice(-12);
-  else if(fluxoPeriodo==='24m') dados=dados.slice(-24);
+  // Para 'ano': agrupa por ano (saldo acumulado)
   let lbs, com, fin, ied;
   if(fluxoPeriodo==='ano'){
     const porAno={};
     dados.forEach(function(d){
       const y=d.m.slice(0,4);
-      if(!porAno[y]) porAno[y]={ce:0,cs:0,fe:0,fs:0,ie:0,is:0};
-      porAno[y].ce+=d.com_e; porAno[y].cs+=d.com_s;
-      porAno[y].fe+=d.fin_e; porAno[y].fs+=d.fin_s;
-      porAno[y].ie+=d.ied_e; porAno[y].is+=d.ied_s;
+      if(!porAno[y]) porAno[y]={com_e:0,com_s:0,fin_e:0,fin_s:0,ied_e:0,ied_s:0};
+      porAno[y].com_e+=d.com_e; porAno[y].com_s+=d.com_s;
+      porAno[y].fin_e+=d.fin_e; porAno[y].fin_s+=d.fin_s;
+      porAno[y].ied_e+=d.ied_e; porAno[y].ied_s+=d.ied_s;
     });
     const anos=Object.keys(porAno).sort();
     lbs=anos;
-    com=anos.map(function(y){ return +((porAno[y].ce-porAno[y].cs)/1000).toFixed(1); });
-    fin=anos.map(function(y){ return +((porAno[y].fe-porAno[y].fs)/1000).toFixed(1); });
-    ied=anos.map(function(y){ return +((porAno[y].ie-porAno[y].is)/1000).toFixed(1); });
+    com=anos.map(function(y){ return +((porAno[y].com_e-porAno[y].com_s)/1000).toFixed(1); });
+    fin=anos.map(function(y){ return +((porAno[y].fin_e-porAno[y].fin_s)/1000).toFixed(1); });
+    ied=anos.map(function(y){ return +((porAno[y].ied_e-porAno[y].ied_s)/1000).toFixed(1); });
   } else {
     lbs=dados.map(function(d){ return nm(d.m); });
     com=dados.map(function(d){ return +((d.com_e-d.com_s)/1000).toFixed(1); });
@@ -1125,12 +1106,12 @@ function renderFluxoTipo(){
           callbacks:{
             title:function(items){ return 'Saldo liquido — '+items[0].label; },
             label:function(c){
-              const s=c.parsed.y>=0?'+':'';
-              return ' '+c.dataset.label+': '+s+c.parsed.y.toFixed(1)+' bi';
+              const sinal=c.parsed.y>=0?'+':'';
+              return ' '+c.dataset.label+': '+sinal+'US$ '+c.parsed.y.toFixed(1)+' bi';
             },
             afterBody:function(items){
-              const tot=items.reduce(function(a,c){return a+c.parsed.y;},0);
-              return ['─────────────','  Total: '+(tot>=0?'+':'')+tot.toFixed(1)+' bi'];
+              const total=items.reduce(function(a,c){return a+c.parsed.y;},0);
+              return ['─────────────────','  Total: '+(total>=0?'+':'')+total.toFixed(1)+' bi'];
             }
           }
         }
@@ -1141,6 +1122,7 @@ function renderFluxoTipo(){
           ticks:{color:'#9aa0ab',font:{size:10},callback:function(v){ return (v>=0?'+':'')+v+' bi'; }},
           title:{display:true,text:'Saldo liquido (US$ bi)',color:'#9aa0ab',font:{size:10}},
           afterDataLimits:function(axis){
+            // garante zero visivel
             if(axis.max<0) axis.max=0.5;
             if(axis.min>0) axis.min=-0.5;
           }
@@ -1152,58 +1134,26 @@ function renderFluxoTipo(){
 
 /* ── Init ── */
 (function(){
-  if(!DATA||!DATA.length){
-    console.error('[Painel] DATA vazio — verifique o Python.');
-    document.getElementById('chH').parentElement.innerHTML=
-      '<div style="padding:40px;text-align:center;color:#888;font-size:13px;">'+
-      'Nenhum dado disponivel. Execute o Python para gerar o painel com dados reais.</div>';
-    return;
-  }
-  console.log('[Painel] DATA carregado:', DATA.length, 'meses |', Object.keys(DATA_DIARIOS).length, 'meses com dados diarios');
-
-  const ss=document.getElementById('ss');
-  const se=document.getElementById('se');
-  const sd=document.getElementById('sd');
-
-  // Popula selects de periodo (mensal)
+  const ss=document.getElementById('ss'), se=document.getElementById('se'), sd=document.getElementById('sd');
   DATA.forEach(d=>{
     const lab=nm(d.m);
-    const o1=document.createElement('option'); o1.value=d.m; o1.textContent=lab; ss.appendChild(o1);
-    const o2=document.createElement('option'); o2.value=d.m; o2.textContent=lab; se.appendChild(o2);
+    ss.innerHTML+=`<option value="${d.m}">${lab}</option>`;
+    se.innerHTML+=`<option value="${d.m}">${lab}</option>`;
   });
-
-  // Periodo inicial default: 2 anos atras (ou primeiro disponivel)
-  const hoje=DATA[DATA.length-1].m;
-  const [hy,hmo]=hoje.split('-').map(Number);
-  let iy=hy-2, imo=hmo+1; if(imo>12){imo-=12;iy++;}
-  const iMes=`${iy}-${String(imo).padStart(2,'0')}`;
-  const inicioDefault=DATA.find(d=>d.m>=iMes)||DATA[0];
-  ss.value=inicioDefault.m;
+  ss.value=DATA.find(d=>d.m>='2022-01')?.m||DATA[0].m;
   se.value=DATA[DATA.length-1].m;
-
-  // Popula seletor de mes para visao diaria — todos os meses do DATA
-  // (meses sem dados diarios mostram mensagem ao selecionar)
-  if(sd){
-    DATA.forEach(function(d){
-      const o=document.createElement('option');
-      o.value=d.m;
-      o.textContent=nm(d.m)+(DATA_DIARIOS[d.m]?' ':'*'); // * = sem dados diarios
-      sd.appendChild(o);
-    });
-    sd.value=DATA[DATA.length-1].m;
-    sd.onchange=renderD;
-  }
-
-
-
-  // Event listeners
+  // Seletor de mes para visao diaria
+  DATA.slice().reverse().forEach(d=>{
+    const temDados=!!DATA_DIARIOS[d.m];
+    sd.innerHTML+=`<option value="${d.m}">${nm(d.m)}${temDados?'':' *'}</option>`;
+  });
+  sd.value=DATA[DATA.length-1].m;
+  sd.onchange=renderD;
   [ss,se].forEach(el=>el.addEventListener('change',renderH));
   document.getElementById('sm').addEventListener('change',renderH);
   document.getElementById('np').addEventListener('input',renderH);
   document.getElementById('np').addEventListener('change',renderH);
-
-  // Renderiza apos DOM estar pronto
-  setTimeout(renderH, 0);
+  setTimeout(renderH,0);
 })();
 </script>
 </body>
