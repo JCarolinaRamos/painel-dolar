@@ -31,6 +31,23 @@ SERIES_PROJ = {
     "Morgan Stanley":   [5.28, 5.36, 5.45, 5.60, 5.52, 5.43, 5.30, None],
 }
 
+# Fluxo cambial mensal (US$ milhoes) — espelha FLUXO_HIST do template JS.
+# Atualize aqui sempre que atualizar o bloco JS correspondente no HTML_TEMPLATE.
+FLUXO_HIST = [
+    {"m":"2025-06","e":28500,"s":25100,"saldo":3400},
+    {"m":"2025-07","e":31200,"s":27800,"saldo":3400},
+    {"m":"2025-08","e":29800,"s":26200,"saldo":3600},
+    {"m":"2025-09","e":33400,"s":29100,"saldo":4300},
+    {"m":"2025-10","e":35100,"s":30400,"saldo":4700},
+    {"m":"2025-11","e":30200,"s":26900,"saldo":3300},
+    {"m":"2025-12","e":28900,"s":25700,"saldo":3200},
+    {"m":"2026-01","e":32100,"s":27300,"saldo":4800},
+    {"m":"2026-02","e":29500,"s":25100,"saldo":4400},
+    {"m":"2026-03","e":34800,"s":29200,"saldo":5600},
+    {"m":"2026-04","e":41200,"s":32000,"saldo":9200},
+    {"m":"2026-05","e":38600,"s":30100,"saldo":8500,"semana":"19-23/mai"},
+]
+
 MESES_PT = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]
 
 def mes_label(m):
@@ -74,6 +91,74 @@ def agrupar_por_mes(dados):
     ]
     print(f"[BCB] {len(mensal)} medias mensais | Ultimo: {ultimo['dataHoraCotacao'][:10]} R$ {ultimo['cotacaoVenda']:.4f}")
     return mensal, ultimo
+
+
+
+# ─── Boletim Focus (Expectativas de Mercado BCB) ───────────────────────────────
+def buscar_focus():
+    """
+    Busca na API de Expectativas do BCB a mediana mais recente para
+    USD/BRL fim de ano (DataReferencia = ano corrente) e retorna:
+        {"mediana": 5.17, "data_boletim": "2026-05-25", "ano_ref": "2026"}
+    Em caso de falha retorna None (o script continua com os valores hardcoded).
+    """
+    ano_ref = str(datetime.today().year)
+    url = (
+        "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/"
+        "ExpectativaMercadoAnuais"
+    )
+    params = {
+        "$filter":  f"Indicador eq 'Câmbio' and DataReferencia eq '{ano_ref}'",
+        "$orderby": "Data desc",
+        "$top":     "1",
+        "$select":  "Mediana,Data,DataReferencia",
+        "$format":  "json",
+    }
+    headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
+    try:
+        print("[Focus] Buscando ultima expectativa de cambio (Boletim Focus BCB)...")
+        r = requests.get(url, params=params, headers=headers, timeout=30)
+        r.raise_for_status()
+        itens = r.json().get("value", [])
+        if not itens:
+            print("[Focus] Nenhum dado retornado — mantendo valor hardcoded.")
+            return None
+        item = itens[0]
+        resultado = {
+            "mediana":      round(float(item["Mediana"]), 2),
+            "data_boletim": item["Data"][:10],   # "2026-05-25"
+            "ano_ref":      item["DataReferencia"],
+        }
+        print(f"[Focus] Mediana dez/{ano_ref[2:]}: R$ {resultado['mediana']:.2f} "
+              f"· Boletim: {resultado['data_boletim']}")
+        return resultado
+    except Exception as e:
+        print(f"[Focus] Falha ao buscar API ({e}) — mantendo valor hardcoded.")
+        return None
+
+
+# ─── PTAX diaria agrupada por mes (para visao Diario) ─────────────────────────
+def agrupar_diarios_por_mes(dados, n_meses=12):
+    """
+    Recebe a lista bruta da API PTAX e devolve um dict:
+        {"2026-05": [{"d": "2026-05-02", "v": 5.0234}, ...], ...}
+    Usa exatamente os dias retornados pela API — sem filtros, sem pular nada.
+    A propria API so devolve dias com pregao oficial (BCB nao publica PTAX
+    em fins de semana nem feriados), entao o resultado ja e o conjunto correto.
+    Cobre os ultimos n_meses com dados disponiveis.
+    """
+    from collections import defaultdict
+    mapa = defaultdict(list)
+    for row in dados:
+        data_str = row["dataHoraCotacao"][:10]   # "2026-05-25"
+        mes      = data_str[:7]                   # "2026-05"
+        mapa[mes].append({"d": data_str, "v": round(row["cotacaoVenda"], 4)})
+
+    # Ordena os pregoes dentro de cada mes e pega os ultimos n_meses
+    meses_ord = sorted(mapa.keys())[-n_meses:]
+    resultado = {m: sorted(mapa[m], key=lambda x: x["d"]) for m in meses_ord}
+    print(f"[BCB] Dados diarios: {len(resultado)} meses ({meses_ord[0]} a {meses_ord[-1]})")
+    return resultado
 
 
 # ─── Template HTML (layout completo com 5 abas) ────────────────────────────────
@@ -844,26 +929,8 @@ const DATA = %%DATA_JSON%%;
 const SPROJ = %%SPROJ_JSON%%;
 const CORES = {"Focus BCB":"#888780","XP Investimentos":"#e67e22","Bradesco":"#1d9e75","Itau":"#7f77dd","Morgan Stanley":"#d4537e"};
 
-// Dados diarios simulados para visao diaria (meses recentes)
-const DATA_DIARIOS = (function(){
-  const base = {
-    "2026-05":[5.0234,5.0189,5.0312,5.0072,4.9987,4.9876,4.9654,4.9723,4.9812,4.9679,4.9534,4.9601,5.0072],
-    "2026-04":[5.1823,5.1654,5.1234,5.0987,5.0765,5.0543,5.0321,5.0234,5.0156,5.0089,5.0023,4.9987,4.9876,4.9765,4.9654,5.0123,5.0234,5.0331,5.0456,5.0567],
-    "2026-03":[5.3456,5.3234,5.3012,5.2987,5.2765,5.2543,5.2321,5.2234,5.2156,5.2089,5.2023,5.1987,5.1876,5.1765,5.1654,5.2123,5.2234,5.2316,5.2456,5.2567,5.2678],
-    "2026-02":[5.3234,5.3012,5.2876,5.2654,5.2432,5.2210,5.2006,5.1876,5.1765,5.1654,5.1543,5.1432,5.1321,5.1210,5.1099,5.2006],
-    "2026-01":[5.4234,5.4012,5.3876,5.3654,5.3432,5.3210,5.3123,5.3456,5.3567,5.3678,5.3789,5.3890,5.3980,5.3780,5.3680,5.3580,5.3480,5.3380,5.3380],
-    "2025-12":[5.5234,5.5012,5.4876,5.4654,5.4432,5.4531,5.4678,5.4789,5.4890,5.4980,5.4780,5.4680,5.4580,5.4480,5.4380,5.4531]
-  };
-  const result = {};
-  Object.keys(base).forEach(function(mes){
-    const vals = base[mes];
-    result[mes] = vals.map(function(v, i){
-      const d = i+1;
-      return {d: mes+'-'+String(d).padStart(2,'0'), v: v};
-    });
-  });
-  return result;
-})();
+// Dados diarios reais da API PTAX BCB (ultimos 12 meses)
+const DATA_DIARIOS = %%DATA_DIARIOS_JSON%%;
 
 // Dados de moedas (EUR/USD, USD/CNY, GBP/USD) - ultimos 13 meses
 const MOEDAS = [
@@ -1240,7 +1307,7 @@ function renderFluxoTipo(){
 
 
 # ─── Gera o HTML substituindo apenas os dados dinamicos ────────────────────────
-def gerar_html(mensal, ultimo, n_diarios):
+def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
     agora       = datetime.today()
     ultima_data = ultimo["dataHoraCotacao"][:10]
     ultima_ptax = ultimo["cotacaoVenda"]
@@ -1265,6 +1332,13 @@ def gerar_html(mensal, ultimo, n_diarios):
     # 1. Dados JS
     html = html.replace("%%DATA_JSON%%",  data_json)
     html = html.replace("%%SPROJ_JSON%%", sproj_json)
+
+    # 1b. DATA_DIARIOS — dados reais agrupados por mes com datas corretas
+    if diarios_por_mes:
+        dd_json = json.dumps(diarios_por_mes, ensure_ascii=False, separators=(",", ":"))
+    else:
+        dd_json = "{}"
+    html = html.replace("%%DATA_DIARIOS_JSON%%", dd_json)
 
     # 2. Ultima PTAX card — valor
     html = re.sub(
@@ -1301,6 +1375,98 @@ def gerar_html(mensal, ultimo, n_diarios):
         r'(Ultimo dado: )\d{2}/\d{2}/\d{4}',
         rf'\g<1>{d_fmt}', html)
 
+    # 9. Card "Fluxo Cambial" — label do mes, valor e subtitulo
+    #    Usa o ultimo registro de FLUXO_HIST que esta embutido no template JS.
+    #    O dicionario FLUXO_HIST e definido no escopo do modulo Python.
+    if FLUXO_HIST:
+        uf        = FLUXO_HIST[-1]           # ultimo mes de fluxo
+        uf_m      = uf["m"]                  # ex: "2026-05"
+        uf_saldo  = uf["saldo"]              # em US$ milhoes
+        uf_label  = mes_label(uf_m)          # ex: "mai/26"
+        uf_bi     = uf_saldo / 1000          # converte para bilhoes
+        sinal     = "+" if uf_bi >= 0 else ""
+        uf_val    = f"{sinal}US$ {uf_bi:.1f} bi".replace(".", ",")
+
+        # Mes anterior (referencia da semana de pico de entrada)
+        mes_ant_m = uf_m
+        y2, mo2   = uf_m.split("-")
+        mo2i      = int(mo2) - 1
+        if mo2i < 1:
+            mo2i = 12
+            y2   = str(int(y2) - 1)
+        mes_ant_label = mes_label(f"{y2}-{mo2i:02d}")  # ex: "abr/26"
+
+        # 9a. Label do card: "Fluxo Cambial (mai/2026)"
+        uf_label_longo = mes_label(uf_m).split("/")[0] + "/" + uf_m[:4]
+        html = re.sub(
+            r'(<div class="cl">Fluxo Cambial \()\w+/\d{4}(\)</div>)',
+            rf'\g<1>{uf_label_longo}\2',
+            html)
+
+        # 9b. Valor do card: "+US$ 9,2 bi"
+        html = re.sub(
+            r'(<div class="cl">Fluxo Cambial.*?<div class="cv[^"]*">)[^<]*(</div>)',
+            rf'\g<1>{uf_val}\2',
+            html, flags=re.DOTALL)
+
+        # 9c. Subtitulo: "Semana 19-23/mai · recorde historico" (se houver campo semana)
+        #     Mantem "recorde historico" somente se o saldo for o maior da serie
+        saldos    = [r["saldo"] for r in FLUXO_HIST]
+        e_recorde = uf_saldo >= max(saldos)
+        rec_tag   = " &middot; recorde historico" if e_recorde else ""
+        semana    = uf.get("semana")          # ex: "19-23/mai"  — opcional
+        if semana:
+            novo_sub = f"Semana {semana}{rec_tag}"
+        else:
+            novo_sub = f"Saldo {uf_label}{rec_tag}"
+        html = re.sub(
+            r'(<div class="cl">Fluxo Cambial.*?<div class="cs">)[^<]*(</div>)',
+            rf'\g<1>{novo_sub}\2',
+            html, flags=re.DOTALL)
+
+    # 10. Card "Focus dez/XX" — label, valor e data do boletim
+    #     Prioridade: dados ao vivo de buscar_focus(); fallback: SERIES_PROJ hardcoded.
+    if focus is not None:
+        # Dados frescos da API de Expectativas do BCB
+        focus_dez   = focus["mediana"]
+        focus_dez_s = f"R$ {focus_dez:.2f}".replace(".", ",")
+        ano_ref     = focus["ano_ref"]            # ex: "2026"
+        # Data do boletim vem como "AAAA-MM-DD" → converter para "dd/mes_pt/aaaa"
+        db          = focus["data_boletim"]       # "2026-05-25"
+        db_parts    = db.split("-")               # ["2026","05","25"]
+        mes_pt_fo   = MESES_PT[int(db_parts[1]) - 1]
+        focus_sub   = f"{db_parts[2]}/{mes_pt_fo}/{db_parts[0]}"  # "25/mai/2026"
+    elif "Focus BCB" in SERIES_PROJ:
+        # Fallback: ultimo valor nao-nulo de SERIES_PROJ e data da PTAX
+        focus_vals  = [v for v in SERIES_PROJ["Focus BCB"] if v is not None]
+        focus_dez   = focus_vals[-1] if focus_vals else None
+        focus_dez_s = f"R$ {focus_dez:.2f}".replace(".", ",") if focus_dez else None
+        ano_ref     = str(agora.year)
+        d_parts     = d_fmt.split("/")
+        mes_pt_fo   = MESES_PT[int(d_parts[1]) - 1]
+        focus_sub   = f"{d_parts[0]}/{mes_pt_fo}/{d_parts[2]}"
+    else:
+        focus_dez_s = None
+
+    if focus_dez_s:
+        # 10a. Label: "Focus dez/26"
+        html = re.sub(
+            r'(<div class="cl">Focus dez/)\d{2}(</div>)',
+            rf'\g<1>{str(ano_ref)[2:]}\2',
+            html)
+
+        # 10b. Valor: "R$ 5,17"
+        html = re.sub(
+            r'(<div class="cl">Focus dez/\d{2}</div>\s*<div class="cv">)[^<]*(</div>)',
+            rf'\g<1>{focus_dez_s}\2',
+            html)
+
+        # 10c. Subtitulo: "Boletim Focus BCB · 25/mai/2026" — data real do boletim
+        html = re.sub(
+            r'(<div class="cl">Focus dez/\d{2}</div>.*?<div class="cs">)Boletim Focus BCB[^<]*(</div>)',
+            rf'\g<1>Boletim Focus BCB &middot; {focus_sub}\2',
+            html, flags=re.DOTALL)
+
     return html
 
 
@@ -1313,9 +1479,11 @@ if __name__ == "__main__":
     is_ci = os.environ.get("CI", "false").lower() == "true"
 
     try:
-        diarios        = buscar_ptax()
-        mensal, ultimo = agrupar_por_mes(diarios)
-        html           = gerar_html(mensal, ultimo, len(diarios))
+        diarios          = buscar_ptax()
+        mensal, ultimo   = agrupar_por_mes(diarios)
+        diarios_por_mes  = agrupar_diarios_por_mes(diarios, n_meses=12)
+        focus            = buscar_focus()        # None se a API falhar
+        html             = gerar_html(mensal, ultimo, len(diarios), focus, diarios_por_mes)
 
         pasta   = os.path.dirname(os.path.abspath(__file__))
         caminho = os.path.join(pasta, ARQUIVO_HTML)
