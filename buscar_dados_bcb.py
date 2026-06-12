@@ -99,18 +99,23 @@ def buscar_focus():
     """
     Busca na API de Expectativas do BCB a mediana mais recente para
     USD/BRL fim de ano (DataReferencia = ano corrente) e retorna:
-        {"mediana": 5.17, "data_boletim": "2026-05-25", "ano_ref": "2026"}
+        {"mediana": 5.20, "data_boletim": "2026-06-02", "ano_ref": "2026"}
+
+    - URL correta: ExpectativasMercadoAnuais (com "s")
+    - Indicador correto: "Taxa de câmbio"
+    - Campo Data = data de publicacao do Boletim Focus (sempre segunda-feira)
+
     Em caso de falha retorna None (o script continua com os valores hardcoded).
     """
     ano_ref = str(datetime.today().year)
     url = (
         "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/"
-        "ExpectativaMercadoAnuais"
+        "ExpectativasMercadoAnuais"   # "s" obrigatorio — endpoint correto da API
     )
     params = {
-        "$filter":  f"Indicador eq 'Câmbio' and DataReferencia eq '{ano_ref}'",
-        "$orderby": "Data desc",
-        "$top":     "1",
+        "$filter":  f"Indicador eq 'Taxa de câmbio' and DataReferencia eq '{ano_ref}'",
+        "$orderby": "Data desc",      # mais recente primeiro
+        "$top":     "1",              # so o ultimo boletim
         "$select":  "Mediana,Data,DataReferencia",
         "$format":  "json",
     }
@@ -124,13 +129,15 @@ def buscar_focus():
             print("[Focus] Nenhum dado retornado — mantendo valor hardcoded.")
             return None
         item = itens[0]
+        # item["Data"] = "2026-06-02T00:00:00" ou "2026-06-02" — pega so a data
+        data_boletim = item["Data"][:10]
         resultado = {
             "mediana":      round(float(item["Mediana"]), 2),
-            "data_boletim": item["Data"][:10],   # "2026-05-25"
+            "data_boletim": data_boletim,   # "2026-06-02" — data real do boletim
             "ano_ref":      item["DataReferencia"],
         }
         print(f"[Focus] Mediana dez/{ano_ref[2:]}: R$ {resultado['mediana']:.2f} "
-              f"· Boletim: {resultado['data_boletim']}")
+              f"· Boletim de {data_boletim}")
         return resultado
     except Exception as e:
         print(f"[Focus] Falha ao buscar API ({e}) — mantendo valor hardcoded.")
@@ -1423,6 +1430,27 @@ def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
             r'(<div class="cl">Fluxo Cambial.*?<div class="cs">)[^<]*(</div>)',
             rf'\g<1>{novo_sub}\2',
             html, flags=re.DOTALL)
+
+        # 9d. Titulo "Detalhamento por tipo de fluxo — ultimo mes disponivel (mes/ano)"
+        #     Mantem sincronizado com o ultimo mes do FLUXO_HIST (mesma fonte do card acima).
+        html = re.sub(
+            r'(Detalhamento por tipo de fluxo &mdash; ultimo mes disponivel \()\w+/\d{4}(\))',
+            rf'\g<1>{uf_label_longo}\2',
+            html)
+
+    # ─────────────────────────────────────────────────────────────────────
+    # ATENCAO — MANUTENCAO MENSAL MANUAL
+    # As series abaixo NAO sao buscadas automaticamente por este script e
+    # precisam ser atualizadas manualmente todo mes para que as abas
+    # "Comparativo Cambial" e "Fluxo de Capital" reflitam o mes vigente:
+    #   - FLUXO_HIST  (saldo do fluxo cambial total — fonte: BCB, fluxo cambial semanal/mensal)
+    #   - FLUXO_TIPO  (saldo por canal: comercial / financeiro / IED — fonte: BCB)
+    #   - MOEDAS      (EUR/USD, USD/CNY, GBP/USD — adicionar novo ponto em "hist"
+    #                  e atualizar "atual"/"var_*"/"pct_*" de cada moeda)
+    #   - SERIES_PROJ (projecoes institucionais — Focus/XP/Bradesco/Itau/Morgan Stanley)
+    # Sem essa atualizacao, os graficos continuam mostrando o ultimo mes
+    # cadastrado mesmo que o restante do painel (PTAX/Focus) ja esteja atual.
+    # ─────────────────────────────────────────────────────────────────────
 
     # 10. Card "Focus dez/XX" — label, valor e data do boletim
     #     Prioridade: dados ao vivo de buscar_focus(); fallback: SERIES_PROJ hardcoded.
