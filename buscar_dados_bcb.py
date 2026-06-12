@@ -33,6 +33,8 @@ SERIES_PROJ = {
 
 # Fluxo cambial mensal (US$ milhoes) — espelha FLUXO_HIST do template JS.
 # Atualize aqui sempre que atualizar o bloco JS correspondente no HTML_TEMPLATE.
+FALLBACK_MOEDAS = [{'par': 'EUR/USD', 'nome': 'Euro', 'atual': 1.157, 'var_mes': 0.023, 'pct_mes': 2.03, 'var_ano': 0.122, 'pct_ano': 11.79, 'var_12m': 0.1, 'pct_12m': 9.46, 'hist': [{'m': '2025-05', 'v': 1.058}, {'m': '2025-06', 'v': 1.072}, {'m': '2025-07', 'v': 1.089}, {'m': '2025-08', 'v': 1.102}, {'m': '2025-09', 'v': 1.098}, {'m': '2025-10', 'v': 1.112}, {'m': '2025-11', 'v': 1.105}, {'m': '2025-12', 'v': 1.089}, {'m': '2026-01', 'v': 1.035}, {'m': '2026-02', 'v': 1.068}, {'m': '2026-03', 'v': 1.094}, {'m': '2026-04', 'v': 1.116}, {'m': '2026-05', 'v': 1.134}, {'m': '2026-06', 'v': 1.157}]}, {'par': 'USD/CNY', 'nome': 'Yuan chines', 'atual': 7.234, 'var_mes': -0.026, 'pct_mes': -0.36, 'var_ano': 0.054, 'pct_ano': 0.75, 'var_12m': 0.014, 'pct_12m': 0.19, 'hist': [{'m': '2025-05', 'v': 7.22}, {'m': '2025-06', 'v': 7.245}, {'m': '2025-07', 'v': 7.26}, {'m': '2025-08', 'v': 7.25}, {'m': '2025-09', 'v': 7.235}, {'m': '2025-10', 'v': 7.21}, {'m': '2025-11', 'v': 7.24}, {'m': '2025-12', 'v': 7.29}, {'m': '2026-01', 'v': 7.18}, {'m': '2026-02', 'v': 7.22}, {'m': '2026-03', 'v': 7.26}, {'m': '2026-04', 'v': 7.26}, {'m': '2026-05', 'v': 7.234}]}, {'par': 'GBP/USD', 'nome': 'Libra esterlina', 'atual': 1.298, 'var_mes': 0.027, 'pct_mes': 2.12, 'var_ano': 0.063, 'pct_ano': 5.1, 'var_12m': 0.04, 'pct_12m': 3.18, 'hist': [{'m': '2025-05', 'v': 1.258}, {'m': '2025-06', 'v': 1.271}, {'m': '2025-07', 'v': 1.285}, {'m': '2025-08', 'v': 1.292}, {'m': '2025-09', 'v': 1.286}, {'m': '2025-10', 'v': 1.294}, {'m': '2025-11', 'v': 1.288}, {'m': '2025-12', 'v': 1.271}, {'m': '2026-01', 'v': 1.235}, {'m': '2026-02', 'v': 1.259}, {'m': '2026-03', 'v': 1.274}, {'m': '2026-04', 'v': 1.271}, {'m': '2026-05', 'v': 1.298}]}]
+
 FLUXO_HIST = [
     {"m":"2025-06","e":28500,"s":25100,"saldo":3400},
     {"m":"2025-07","e":31200,"s":27800,"saldo":3400},
@@ -45,7 +47,8 @@ FLUXO_HIST = [
     {"m":"2026-02","e":29500,"s":25100,"saldo":4400},
     {"m":"2026-03","e":34800,"s":29200,"saldo":5600},
     {"m":"2026-04","e":41200,"s":32000,"saldo":9200},
-    {"m":"2026-05","e":38600,"s":30100,"saldo":8500,"semana":"19-23/mai"},
+    {"m":"2026-05","e":78411,"s":77668,"saldo":743},
+    {"m":"2026-06","e":18535,"s":15947,"saldo":2588,"semana":"01-05/jun (parcial)"},
 ]
 
 MESES_PT = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]
@@ -112,28 +115,36 @@ def buscar_focus():
         "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/"
         "ExpectativasMercadoAnuais"   # "s" obrigatorio — endpoint correto da API
     )
-    params = {
-        "$filter":  f"Indicador eq 'Taxa de câmbio' and DataReferencia eq '{ano_ref}'",
-        "$orderby": "Data desc",      # mais recente primeiro
-        "$top":     "1",              # so o ultimo boletim
-        "$select":  "Mediana,Data,DataReferencia",
-        "$format":  "json",
-    }
+    from urllib.parse import quote
+    qs = (
+        f"$filter={quote('DataReferencia eq ' + chr(39) + ano_ref + chr(39))}"
+        f"&$orderby=Data%20desc&$top=100"
+        f"&$select=Indicador,Mediana,Data,DataReferencia&$format=json"
+    )
     headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
     try:
         print("[Focus] Buscando ultima expectativa de cambio (Boletim Focus BCB)...")
-        r = requests.get(url, params=params, headers=headers, timeout=30)
+        r = requests.get(f"{url}?{qs}", headers=headers, timeout=30)
         r.raise_for_status()
-        itens = r.json().get("value", [])
+        # Filtra Indicador no Python (evita problemas de encoding de acento no $filter)
+        todos = r.json().get("value", [])
+        itens = [v for v in todos if v.get("Indicador") == "Câmbio"]
         if not itens:
-            print("[Focus] Nenhum dado retornado — mantendo valor hardcoded.")
+            indicadores = sorted(set(v.get("Indicador") for v in todos))
+            print(f"[Focus] Indicador 'Câmbio' nao encontrado. "
+                  f"Indicadores disponiveis ({len(todos)} registros): {indicadores}")
             return None
         item = itens[0]
-        # item["Data"] = "2026-06-02T00:00:00" ou "2026-06-02" — pega so a data
-        data_boletim = item["Data"][:10]
+        # item["Data"] = data da CONSULTA/snapshot (ex: hoje), nao a data de publicacao
+        # do Boletim Focus. O Boletim e publicado semanalmente, sempre na SEGUNDA-FEIRA,
+        # e a mediana fica valendo at\u00e9 a proxima divulgacao. Por isso calculamos a
+        # ultima segunda-feira anterior (ou igual) a data do snapshot.
+        data_snapshot = datetime.strptime(item["Data"][:10], "%Y-%m-%d")
+        data_boletim_dt = data_snapshot - timedelta(days=data_snapshot.weekday())  # weekday(): Mon=0
+        data_boletim = data_boletim_dt.strftime("%Y-%m-%d")
         resultado = {
             "mediana":      round(float(item["Mediana"]), 2),
-            "data_boletim": data_boletim,   # "2026-06-02" — data real do boletim
+            "data_boletim": data_boletim,   # sempre uma segunda-feira
             "ano_ref":      item["DataReferencia"],
         }
         print(f"[Focus] Mediana dez/{ano_ref[2:]}: R$ {resultado['mediana']:.2f} "
@@ -141,6 +152,115 @@ def buscar_focus():
         return resultado
     except Exception as e:
         print(f"[Focus] Falha ao buscar API ({e}) — mantendo valor hardcoded.")
+        return None
+
+
+def buscar_expectativa_anual(indicador, ano_ref=None):
+    """
+    Generalizacao de buscar_focus(): busca a mediana mais recente do Boletim
+    Focus para qualquer indicador anual (ex.: 'IPCA', 'Selic', 'Taxa de câmbio').
+    Retorna {"mediana": float, "data_boletim": "AAAA-MM-DD" (segunda-feira)} ou None.
+    """
+    ano_ref = ano_ref or str(datetime.today().year)
+    url = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+    from urllib.parse import quote
+    filtro = f"Indicador eq {chr(39)}{indicador}{chr(39)} and DataReferencia eq {chr(39)}{ano_ref}{chr(39)}"
+    qs = (
+        f"$filter={quote(filtro)}"
+        f"&$orderby=Data%20desc&$top=5"
+        f"&$select=Indicador,Mediana,Data,DataReferencia&$format=json"
+    )
+    headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
+    try:
+        r = requests.get(f"{url}?{qs}", headers=headers, timeout=30)
+        r.raise_for_status()
+        itens = r.json().get("value", [])
+        if not itens:
+            print(f"[Expectativas:{indicador}] Nenhum dado retornado — mantendo valor hardcoded.")
+            return None
+        item = itens[0]
+        snap = datetime.strptime(item["Data"][:10], "%Y-%m-%d")
+        boletim = snap - timedelta(days=snap.weekday())
+        return {"mediana": float(item["Mediana"]), "data_boletim": boletim.strftime("%Y-%m-%d")}
+    except Exception as e:
+        print(f"[Expectativas:{indicador}] Falha ({e}) — mantendo valor hardcoded.")
+        return None
+
+
+# ─── Selic (taxa vigente, definida pelo Copom) ─────────────────────────────────
+def buscar_selic_atual():
+    """
+    Busca a meta Selic vigente via SGS (serie 432 - Meta Selic definida pelo Copom).
+    Retorna {"valor": 14.50, "data": "2026-04-29"} ou None em caso de falha.
+    """
+    url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1"
+    try:
+        r = requests.get(url, params={"formato": "json"},
+                         headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        r.raise_for_status()
+        item = r.json()[0]   # {"data": "29/04/2026", "valor": "14.50"}
+        d, m, y = item["data"].split("/")
+        print(f"[Selic] Meta vigente: {item['valor']}% (Copom de {d}/{m}/{y})")
+        return {"valor": float(item["valor"]), "data": f"{y}-{m}-{d}"}
+    except Exception as e:
+        print(f"[Selic] Falha ao buscar SGS 432 ({e}) — mantendo valor hardcoded.")
+        return None
+
+
+# ─── Cotacoes EUR/USD, GBP/USD, USD/CNY (Frankfurter - ECB) ────────────────────
+def buscar_moedas():
+    """
+    Busca series mensais (ultimos 13 meses) de EUR/USD, GBP/USD e USD/CNY via
+    Frankfurter (dados do BCE, sem necessidade de chave de API) e monta a
+    estrutura usada pelo array MOEDAS do painel (Comparativo Cambial).
+    Retorna None em caso de falha (mantem MOEDAS hardcoded no template).
+    """
+    hoje = datetime.today()
+    inicio = (hoje.replace(day=1) - timedelta(days=400)).replace(day=1)
+    url = f"https://api.frankfurter.app/{inicio:%Y-%m-%d}..{hoje:%Y-%m-%d}"
+    try:
+        r = requests.get(url, params={"from": "USD", "to": "EUR,GBP,CNY"},
+                          headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        r.raise_for_status()
+        rates = r.json()["rates"]   # {"2026-05-29": {"EUR":0.881,"GBP":0.760,"CNY":7.234}, ...}
+
+        # Pega a ultima cotacao disponivel de cada mes (incluindo o mes corrente, parcial)
+        por_mes = {}
+        for data_str, vals in sorted(rates.items()):
+            por_mes[data_str[:7]] = (data_str, vals)
+        meses = sorted(por_mes.keys())[-13:]
+
+        def serie(par, conv):
+            """conv: funcao que transforma o valor cru da Frankfurter no par desejado"""
+            hist = [{"m": m, "v": round(conv(por_mes[m][1]), 4)} for m in meses]
+            atual = hist[-1]["v"]
+            ant   = hist[-2]["v"]
+            ano0  = next((h["v"] for h in hist if h["m"][:4] == meses[-1][:4]), hist[0]["v"])
+            doze  = hist[0]["v"]
+            def pct(a, b): return round((a - b) / b * 100, 2)
+            return {
+                "atual": atual,
+                "var_mes": round(atual - ant, 4), "pct_mes": pct(atual, ant),
+                "var_ano": round(atual - ano0, 4), "pct_ano": pct(atual, ano0),
+                "var_12m": round(atual - doze, 4), "pct_12m": pct(atual, doze),
+                "hist": hist,
+            }
+
+        eur = serie("EUR/USD", lambda v: 1 / v["EUR"])   # USD->EUR invertido = EUR/USD
+        gbp = serie("GBP/USD", lambda v: 1 / v["GBP"])
+        cny = serie("USD/CNY", lambda v: v["CNY"])       # ja esta no formato USD->CNY
+
+        print(f"[Moedas] EUR/USD={eur['atual']:.4f} | GBP/USD={gbp['atual']:.4f} | USD/CNY={cny['atual']:.4f} "
+              f"(Frankfurter/ECB, {meses[-1]})")
+
+        moedas = [
+            {"par": "EUR/USD", "nome": "Euro", **eur},
+            {"par": "USD/CNY", "nome": "Yuan chines", **cny},
+            {"par": "GBP/USD", "nome": "Libra esterlina", **gbp},
+        ]
+        return moedas
+    except Exception as e:
+        print(f"[Moedas] Falha ao buscar Frankfurter ({e}) — mantendo MOEDAS hardcoded.")
         return None
 
 
@@ -474,6 +594,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <!-- ══ PAINEL 3: FLUXO DE CAPITAL ══ -->
 <div id="pf" class="panel" style="display:none">
 
+  <div style="font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:14px;">
+    &#9888; <strong>Mai/2026:</strong> fechamento mensal oficial do BCB (saldo +US$ 743 mi; comercial +US$8,65bi,
+    financeiro -US$7,91bi). Abertura comercial e real; abertura do canal financeiro usa magnitude aproximada
+    (BCB nao detalhou compras/vendas isoladas de maio). <strong>Jun/2026:</strong> dados parciais (01-05/jun, saldo
+    +US$2,59 bi); IED do periodo ainda nao divulgado. Fechamento completo de junho previsto para ~10/jul/2026.
+  </div>
+
   <!-- Cabeçalho + filtro de período -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
     <div class="ptitle" style="margin:0;">Fluxo Cambial &mdash; Movimentacao de capital internacional (BCB)</div>
@@ -749,35 +876,37 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 <!-- ══ PAINEL 5: ANALISE DE MERCADO ══ -->
 <div id="pa" class="panel" style="display:none">
-  <div class="ptitle">Analise de Mercado &mdash; O que esta movendo o dolar em mai/2026</div>
+  <div class="ptitle">Analise de Mercado &mdash; O que esta movendo o dolar em <!--MES_ATUAL--></div>
 
   <div class="an-card neutro" style="margin-bottom:16px;">
     <div class="an-titulo"><span class="an-ico">&#127777;</span> Termometro cambial atual</div>
     <div class="termometro-wrap">
       <div class="termometro-label"><span>Real muito forte</span><span>Neutro</span><span>Dolar muito forte</span></div>
       <div class="termometro"><div class="termometro-marker" style="left:28%"></div></div>
-      <div class="termometro-val">Real levemente apreciado &mdash; USD/BRL ~R$ 4,98 (mai/2026)</div>
+      <div class="termometro-val">USD/BRL ~R$ <!--ULTIMA_PTAX--> (<!--MES_ATUAL-->)</div>
     </div>
     <div class="an-texto" style="margin-top:10px;">
-      O dolar recuou de <strong>R$ 6,18 (jan/2025)</strong> para <strong>R$ 4,98 (mai/2026)</strong>, queda de 19,5% em 16 meses.
-      O real registrou a <strong>2a maior valorizacao entre 28 moedas emergentes</strong> no acumulado de 2026,
-      impulsionado por fluxo externo recorde e diferencial de juros elevado.
+      O cambio USD/BRL fechou o ultimo pregao em <strong>R$ <!--ULTIMA_PTAX_4--></strong> (<!--ULTIMA_DATA-->),
+      com a media de <!--MES_ATUAL--> em <strong>R$ <!--MEDIA_MES--></strong>. O grafico "Historico + Media Movel" mostra
+      a evolucao completa desde 2019 e a projecao por media movel para os proximos meses; a aba "Projecoes Institucionais"
+      traz o consenso de mercado (Boletim Focus) e de bancos/corretoras para o fechamento de 2026.
     </div>
   </div>
 
   <div class="an-grid">
     <div class="an-card positivo">
-      <div class="an-titulo"><span class="an-ico">&#9650;</span> Fatores que fortalecem o real</div>
+      <div class="an-titulo"><span class="an-ico">&#9650;</span> Fatores que sustentam o real</div>
       <div class="an-texto">
-        <strong>Diferencial de juros (carry trade):</strong> Com a Selic em 14,75% e o Fed entre 3,50-3,75%,
-        o spread real e um dos mais atrativos do mundo, atraindo capital estrangeiro para renda fixa brasileira.<br><br>
-        <strong>Fluxo externo recorde:</strong> Na semana de 20-24/abr, o Brasil registrou entrada liquida de
-        <strong>US$ 9,2 bilhoes</strong> &mdash; o maior ingresso semanal da historia (BTG Pactual/BCB).
-        Investidores estrangeiros representam 61,2% dos negocios da B3 em 2026, primeira vez acima de 60%.<br><br>
-        <strong>Commodities e geopolitica:</strong> O conflito no Oriente Medio manteve o petroleo acima de US$ 100,
-        beneficiando o Brasil como exportador. A XP classifica o Brasil como <em>"vencedor relativo"</em> no contexto geopolitico atual.<br><br>
-        <strong>Dolar global mais fraco:</strong> O indice DXY recuou ~9% em 2025.
-        Com o Fed cortando juros, o capital migra para emergentes com retorno superior.
+        <strong>Diferencial de juros (carry trade):</strong> Com a Selic em 14,75% bem acima da taxa do Fed (3,50-3,75%),
+        o spread real continua entre os mais atrativos do mundo, sustentando o carry trade e atraindo capital estrangeiro
+        para a renda fixa brasileira.<br><br>
+        <strong>Fluxo cambial:</strong> O Banco Central acompanha semanalmente as entradas e saidas de capital estrangeiro
+        (canal comercial + financeiro). Entradas liquidas elevadas tendem a apreciar o real; veja o detalhamento
+        atualizado na aba "Fluxo de Capital".<br><br>
+        <strong>Comercio exterior:</strong> superavits consistentes na balanca comercial (exportacoes acima de
+        importacoes) seguem como suporte estrutural ao cambio.<br><br>
+        <strong>Participacao estrangeira na B3:</strong> a presenca elevada de investidores nao residentes em renda
+        fixa e variavel ajuda a conter altas mais fortes do dolar.
       </div>
     </div>
 
@@ -787,12 +916,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <strong>Eleicoes presidenciais (out/2026):</strong> Anos eleitorais no Brasil seguem um padrao historico claro:
         1S calmo, 3T com pico de volatilidade, 4T com acomodacao pos-urnas.
         O Morgan Stanley projeta pico de <strong>R$ 5,60 no 3T26</strong> por conta desse risco.<br><br>
-        <strong>Risco fiscal:</strong> O aumento dos gastos em ano eleitoral preocupa o mercado.
+        <strong>Risco fiscal:</strong> o aumento dos gastos em ano eleitoral preocupa o mercado.
         Qualquer deterioracao nas contas publicas pode reverter o fluxo externo rapidamente.<br><br>
-        <strong>Reducao do diferencial de juros:</strong> A Selic em ciclo de queda estreita o spread com os EUA.
-        Se o corte for percebido como precipitado, o real perde atratividade.<br><br>
-        <strong>Inflacao importada:</strong> Petroleo caro e cambio mais forte criam pressoes opostas.
-        A XP aponta perspectivas inflacionarias que pioraram por fatores globais e domesticos.
+        <strong>Reducao do diferencial de juros:</strong> a Selic em eventual ciclo de queda estreita o spread com os EUA;
+        se o corte for percebido como precipitado, o real perde atratividade.<br><br>
+        <strong>Inflacao:</strong> a projecao do mercado para o IPCA de 2026 esta em <!--IPCA_PCT-->% no Boletim Focus mais recente
+        (ver card "IPCA 2026" acima) &mdash; pressoes inflacionarias persistentes podem condicionar o ritmo de corte da Selic
+        e a confianca no real.<br><br>
+        <strong>Cenario externo:</strong> conflitos geopoliticos e oscilacoes no preco do petroleo (Brent) tendem a
+        afetar a aversao a risco global e, por consequencia, moedas emergentes como o real.
       </div>
     </div>
 
@@ -826,7 +958,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <div class="inst-reason">
           <div class="inst-reason-header">
             <div class="inst-dot2" style="background:#888780"></div>
-            <span class="inst-nome">Focus BCB &mdash; R$ 5,17</span>
+            <span class="inst-nome">Focus BCB &mdash; R$ 5,17</span><!--FOCUS_BCB_TAG-->
             <span class="inst-proj">Mediana de mercado</span>
           </div>
           <div class="inst-reason-texto">Mediana de dezenas de instituicoes. Reflete o consenso geral que ve o real levemente apreciado, com upside limitado dado o contexto fiscal e eleitoral.</div>
@@ -861,30 +993,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="an-texto">
       O mercado financeiro tem revisado <strong>consistentemente para baixo</strong> a projecao do dolar para o fechamento de 2026.
       Nas ultimas quatro semanas, a mediana do Boletim Focus registrou queda continua:
-      <span style="font-weight:600;color:#0f7c4a;">&#8595; -0,08 (abr/2026 &rarr; 25/mai/2026)</span><br><br>
+      <span style="font-weight:600;color:#0f7c4a;">&#8595; -0,05 (18/mai/2026 &rarr; 08/jun/2026)</span><br><br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;align-items:center;">
         <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
-          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 4 sem.</div>
-          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,25</div>
-          <div style="font-size:10px;color:#9ca3af;">abr/2026</div>
-        </div>
-        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
-        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
-          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 2 sem.</div>
-          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
-          <div style="font-size:10px;color:#9ca3af;">11/mai/2026</div>
-        </div>
-        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
-        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
-          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 1 sem.</div>
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 3 sem.</div>
           <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,20</div>
           <div style="font-size:10px;color:#9ca3af;">18/mai/2026</div>
         </div>
         <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 2 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,17</div>
+          <div style="font-size:10px;color:#9ca3af;">25/mai/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
+        <div style="flex:1;min-width:110px;background:#fff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;text-align:center;">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Ha 1 sem.</div>
+          <div style="font-size:18px;font-weight:700;color:#374151;">R$ 5,16</div>
+          <div style="font-size:10px;color:#9ca3af;">01/jun/2026</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#9ca3af;">&#8594;</div>
         <div style="flex:1;min-width:110px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #3b82f6;border-radius:8px;padding:10px 14px;text-align:center;">
           <div style="font-size:10px;color:#1d4ed8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:700;">Mais recente</div>
-          <div style="font-size:20px;font-weight:700;color:#1d4ed8;">R$ 5,17</div>
-          <div style="font-size:10px;color:#3b82f6;font-weight:600;">25/mai/2026</div>
+          <div style="font-size:20px;font-weight:700;color:#1d4ed8;">R$ 5,15</div>
+          <div style="font-size:10px;color:#3b82f6;font-weight:600;">08/jun/2026</div>
         </div>
       </div>
       O movimento reflete o <strong>real mais forte que o esperado</strong> no acumulado de 2026,
@@ -940,14 +1072,7 @@ const CORES = {"Focus BCB":"#888780","XP Investimentos":"#e67e22","Bradesco":"#1
 const DATA_DIARIOS = %%DATA_DIARIOS_JSON%%;
 
 // Dados de moedas (EUR/USD, USD/CNY, GBP/USD) - ultimos 13 meses
-const MOEDAS = [
-  {par:"EUR/USD",nome:"Euro",atual:1.1340,var_mes:0.0180,pct_mes:1.61,var_ano:0.0990,pct_ano:9.56,var_12m:0.0760,pct_12m:7.19,
-   hist:[{m:"2025-05",v:1.0580},{m:"2025-06",v:1.0720},{m:"2025-07",v:1.0890},{m:"2025-08",v:1.1020},{m:"2025-09",v:1.0980},{m:"2025-10",v:1.1120},{m:"2025-11",v:1.1050},{m:"2025-12",v:1.0890},{m:"2026-01",v:1.0350},{m:"2026-02",v:1.0680},{m:"2026-03",v:1.0940},{m:"2026-04",v:1.1160},{m:"2026-05",v:1.1340}]},
-  {par:"USD/CNY",nome:"Yuan chines",atual:7.2340,var_mes:-0.0260,pct_mes:-0.36,var_ano:0.0540,pct_ano:0.75,var_12m:0.0140,pct_12m:0.19,
-   hist:[{m:"2025-05",v:7.2200},{m:"2025-06",v:7.2450},{m:"2025-07",v:7.2600},{m:"2025-08",v:7.2500},{m:"2025-09",v:7.2350},{m:"2025-10",v:7.2100},{m:"2025-11",v:7.2400},{m:"2025-12",v:7.2900},{m:"2026-01",v:7.1800},{m:"2026-02",v:7.2200},{m:"2026-03",v:7.2600},{m:"2026-04",v:7.2600},{m:"2026-05",v:7.2340}]},
-  {par:"GBP/USD",nome:"Libra esterlina",atual:1.2980,var_mes:0.0270,pct_mes:2.12,var_ano:0.0630,pct_ano:5.10,var_12m:0.0400,pct_12m:3.18,
-   hist:[{m:"2025-05",v:1.2580},{m:"2025-06",v:1.2710},{m:"2025-07",v:1.2850},{m:"2025-08",v:1.2920},{m:"2025-09",v:1.2860},{m:"2025-10",v:1.2940},{m:"2025-11",v:1.2880},{m:"2025-12",v:1.2710},{m:"2026-01",v:1.2350},{m:"2026-02",v:1.2590},{m:"2026-03",v:1.2740},{m:"2026-04",v:1.2710},{m:"2026-05",v:1.2980}]}
-];
+const MOEDAS = %%MOEDAS_JSON%%;
 
 // Dados de fluxo cambial (BCB SGS - estimativa)
 const FLUXO_HIST = [
@@ -956,7 +1081,8 @@ const FLUXO_HIST = [
   {m:"2025-10",e:35100,s:30400,saldo:4700},{m:"2025-11",e:30200,s:26900,saldo:3300},
   {m:"2025-12",e:28900,s:25700,saldo:3200},{m:"2026-01",e:32100,s:27300,saldo:4800},
   {m:"2026-02",e:29500,s:25100,saldo:4400},{m:"2026-03",e:34800,s:29200,saldo:5600},
-  {m:"2026-04",e:41200,s:32000,saldo:9200},{m:"2026-05",e:38600,s:30100,saldo:8500}
+  {m:"2026-04",e:41200,s:32000,saldo:9200},{m:"2026-05",e:78411,s:77668,saldo:743},
+  {m:"2026-06",e:18535,s:15947,saldo:2588,"semana":"01-05/jun (parcial)"}
 ];
 
 // Dados de fluxo por tipo — saldo liquido mensal (US$ milhoes)
@@ -975,7 +1101,8 @@ const FLUXO_TIPO = [
   {m:"2026-02", com_e:11200,com_s:9200,  fin_e:14000,fin_s:12400, ied_e:4300,ied_s:3500},
   {m:"2026-03", com_e:13200,com_s:10600, fin_e:16500,fin_s:14700, ied_e:5100,ied_s:3900},
   {m:"2026-04", com_e:15600,com_s:11400, fin_e:19600,fin_s:16400, ied_e:6000,ied_s:4200},
-  {m:"2026-05", com_e:14700,com_s:11300, fin_e:17400,fin_s:13600, ied_e:6500,ied_s:5100}
+  {m:"2026-05", com_e:28411,com_s:19759, fin_e:50000,fin_s:57909, ied_e:null,ied_s:null},
+  {m:"2026-06", com_e:5882,com_s:3808, fin_e:12653,fin_s:12139, ied_e:null,ied_s:null}
 ];
 
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -1180,19 +1307,19 @@ function renderFluxo(){
   let lbs,ent,sai,saldo;
   if(fluxoPeriodo==='ano'){
     const porAno={};
-    dados.forEach(d=>{const y=d.m.slice(0,4);if(!porAno[y])porAno[y]={e:0,s:0};porAno[y].e+=d.e;porAno[y].s+=d.s;});
+    dados.forEach(d=>{const y=d.m.slice(0,4);if(!porAno[y])porAno[y]={e:0,s:0};porAno[y].e+=(d.e||0);porAno[y].s+=(d.s||0);});
     const anos=Object.keys(porAno).sort();
     lbs=anos; ent=anos.map(y=>+(porAno[y].e/1000).toFixed(1));
     sai=anos.map(y=>+(porAno[y].s/1000).toFixed(1));
     saldo=anos.map(y=>+((porAno[y].e-porAno[y].s)/1000).toFixed(1));
   } else {
     lbs=dados.map(d=>nm(d.m));
-    ent=dados.map(d=>+(d.e/1000).toFixed(1));
-    sai=dados.map(d=>+(d.s/1000).toFixed(1));
+    ent=dados.map(d=>d.e==null?null:+(d.e/1000).toFixed(1));
+    sai=dados.map(d=>d.s==null?null:+(d.s/1000).toFixed(1));
     saldo=dados.map(d=>+(d.saldo/1000).toFixed(1));
   }
-  const totalE=ent.reduce((a,b)=>a+b,0).toFixed(1);
-  const totalS=sai.reduce((a,b)=>a+b,0).toFixed(1);
+  const totalE=ent.reduce((a,b)=>a+(b||0),0).toFixed(1);
+  const totalS=sai.reduce((a,b)=>a+(b||0),0).toFixed(1);
   const totalSaldo=+(totalE-totalS).toFixed(1);
   const label={'6m':'Ultimos 6 meses','12m':'Ultimos 12 meses','ano':'Por ano'}[fluxoPeriodo];
   const cards=document.getElementById('fluxo-cards');
@@ -1230,7 +1357,7 @@ function renderFluxoTipo(){
       if(!porAno[y]) porAno[y]={com_e:0,com_s:0,fin_e:0,fin_s:0,ied_e:0,ied_s:0};
       porAno[y].com_e+=d.com_e; porAno[y].com_s+=d.com_s;
       porAno[y].fin_e+=d.fin_e; porAno[y].fin_s+=d.fin_s;
-      porAno[y].ied_e+=d.ied_e; porAno[y].ied_s+=d.ied_s;
+      porAno[y].ied_e+=(d.ied_e||0); porAno[y].ied_s+=(d.ied_s||0);
     });
     const anos=Object.keys(porAno).sort();
     lbs=anos;
@@ -1241,7 +1368,7 @@ function renderFluxoTipo(){
     lbs=dados.map(function(d){ return nm(d.m); });
     com=dados.map(function(d){ return +((d.com_e-d.com_s)/1000).toFixed(1); });
     fin=dados.map(function(d){ return +((d.fin_e-d.fin_s)/1000).toFixed(1); });
-    ied=dados.map(function(d){ return +((d.ied_e-d.ied_s)/1000).toFixed(1); });
+    ied=dados.map(function(d){ return (d.ied_e==null||d.ied_s==null)?null:+((d.ied_e-d.ied_s)/1000).toFixed(1); });
   }
   chFluxoTipo=new Chart(document.getElementById('chFluxoTipo'),{
     type:'bar',
@@ -1314,7 +1441,8 @@ function renderFluxoTipo(){
 
 
 # ─── Gera o HTML substituindo apenas os dados dinamicos ────────────────────────
-def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
+def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None,
+               moedas=None, selic=None, ipca=None):
     agora       = datetime.today()
     ultima_data = ultimo["dataHoraCotacao"][:10]
     ultima_ptax = ultimo["cotacaoVenda"]
@@ -1336,9 +1464,21 @@ def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
 
     html = HTML_TEMPLATE
 
+    # 0. Analise de Mercado — placeholders dinamicos (mes/valores atuais, sem texto "manual")
+    html = html.replace("<!--MES_ATUAL-->", ml)
+    html = html.replace("<!--ULTIMA_PTAX-->", fmt_br(ultima_ptax, 2))
+    html = html.replace("<!--ULTIMA_PTAX_4-->", ultima_ptax_br)
+    html = html.replace("<!--ULTIMA_DATA-->", d_fmt)
+    html = html.replace("<!--MEDIA_MES-->", media_mes_br)
+
     # 1. Dados JS
     html = html.replace("%%DATA_JSON%%",  data_json)
     html = html.replace("%%SPROJ_JSON%%", sproj_json)
+
+    # 1c. MOEDAS — EUR/USD, GBP/USD, USD/CNY (Frankfurter/ECB; fallback se API falhar)
+    moedas_json = json.dumps(moedas if moedas is not None else FALLBACK_MOEDAS,
+                              ensure_ascii=False, separators=(",", ":"))
+    html = html.replace("%%MOEDAS_JSON%%", moedas_json)
 
     # 1b. DATA_DIARIOS — dados reais agrupados por mes com datas corretas
     if diarios_por_mes:
@@ -1470,9 +1610,12 @@ def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
         focus_dez   = focus_vals[-1] if focus_vals else None
         focus_dez_s = f"R$ {focus_dez:.2f}".replace(".", ",") if focus_dez else None
         ano_ref     = str(agora.year)
-        d_parts     = d_fmt.split("/")
-        mes_pt_fo   = MESES_PT[int(d_parts[1]) - 1]
-        focus_sub   = f"{d_parts[0]}/{mes_pt_fo}/{d_parts[2]}"
+        # Mesmo no fallback, o "Boletim Focus" e divulgado sempre numa segunda-feira —
+        # usar a data da PTAX (hoje) deixaria o subtitulo errado em qualquer dia que
+        # nao seja segunda. Calculamos a ultima segunda-feira a partir de hoje.
+        ultima_segunda = agora - timedelta(days=agora.weekday())
+        mes_pt_fo   = MESES_PT[ultima_segunda.month - 1]
+        focus_sub   = f"{ultima_segunda.day:02d}/{mes_pt_fo}/{ultima_segunda.year}"
     else:
         focus_dez_s = None
 
@@ -1495,6 +1638,46 @@ def gerar_html(mensal, ultimo, n_diarios, focus=None, diarios_por_mes=None):
             rf'\g<1>Boletim Focus BCB &middot; {focus_sub}\2',
             html, flags=re.DOTALL)
 
+        # 10d. Tag "R$ X,XX — resistencia Focus (dd/mm)" no card "monitorar"
+        focus_sub_curto = focus_sub[:6]  # "08/jun"
+        html = re.sub(
+            r'(<span class="tag tag-medio">)R\$ [\d,]+ &mdash; resistencia Focus \([^)]*\)(</span>)',
+            rf'\g<1>{focus_dez_s} &mdash; resistencia Focus ({focus_sub_curto})\2',
+            html)
+
+    # 11. Selic vigente (SGS 432) — card "monitorar" + mencoes na analise narrativa
+    if selic is not None:
+        selic_s = fmt_br(selic["valor"], 2)
+        d_selic = datetime.strptime(selic["data"], "%Y-%m-%d")
+        selic_sub = f"Vigente desde {d_selic.day:02d}/{MESES_PT[d_selic.month-1]}/{d_selic.year}"
+        html = re.sub(
+            r'(<div class="monitor-label">Selic</div><div class="monitor-val">)[\d,]+%(</div><div class="monitor-sub">)[^<]*(</div>)',
+            rf'\g<1>{selic_s}%\2{selic_sub}\3',
+            html)
+        # Mencao no card "Fatores que ainda sustentam o real"
+        html = re.sub(r'Selic em [\d,]+%', f'Selic em {selic_s}%', html)
+
+    # 12. IPCA 2026 (Expectativas/Focus) — card "monitorar" + mencao na analise
+    if ipca is not None:
+        ipca_s = fmt_br(ipca["mediana"], 2)
+        html = re.sub(
+            r'(<div class="monitor-label">IPCA 2026</div><div class="monitor-val">)[\d,]+%(</div>)',
+            rf'\g<1>{ipca_s}%\2',
+            html)
+        html = re.sub(r'IPCA 2026 projetado em [\d,]+%', f'IPCA 2026 projetado em {ipca_s}%', html)
+        html = html.replace("<!--IPCA_PCT-->", ipca_s)
+    else:
+        html = html.replace("<!--IPCA_PCT-->", "14,75")  # fallback hardcoded
+
+    # 13. "Focus BCB — R$ X,XX" no card de divergencia institucional (acompanha o card principal)
+    if focus_dez_s:
+        html = re.sub(
+            r'<span class="inst-nome">Focus BCB &mdash; R\$ [\d,]+</span><!--FOCUS_BCB_TAG-->',
+            f'<span class="inst-nome">Focus BCB &mdash; {focus_dez_s}</span>',
+            html)
+    else:
+        html = html.replace("<!--FOCUS_BCB_TAG-->", "")
+
     return html
 
 
@@ -1511,7 +1694,11 @@ if __name__ == "__main__":
         mensal, ultimo   = agrupar_por_mes(diarios)
         diarios_por_mes  = agrupar_diarios_por_mes(diarios, n_meses=12)
         focus            = buscar_focus()        # None se a API falhar
-        html             = gerar_html(mensal, ultimo, len(diarios), focus, diarios_por_mes)
+        moedas           = buscar_moedas()        # None se a API falhar
+        selic            = buscar_selic_atual()   # None se a API falhar
+        ipca             = buscar_expectativa_anual("IPCA")  # None se a API falhar
+        html             = gerar_html(mensal, ultimo, len(diarios), focus, diarios_por_mes,
+                                       moedas, selic, ipca)
 
         pasta   = os.path.dirname(os.path.abspath(__file__))
         caminho = os.path.join(pasta, ARQUIVO_HTML)
